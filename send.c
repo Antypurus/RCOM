@@ -3,6 +3,8 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <termios.h>
+#include <unistd.h>
+#include <signal.h>
 
 #define FLAG 0x7E
 #define ADDRS 0x03
@@ -13,7 +15,7 @@
 #define MODEMDEVICE "/dev/ttyS1"
 #define _POSIX_SOURCE 1 /* POSIX compliant source */
 #define FALSE 0
-#define TRUE 1	
+#define TRUE 1
 
 #define READ_FLAG 0
 #define READ_ADDR 1
@@ -23,8 +25,30 @@
 #define DONE_READING 5
 
 volatile int STOP=FALSE;
+volatile int HAS_RECEIVED = FALSE;
+unsigned int resend_counter = 0;
+
+unsigned int fdd;
+unsigned int *sd;
+
+void  ALARMhandler(int sig)
+{
+  if(HAS_RECEIVED==FALSE){
+  	if(resend_counter>=3){
+  		printf("Connection Timed Out\n");
+  		exit(-1);
+  	}else{
+  		send(fdd,sd,5);
+  		printf("Resent Packet, Attempt %d\n",resend_counter+1);
+  		resend_counter++;
+  		alarm(3);
+  	}
+  } 
+}
 
 void main(int argc,char** argv){
+	signal(SIGALRM, ALARMhandler);
+
 	unsigned char address = ADDRS;
 	unsigned char control = SET;
 
@@ -41,15 +65,15 @@ void main(int argc,char** argv){
 	int fd,c, res;
     struct termios oldtio,newtio;
     int i, sum = 0, speed = 0;
-    
-    if ( (argc < 2) || 
-  	     ((strcmp("/dev/ttyS0", argv[1])!=0) && 
+
+    if ( (argc < 2) ||
+  	     ((strcmp("/dev/ttyS0", argv[1])!=0) &&
   	      (strcmp("/dev/ttyS1", argv[1])!=0) )) {
       printf("Usage:\tnserial SerialPort\n\tex: nserial /dev/ttyS1\n");
       exit(1);
     }
 
-       fd = open(argv[1], O_RDWR | O_NOCTTY );
+       fd = open(argv[1], O_RDWR | O_NOCTTY);
     if (fd <0) {perror(argv[1]); exit(-1); }
 
     if ( tcgetattr(fd,&oldtio) == -1) { /* save current port settings */
@@ -68,8 +92,8 @@ void main(int argc,char** argv){
     newtio.c_cc[VTIME]    = 0;   /* inter-character timer unused */
     newtio.c_cc[VMIN]     = 5;   /* blocking read until 5 chars received */
 
-  /* 
-    VTIME e VMIN devem ser alterados de forma a proteger com um temporizador a 
+  /*
+    VTIME e VMIN devem ser alterados de forma a proteger com um temporizador a
     leitura do(s) próximo(s) caracter(es)
   */
 
@@ -81,9 +105,11 @@ void main(int argc,char** argv){
     }
 
     printf("New termios structure set\n");
-    
-    res = write(fd,control_frame,5);   
+
+    res = write(fd,control_frame,5);
     printf("%d bytes written\n", res);
+    fdd = fd;
+    sd = control_frame;
 
     printf("created controll frame:%s\n",control_frame);
 
@@ -92,8 +118,19 @@ void main(int argc,char** argv){
     unsigned char addr_r=0;
     unsigned char ctr_r =0;
 
+    unsigned int readd = 0;
+
     while(curr_state != DONE_READING){
-    	read(fd,&reade,1);
+    	alarm(3);
+    	
+    	readd = read(fd,&reade,1);
+
+ 		if(readd!=0){
+ 			alarm(0);
+ 			readd = 0,
+ 			HAS_RECEIVED = TRUE;
+ 		}
+
     	switch(curr_state){
     		case(READ_FLAG):{
     			if(reade == FLAG){
