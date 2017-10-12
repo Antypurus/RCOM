@@ -4,7 +4,9 @@
 #define _SERIAL_PROTOCOL
 
 #define MAX_FRAME_SIZE 100
-#define MAX_DATA_PER_FRAME 94
+#define MAX_DATA_PER_FRAME 47 //only 94 bytes of information can be sent and if all bytes of the message need to be sutted then 
+							  // it will go over the limit , to that degree we use 47 such that if all bytes need stuffing we will
+							  // be using 94 bytes for the stuffed data ensuring we do not go over the 100 byter per frame limit.
 
 //  The level field indicates wheter a function is used on the sender, the receptor or both
 
@@ -19,7 +21,7 @@
 
 	@return - the number of frames allocated
 */
-unsigned int allocateInformationFrames(unsigned char** buff,unsigned char data[]);
+unsigned int allocateInformationFrames(unsigned char** buff,const unsigned char data[]);
 
 /*
     Level:Sender
@@ -43,7 +45,7 @@ void deallocateInformationFrames(unsigned char** frames,unsigned int numberOfFra
 	@param dataSection - the section from the data that should be moved into the frame
 	@param numberOfSections - the number of sections the suplied data is divided into
 */
-void moveInformationToFrame(unsigned char* frame,unsigned char data[],unsigned int dataSection,unsigned int numberOfSections);
+void moveInformationToFrame(unsigned char* frame,const unsigned char data[],unsigned int dataSection,unsigned int numberOfSections);
 
 /*
 	Level:Sender
@@ -87,5 +89,18 @@ unsigned int openConnection(char* serialPort,unsgined unsigned int flags = 0);
 	@param fd - file descriptor of the serial port you want to disconect from
 */
 void closeConnection(unsigned int fd);
+
+/*
+	Level:Sender
+
+	This functions is responsible for byte stuffing the data in order for proper transfer over the serial port.
+	to do this is substitutes any byte with the value 0x7E(the frame flag) with the bytes 0x7D 0x5D (0x7E XOR 0x20)
+
+	@param data - the data that needs to be stuffed
+	@param sizeOfData - the initial size in bytes of the data, this value will be substituted with the size of the stuffed data
+
+	@return an array the data in its stuffed format
+*/
+unsigned char[] byteStuffingOnData(const unsigned char data[],unsigned int* sizeOfData);
 
 #endif
