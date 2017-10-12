@@ -19,7 +19,7 @@
 
 	@return - the number of frames allocated
 */
-unsigned int allocateInformationFrames(unsigned int** buff,unsigned int data[]);
+unsigned int allocateInformationFrames(unsigned char** buff,unsigned char data[]);
 
 /*
     Level:Sender
@@ -30,7 +30,7 @@ unsigned int allocateInformationFrames(unsigned int** buff,unsigned int data[]);
     
     @Param numberOfFrames - the number of frames inside the frame buffer , this value is returned by the prepareData function
 */
-void deallocateInformationFrames(unsigned int** frames,unsigned int numberOfFrames);
+void deallocateInformationFrames(unsigned char** frames,unsigned int numberOfFrames);
 
 /*
 	Level:Sender
@@ -43,7 +43,7 @@ void deallocateInformationFrames(unsigned int** frames,unsigned int numberOfFram
 	@param dataSection - the section from the data that should be moved into the frame
 	@param numberOfSections - the number of sections the suplied data is divided into
 */
-void moveInformationToFrame(unsigned int* frame,unsigned int data[],unsigned int dataSection,unsigned int numberOfSections);
+void moveInformationToFrame(unsigned char* frame,unsigned char data[],unsigned int dataSection,unsigned int numberOfSections);
 
 /*
 	Level:Sender
@@ -54,7 +54,18 @@ void moveInformationToFrame(unsigned int* frame,unsigned int data[],unsigned int
 	@param frames - the buffer of frames that need to be prepared
 	@param numberFrames - the ammount of frames in the buffer that should be prepared
 */
-void prepareInformationFrames(unsigned int** frames,unsigned int numberFrames);
+void prepareInformationFrames(unsigned char** frames,unsigned int numberFrames);
+
+/*
+	Level:Both
+
+	This function calculates the error checking block for a given array of data
+
+	@param data - the piece of data to calculate the BCC on
+
+	@return the error checking block (BCC)
+*/
+unsigned char calculateBCC2(const unsigned char data[]);
 
 /*
 	Level:Both
