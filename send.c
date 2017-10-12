@@ -70,7 +70,7 @@ void freeDataFrames(unsigned int**frames,unsigned int numberFrames){
 	return;
 }
 
-void modeDataToFrame(unsigned int* frame,unsigned int data[],unsigned int dataSection){
+void moveDataToFrame(unsigned int* frame,unsigned int data[],unsigned int dataSection){
 	return;
 }
 
