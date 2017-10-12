@@ -32,8 +32,28 @@ unsigned int allocateInformationFrames(unsigned int** buff,unsigned int data[]);
 */
 void deallocateInformationFrames(unsigned int** frames,unsigned int numberOfFrames);
 
+/*
+	Level:Sender
+
+	This Function moves a given section of the total data into the frame for transfer it also sets the error checker (BCC2)
+	after the move, this move is done with memmove as such should be safe.
+
+	@param frame - the frame the data is going to be moved to
+	@param data - the data to extract from
+	@param dataSection - the section from the data that should be moved into the frame
+	@param numberOfSections - the number of sections the suplied data is divided into
+*/
 void moveInformationToFrame(unsigned int* frame,unsigned int data[],unsigned int dataSection,unsigned int numberOfSections);
 
-void prepareInformationFrames(unsigned int** frames,unsigned int data[],unsigned int numberFrames)
+/*
+	Level:Sender
+
+	This function prepares a information transfer frame, it sets its flag bytes, the address byte, the command byte and
+	the error checking block 1(BCC1)
+
+	@param frames - the buffer of frames that need to be prepared
+	@param numberFrames - the ammount of frames in the buffer that should be prepared
+*/
+void prepareInformationFrames(unsigned int** frames,unsigned int numberFrames);
 
 #endif
