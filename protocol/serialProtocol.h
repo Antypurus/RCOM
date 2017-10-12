@@ -15,7 +15,7 @@
 	created.
 
 	@Param buff - buffer to store the frames
-	@Pram data - data to be transfered, used to calculate the number of frames required
+	@Param data - data to be transfered, used to calculate the number of frames required
 
 	@return - the number of frames allocated
 */
@@ -55,5 +55,26 @@ void moveInformationToFrame(unsigned int* frame,unsigned int data[],unsigned int
 	@param numberFrames - the ammount of frames in the buffer that should be prepared
 */
 void prepareInformationFrames(unsigned int** frames,unsigned int numberFrames);
+
+/*
+	Level:Both
+
+	This Function open the serial port and return its file descriptor
+
+	@param serialPort - the serial port you want to connect to
+	@param flags - the flags you want to use to open the file , if 0 is used the default values will be used
+
+	@return the file descriptor of the serial port specified
+*/
+unsigned int openConnection(char* serialPort,unsgined unsigned int flags = 0);
+
+/*
+	Level:Both
+
+	This function closes the connection to the specified file descriptor
+
+	@param fd - file descriptor of the serial port you want to disconect from
+*/
+void closeConnection(unsigned int fd);
 
 #endif
