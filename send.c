@@ -5,6 +5,8 @@
 #include <termios.h>
 #include <unistd.h>
 #include <signal.h>
+#include <Math.h>
+#include <stdlib.h>
 
 #define FLAG 0x7E
 #define ADDRS 0x03
@@ -24,6 +26,9 @@
 #define READ_FLAG_2 4
 #define DONE_READING 5
 
+#define MAX_FRAME_SIZE 100
+#define MAX_DATA_PER_FRAME 94
+
 volatile int STOP=FALSE;
 volatile int HAS_RECEIVED = FALSE;
 unsigned int resend_counter = 0;
@@ -31,9 +36,43 @@ unsigned int resend_counter = 0;
 unsigned int fdd;
 unsigned int *sd;
 
+/*
+	This function allocates the memory required to create and transfer the data frames, and then return the number of frames that were
+	created.
+
+	@Param buff - buffer to store the frames
+	@Pram data - data to be transfered
+
+	@return - the number of frames allocated
+*/
+unsigned int prepareData(unsigned int **buff,unsigned int data[]){
+	unsigned int numFrames = (unsigned int)floor(sizeof(data) / MAX_DATA_PER_FRAME); //determines hor many frames are required;
+	buff = (unsigned int**)malloc(sizeof(unsigned int*)*numFrames); //allocates a buffer for the frames
+	
+	for(unsigned int i = 0;i<numFrames;++i){
+		buff[i] = (unsigned int*)malloc(sizeof(unsigned int*)*MAX_FRAME_SIZE);//allocates the spach for each individual frame
+	}
+
+	return numFrames;
+}
+
+/*
+	This FUnction frees the memory allocated for the frames and the memory allocated for the frame buffer
+
+	@Param frames - the buffer where the frames are being kept
+	@Param numberFrames - the number of frames inside the frame buffer , this value is returned by the prepareData function
+*/
+void freeDataFrames(unsigned int**frames,unsigned int numberFrames){
+	for(unsigned int i = 0;i<numberFrames;++i){
+		free(frames[i]);// free the memory for each frame
+	}
+	free(frames);//free the frame buffer
+	return;
+}
+
 void  ALARMhandler(int sig)
 {
-  if(HAS_RECEIVED==FALSE){
+  if(HAS_RECEIVED==FALSE){  
   	if(resend_counter>=3){
   		printf("Connection Timed Out\n");
   		exit(-1);
