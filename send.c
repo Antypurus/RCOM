@@ -57,7 +57,7 @@ unsigned int prepareData(unsigned int **buff,unsigned int data[]){
 }
 
 /*
-	This FUnction frees the memory allocated for the frames and the memory allocated for the frame buffer
+	This Function frees the memory allocated for the frames and the memory allocated for the frame buffer
 
 	@Param frames - the buffer where the frames are being kept
 	@Param numberFrames - the number of frames inside the frame buffer , this value is returned by the prepareData function
@@ -67,6 +67,21 @@ void freeDataFrames(unsigned int**frames,unsigned int numberFrames){
 		free(frames[i]);// free the memory for each frame
 	}
 	free(frames);//free the frame buffer
+	return;
+}
+
+void modeDataToFrame(unsigned int* frame,unsigned int data[],unsigned int dataSection){
+	return;
+}
+
+void prepareFramesToSend_SENDER(unsigned int**frames,unsiged int data[],numberFrames){
+	for(unsigned int i = 0;i<numberFrames;++i){
+		frames[i][0] = FLAG;
+		frames[i][1] = ADDRS;
+		frames[i][2] = i%2;
+		frames[i][3] = frames[i][2] ^ frames[i][1];
+		modeDataToFrame(frames[i],data,i-1);
+	}
 	return;
 }
 
