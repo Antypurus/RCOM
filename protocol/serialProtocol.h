@@ -17,6 +17,7 @@ struct SEND_CONTROLL{
 	unsigned char** frames;
 	unsigned char* frameToSend;
 	unsigned int sendFrameNumber;
+	unsigned int currentlySendingNumber;
 }
 
 //  The level field indicates wheter a function is used on the sender, the receptor or both
@@ -128,6 +129,39 @@ unsigned char[] byteStuffingOnData(const unsigned char data[],unsigned int* size
 */
 unsigned char ReceptorResponseInterpreter(const unsigned char* receptorResponse);
 
+/*
+	Level:Sender
 
+	This Function sends a SET command frame to the receptor
+
+	@param fd - the file descriptor of the receptor
+
+	@return - 1 in case of success , 0 in case an error occurred.
+*/
+unsigned char sendSetCommand(unsigned int fd);
+
+/*
+	Level:Sender
+
+	This Function sends a DISC command frame to the receptor
+
+	@param fd - the file descriptor of the receptor
+
+	@return - 1 in case of success , 0 in case an error occurred.
+*/
+unsigned char sendDisconnectCommand(unsigned int fd);
+
+/*
+	Level:Sender
+
+	This Function sends data to the receptor, it internaly manages the division of
+	the data frames and waiting for proper response from the receptor
+
+	@param fd - the file descriptor of the receptor
+	@param data - data to be sent
+
+	@return - 1 in case of success , 0 in case an error occurred.
+*/
+unsigned char sendData(unsigned int fd,const unsigned char data[]);
 
 #endif
