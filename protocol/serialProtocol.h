@@ -120,8 +120,13 @@ unsigned char[] byteStuffingOnData(const unsigned char data[],unsigned int* size
 	This function interprets a response sent by the receptor and returns a value acordingly.To do this it uses a simple state machine
 
 	@param receptorResponse - the frame with the receptor response
+
+	@return wich type of responde the receptor sent:
+				1 - Positive ACK
+				0 - Unordered ACK
+				-1 - Rejection ACK
 */
-unsigned char ReceptorResponseInterpreter(const unsigned char* receptorResponse)
+unsigned char ReceptorResponseInterpreter(const unsigned char* receptorResponse);
 
 
 
