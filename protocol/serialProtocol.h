@@ -8,6 +8,17 @@
 							  // it will go over the limit , to that degree we use 47 such that if all bytes need stuffing we will
 							  // be using 94 bytes for the stuffed data ensuring we do not go over the 100 byter per frame limit.
 
+/*
+	Level:Sender
+
+	This struct is used to manage the frame sending protocol and dealing with the responsees from the receptor
+*/
+struct SEND_CONTROLL{
+	unsigned char** frames;
+	unsigned char* frameToSend;
+	unsigned int sendFrameNumber;
+}
+
 //  The level field indicates wheter a function is used on the sender, the receptor or both
 
 /*
@@ -102,5 +113,16 @@ void closeConnection(unsigned int fd);
 	@return an array the data in its stuffed format
 */
 unsigned char[] byteStuffingOnData(const unsigned char data[],unsigned int* sizeOfData);
+
+/*
+	Level:Sender
+
+	This function interprets a response sent by the receptor and returns a value acordingly.To do this it uses a simple state machine
+
+	@param receptorResponse - the frame with the receptor response
+*/
+unsigned char ReceptorResponseInterpreter(const unsigned char* receptorResponse)
+
+
 
 #endif
