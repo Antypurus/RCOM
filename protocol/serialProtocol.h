@@ -49,6 +49,17 @@ void deallocateInformationFrames(unsigned char** frames,unsigned int numberOfFra
 /*
 	Level:Sender
 
+	This function splits the data into chunks apropriate to send through the data frames
+
+	@param data - the data that must be divided
+
+	@return a buffer with the divided data chunks
+*/
+unsigned char** divideData(const unsigned char data[]);
+
+/*
+	Level:Sender
+
 	This Function moves a given section of the total data into the frame for transfer it also sets the error checker (BCC2)
 	after the move, this move is done with memmove as such should be safe.
 
