@@ -134,3 +134,47 @@ unsigned char calculateBCC2(const unsigned char data[]){
 
     return ret;
 }
+
+//Need to document and properly adapt the code
+unsigned int openConnection(char* serialPort,unsgined unsigned int flags = 0){
+    struct termios oldtio,newtio;
+    int i, sum = 0, speed = 0;
+
+    if ( 
+  	     ((strcmp("/dev/ttyS0", serialPort)!=0) &&
+  	      (strcmp("/dev/ttyS1", serialPort)!=0) )) {
+      printf("Usage:\tnserial SerialPort\n\tex: nserial /dev/ttyS1\n");
+      exit(1);
+    }
+
+    fd = open(serialPort, O_RDWR | O_NOCTTY);
+
+    if (fd <0) {perror(argv[1]); exit(-1); }
+
+    if ( tcgetattr(fd,&oldtio) == -1) { /* save current port settings */
+      perror("tcgetattr");
+      exit(-1);
+    }
+
+    bzero(&newtio, sizeof(newtio));
+    newtio.c_cflag = BAUDRATE | CS8 | CLOCAL | CREAD;
+    newtio.c_iflag = IGNPAR;
+    newtio.c_oflag = 0;
+
+    /* set input mode (non-canonical, no echo,...) */
+    newtio.c_lflag = 0;
+
+    newtio.c_cc[VTIME]    = 0;   /* inter-character timer unused */
+    newtio.c_cc[VMIN]     = 5;   /* blocking read until 5 chars received */
+
+    tcflush(fd, TCIOFLUSH);
+
+    if ( tcsetattr(fd,TCSANOW,&newtio) == -1) {
+      perror("tcsetattr");
+      exit(-1);
+    }
+
+    printf("New termios structure set\n");
+
+    return fd;
+}
