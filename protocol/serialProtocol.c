@@ -88,3 +88,12 @@ unsigned char** divideData(const unsigned char data[]){
 
     return buffer;
 }
+
+void moveInformationToFrame(unsigned char* frame,const unsigned char data[]){
+    if(sizeof(data)>MAX_DATA_PER_FRAME){
+        return; //The data is too big for this frame;
+    }
+
+    memmove(frame+4,data,sizeof(data));//moves the data to the data section of the frame
+    return;
+}

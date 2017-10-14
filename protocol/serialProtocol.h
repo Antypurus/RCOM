@@ -64,11 +64,9 @@ unsigned char** divideData(const unsigned char data[]);
 	after the move, this move is done with memmove as such should be safe.
 
 	@param frame - the frame the data is going to be moved to
-	@param data - the data to extract from
-	@param dataSection - the section from the data that should be moved into the frame
-	@param numberOfSections - the number of sections the suplied data is divided into
+	@param data - the data to move to the frame,this data must at most be of size MAX_DATA_PER_FRAME
 */
-void moveInformationToFrame(unsigned char* frame,const unsigned char data[],unsigned int dataSection,unsigned int numberOfSections);
+void moveInformationToFrame(unsigned char* frame,const unsigned char data[]);
 
 /*
 	Level:Sender
