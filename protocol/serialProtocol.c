@@ -40,7 +40,26 @@ void deallocateInformationFrames(unsigned char** frames,unsigned int numberOfFra
 }
 
 unsigned char** allocateCharBuffers(unsigned int numberOfBuffers,unsigned int dataPerBuffer){
+    //allocates the buffer of buffers
+    unsigned char** buffer = (unsigned char**)malloc(sizeof(unsigned char*)*numberOfBuffers);
 
+    if(buffer = NULL){
+        deallocatedCharBuffers(buffer,0);//deallocates the buffer of buffers at is not needed
+        return -1;//indicates there has been an error with the allocation
+    }
+
+    //allocate each individual buffer
+    for(unsigned int i=0;i<numberOfBuffers;++i){
+        buffer[i] = (unsigned char*)malloc(sizeof(unsigned char)*dataPerBuffer);
+
+        if(buffer[i]==NULL){
+            deallocatedCharBuffers(buffer,0);//deallocates the buffer of buffers at is not needed
+            return -1;//indicates there has been an error with the allocation
+        }
+
+    }
+
+    return buffer;
 }
 
 void deallocatedCharBuffers(unsigned char** buffers,unsigned int numberOfBuffers){
