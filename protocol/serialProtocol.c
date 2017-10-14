@@ -117,8 +117,8 @@ void moveDataToFrames(unsigned char** frames,const unsigned char data[],unsigned
     unsigned char info[][] = divideData(data);//obtain the data divided into chunks
 
     for(unsigned int i=0;i<numberFrames;++i){
-        moveInformationToFrame(frames[i],info[i]);
-        frames[i][MAX_FRAME_SIZE-2] = calculateBCC2(info[i]);
+        moveInformationToFrame(frames[i],info[i]);//moves the chunk of data into the frame
+        frames[i][MAX_FRAME_SIZE-2] = calculateBCC2(info[i]);//sets the BCC for the data chunk that was moved
     }
 
     return;
@@ -126,10 +126,10 @@ void moveDataToFrames(unsigned char** frames,const unsigned char data[],unsigned
 
 unsigned char calculateBCC2(const unsigned char data[]){
     unsigned char ret = 0;
-    unsigned int size = sizeof(data)/sizeof(unsigned char);
+    unsigned int size = sizeof(data)/sizeof(unsigned char);//determine the size of the data
 
     for(unsigned int i=0;i<size;++i){
-        ret = ret ^ data[i];
+        ret = ret ^ data[i];//calculate the XOR of the whole data
     }
 
     return ret;
