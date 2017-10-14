@@ -1,6 +1,7 @@
 #include<serialProtocol.h>
 #include<Math.h>
 #include<stdlib.h>
+#include<string.h>
 
 #define NULL 0
 
@@ -74,4 +75,16 @@ void deallocatedCharBuffers(unsigned char** buffers,unsigned int numberOfBuffers
 
 unsigned char** divideData(const unsigned char data[]){
     unsigned int size = (unsigned int)floor(sizeof(data)/MAX_DATA_PER_FRAME);//determine the size of the data
+    unsigned char** buffer = allocateCharBuffers(size,MAX_DATA_PER_FRAME);//allocates the required space for the data holders
+
+    if(buffer==-1){
+        return -1;//return an error code, meaning there was an error with the allocation
+    }
+
+    //moves each chunk of data to the buffers
+    for(unsigned int i=0;i<size;++i){
+        memmove(buffer[i],data+i*MAX_DATA_PER_FRAME,MAX_DATA_PER_FRAME);
+    }
+
+    return buffer;
 }
