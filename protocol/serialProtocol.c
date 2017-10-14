@@ -1,7 +1,11 @@
-#include<serialProtocol.h>
-#include<Math.h>
-#include<stdlib.h>
-#include<string.h>
+#include <serialProtocol.h>
+#include <Math.h>
+#include <stdlib.h>
+#include <string.h>
+#include <fcntl.h>
+#include <termios.h>
+#include <unistd.h>
+#include <signal.h>
 
 #define NULL 0
 
@@ -100,10 +104,33 @@ void moveInformationToFrame(unsigned char* frame,const unsigned char data[]){
 
 void prepareInformationFrames(unsigned char** frames,unsigned int numberFrames){
     for(unsigned int i=0;i<numberFrames;++i){
-        frames[i][0]=0;//FLAG
-        frames[i][1]=0;//ADDRS
-        frames[i][2]=0;//CTRL
-        frames[i][3]=0;//BCC1
-        frames[i][MAX_FRAME_SIZE-1]=0;//FLAG
+        frames[i][0]=FLAG;//FLAG
+        frames[i][1]=ADDRS;//ADDRS
+        frames[i][2]=((i%2)<<5);//CTRL
+        frames[i][3]=frames[i][1] ^ frames[i][2];//BCC1
+        frames[i][MAX_FRAME_SIZE-1]=FLAG;//FLAG
     }
+    return;
+}
+
+void moveDataToFrames(unsigned char** frames,const unsigned char data[],unsigned int numberOfFrames){
+    unsigned char info[][] = divideData(data);//obtain the data divided into chunks
+
+    for(unsigned int i=0;i<numberFrames;++i){
+        moveInformationToFrame(frames[i],info[i]);
+        frames[i][MAX_FRAME_SIZE-2] = calculateBCC2(info[i]);
+    }
+
+    return;
+}
+
+unsigned char calculateBCC2(const unsigned char data[]){
+    unsigned char ret = 0;
+    unsigned int size = sizeof(data)/sizeof(unsigned char);
+
+    for(unsigned int i=0;i<size;++i){
+        ret = ret ^ data[i];
+    }
+
+    return ret;
 }

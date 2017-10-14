@@ -3,6 +3,17 @@
 #ifndef _SERIAL_PROTOCOL
 #define _SERIAL_PROTOCOL
 
+#define FLAG 0x7E
+#define ADDRS 0x03
+#define SET 0x03
+#define ADDR2 0x01
+
+#define BAUDRATE B38400
+#define MODEMDEVICE "/dev/ttyS1"
+#define _POSIX_SOURCE 1 /* POSIX compliant source */
+#define FALSE 0
+#define TRUE 1
+
 #define MAX_FRAME_SIZE 100
 #define MAX_DATA_PER_FRAME 47 //only 94 bytes of information can be sent and if all bytes of the message need to be sutted then 
 							  // it will go over the limit , to that degree we use 47 such that if all bytes need stuffing we will
@@ -67,6 +78,9 @@ unsigned char** divideData(const unsigned char data[]);
 	@param data - the data to move to the frame,this data must at most be of size MAX_DATA_PER_FRAME
 */
 void moveInformationToFrame(unsigned char* frame,const unsigned char data[]);
+
+//DOCUMENTATION MISSING
+void moveDataToFrames(unsigned char** frames,const unsigned char data[],unsigned int numberOfFrames);
 
 /*
 	Level:Sender
