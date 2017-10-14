@@ -175,4 +175,10 @@ unsigned char sendDisconnectCommand(unsigned int fd);
 */
 unsigned char sendData(unsigned int fd,const unsigned char data[]);
 
+//DOCUMENTATION MISSING
+unsigned char** allocateCharBuffers(unsigned int numberOfBuffers,unsigned int dataPerBuffer);
+
+//DOCUMENTATION MISSING
+void deallocatedCharBuffers(unsigned char** buffers,unsigned int numberOfBuffers);
+
 #endif

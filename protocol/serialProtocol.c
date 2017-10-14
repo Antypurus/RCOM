@@ -38,3 +38,21 @@ void deallocateInformationFrames(unsigned char** frames,unsigned int numberOfFra
     free(frames);
     return;
 }
+
+unsigned char** allocateCharBuffers(unsigned int numberOfBuffers,unsigned int dataPerBuffer){
+
+}
+
+void deallocatedCharBuffers(unsigned char** buffers,unsigned int numberOfBuffers){
+    //dealocates the memory space of each buffer
+    for(unsigned int i=0:i<numberOfFrames){
+        free(buffers[i]);
+    }
+    //delocates the buffer of buffers
+    free(buffers);
+    return;
+}
+
+unsigned char** divideData(const unsigned char data[]){
+    unsigned int size = (unsigned int)floor(sizeof(data)/MAX_DATA_PER_FRAME);//determine the size of the data
+}
