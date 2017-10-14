@@ -97,3 +97,13 @@ void moveInformationToFrame(unsigned char* frame,const unsigned char data[]){
     memmove(frame+4,data,sizeof(data));//moves the data to the data section of the frame
     return;
 }
+
+void prepareInformationFrames(unsigned char** frames,unsigned int numberFrames){
+    for(unsigned int i=0;i<numberFrames;++i){
+        frames[i][0]=0;//FLAG
+        frames[i][1]=0;//ADDRS
+        frames[i][2]=0;//CTRL
+        frames[i][3]=0;//BCC1
+        frames[i][MAX_FRAME_SIZE-1]=0;//FLAG
+    }
+}
