@@ -212,3 +212,14 @@ unsigned char* byteStuffingOnData(const unsigned char data[],unsigned int* sizeO
     *sizeOfData = postSize;
     return buffer[0];
 }
+
+//NEEDS TO BE DOCUMENTED
+unsigned char ReceptorResponseInterpreter(const unsigned char* receptorResponse){
+    unsigned int currntState = FLAG_STR;
+
+    for(unsigned int i=0;i<5;++i){
+
+    }
+
+    return ERR;//error code
+}

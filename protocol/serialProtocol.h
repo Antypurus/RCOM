@@ -14,6 +14,17 @@
 #define FALSE 0
 #define TRUE 1
 
+#define FLAG_STR 0
+#define ADDR 1
+#define CTRL 2
+#define BCC 3
+#define FLAG_END 4
+
+#define UA 0
+#define REJ -1
+#define ACPT 1
+#define ERR -2
+
 #define MAX_FRAME_SIZE 100
 #define MAX_DATA_PER_FRAME 47 //only 94 bytes of information can be sent and if all bytes of the message need to be sutted then 
 							  // it will go over the limit , to that degree we use 47 such that if all bytes need stuffing we will
