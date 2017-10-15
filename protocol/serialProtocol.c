@@ -189,7 +189,7 @@ void closeConnection(unsigned int fd){
     close(fd);
 }
 
-//NEED TO DOCUMENT
+//NEED TO DOCUMENT - MISSING ERROR CHECKING
 unsigned char* byteStuffingOnData(const unsigned char data[],unsigned int* sizeOfData){
     unsigned int originalSize = *sizeOfData;
     unsigned int postSize = originalSize;
