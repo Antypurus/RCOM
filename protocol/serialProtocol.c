@@ -188,3 +188,27 @@ void closeConnection(unsigned int fd){
   
     close(fd);
 }
+
+//NEED TO DOCUMENT
+unsigned char* byteStuffingOnData(const unsigned char data[],unsigned int* sizeOfData){
+    unsigned int originalSize = *sizeOfData;
+    unsigned int postSize = originalSize;
+
+    unsigned char** buffer = allocateCharBuffers(1,originalSize*2);// we really should not use this but as a barebones implementation it can pass
+
+    unsigned int currIndice = 0;
+    for(unsigned int i=0;i<originalSize;++i){
+        if(data[i]==0x7E){
+            buffer[0][currIndice] = 0x7D;
+            buffer[0][++currIndice] = 0x5D;
+            postSize++;
+        }else{
+            buffer[0][currIndice] = data[i];
+        }
+        currIndice++;
+    }
+
+    realloc(buffer[0],postSize);
+    *sizeOfData = postSize;
+    return buffer[0];
+}
