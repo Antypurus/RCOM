@@ -1,4 +1,4 @@
-#include <serialProtocol.h>
+#include "serialProtocol.h"
 #include <Math.h>
 #include <stdlib.h>
 #include <string.h>
@@ -137,17 +137,18 @@ unsigned char calculateBCC2(const unsigned char data[]){
 
 //Need to document and properly adapt the code
 unsigned int openConnection(char* serialPort,unsgined unsigned int flags = 0){
-    struct termios oldtio,newtio;
-    int i, sum = 0, speed = 0;
-
-    if ( 
-  	     ((strcmp("/dev/ttyS0", serialPort)!=0) &&
-  	      (strcmp("/dev/ttyS1", serialPort)!=0) )) {
+    
+    if ( ((strcmp("/dev/ttyS0", serialPort)!=0) && (strcmp("/dev/ttyS1", serialPort)!=0) )) {
       printf("Usage:\tnserial SerialPort\n\tex: nserial /dev/ttyS1\n");
       exit(1);
     }
 
-    fd = open(serialPort, O_RDWR | O_NOCTTY);
+    unsigned int fd;
+    if(flags=0){
+        fd = open(serialPort, O_RDWR | O_NOCTTY);
+    }else{
+        fd = open(serialPort,flags);
+    }
 
     if (fd <0) {perror(argv[1]); exit(-1); }
 
@@ -177,4 +178,13 @@ unsigned int openConnection(char* serialPort,unsgined unsigned int flags = 0){
     printf("New termios structure set\n");
 
     return fd;
+}
+
+void closeConnection(unsigned int fd){
+    if ( tcsetattr(fd,TCSANOW,&oldtio) == -1) {
+        perror("tcsetattr");
+        exit(-1);
+      }
+  
+    close(fd);
 }

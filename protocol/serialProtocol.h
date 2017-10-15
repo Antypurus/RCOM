@@ -19,6 +19,8 @@
 							  // it will go over the limit , to that degree we use 47 such that if all bytes need stuffing we will
 							  // be using 94 bytes for the stuffed data ensuring we do not go over the 100 byter per frame limit.
 
+struct termios oldtio,newtio; //structures with the information about the serial port pipe connection
+
 /*
 	Level:Sender
 
