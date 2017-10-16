@@ -19,16 +19,26 @@
 #define CTRL 2
 #define BCC 3
 #define FLAG_END 4
+#define DONE_PROC 5
 
-#define UA 0
+/*
+	Response types calculated for each of the 2 possible frame parities, 0 or 1
+*/
+#define REJ1 0x81
+#define REJ0 0x01
+#define RR0 0x05
+#define RR1 0x85
+#define UA 0x07
+
+#define UA_R 0
 #define REJ -1
 #define ACPT 1
 #define ERR -2
 
-#define MAX_FRAME_SIZE 100
-#define MAX_DATA_PER_FRAME 47 //only 94 bytes of information can be sent and if all bytes of the message need to be sutted then 
-							  // it will go over the limit , to that degree we use 47 such that if all bytes need stuffing we will
-							  // be using 94 bytes for the stuffed data ensuring we do not go over the 100 byter per frame limit.
+#define MAX_FRAME_SIZE 206
+#define MAX_DATA_PER_FRAME 100 //only 94 bytes of information can be sent and if all bytes of the message need to be sutted then 
+							   // it will go over the limit , to that degree we use 47 such that if all bytes need stuffing we will
+							   // be using 94 bytes for the stuffed data ensuring we do not go over the 100 byter per frame limit.
 
 struct termios oldtio,newtio; //structures with the information about the serial port pipe connection
 
@@ -42,7 +52,10 @@ struct SEND_CONTROLL{
 	unsigned char* frameToSend;
 	unsigned int sendFrameNumber;
 	unsigned int currentlySendingNumber;
+	unsigned char currPar;
 }
+
+struct SEND_CONTROLL g_ctrl;//global controll structure for the protocol to use
 
 //  The level field indicates wheter a function is used on the sender, the receptor or both
 

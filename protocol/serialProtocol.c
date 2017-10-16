@@ -198,7 +198,7 @@ unsigned char* byteStuffingOnData(const unsigned char data[],unsigned int* sizeO
 
     unsigned int currIndice = 0;
     for(unsigned int i=0;i<originalSize;++i){
-        if(data[i]==0x7E){
+        if(data[i]==0x7E || data[i]==0x7D){
             buffer[0][currIndice] = 0x7D;
             buffer[0][++currIndice] = 0x5D;
             postSize++;
@@ -216,9 +216,89 @@ unsigned char* byteStuffingOnData(const unsigned char data[],unsigned int* sizeO
 //NEEDS TO BE DOCUMENTED
 unsigned char ReceptorResponseInterpreter(const unsigned char* receptorResponse){
     unsigned int currntState = FLAG_STR;
+    unsigned int responseType;
 
     for(unsigned int i=0;i<5;++i){
+        switch(currntState){
 
+            case(FLAG_STR):{
+                if(receptorResponse[i]==FLAG){
+                    currntState = ADDR
+                }else{
+                    return ERR;
+                }
+                break;
+            }
+
+            case(ADDR):{
+                if(receptorResponse[i]==ADDR2){
+                    currntState = CTRL;
+                }else{
+                    return ERR;
+                }
+                break;
+            }
+
+            case(CTRL):{
+                if(g_ctrl.currPar==0){
+                    if(receptorResponse[i]==UA){
+                        responseType = UA_R;
+                        currntState = BCC;
+                        break;
+                    }else if(receptorResponse[i]==RR0){
+                        responseType = ACPT;
+                        currntState = BCC;
+                        break;
+                    }else if(receptorResponse[i]==REJ0){
+                        responseType = REJ;
+                        currntState = BCC;
+                        break;
+                    }else{
+                        return ERR;
+                    }
+                }else if(g_ctrl.currPar==1){
+                    if(receptorResponse[i]==UA){
+                        responseType = UA_R;
+                        currntState = BCC;
+                        break;
+                    }else if(receptorResponse[i]==RR1){
+                        responseType = ACPT;
+                        currntState = BCC;
+                        break;
+                    }else if(receptorResponse[i]==REJ1){
+                        responseType = REJ;
+                        currntState = BCC;
+                        break;
+                    }else{
+                        return ERR;
+                    }
+                }
+                break;
+            }
+
+            case(BCC):{
+                if(receptorResponse[i]==(receptorResponse[i-1]^receptorResponse[i-2])){
+                    currntState = FLAG_END;
+                    break;
+                }else{
+                    return ERR;
+                }
+            }
+
+            case(FLAG_END):{
+                if(receptorResponse[i]==FLAG){
+                    currntState = DONE_PROC;                                      
+                }else{
+                    return ERR;
+                }
+            }
+
+            default:break;
+        }
+    }
+
+    if( currntState == DONE_PROC){
+        return responseType;
     }
 
     return ERR;//error code
