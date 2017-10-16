@@ -152,7 +152,7 @@ unsigned int openConnection(char* serialPort,unsgined unsigned int flags = 0){
 
     unsigned int fd;
     if(flags=0){
-        fd = open(serialPort, O_RDWR | O_NOCTTY);
+        fd = open(serialPort, O_RDWR | O_NOCTTY | O_NONBLOCK);
     }else{
         fd = open(serialPort,flags);
     }
@@ -314,7 +314,9 @@ char ReceptorResponseInterpreter(const unsigned char* receptorResponse){
 //NEEDS TO BE COMMENTED
 unsigned char sendSetCommand(unsigned int fd){
     g_ctrl.currPar = 0;
+    g_ctrl.retryCounter = 0;
 
+    //configures a buffer with the information for the set command
     unsigned char buffer[5];
     buffer[0] = FLAG;
     buffer[1] = ADDR;
@@ -322,9 +324,23 @@ unsigned char sendSetCommand(unsigned int fd){
     buffer[3] = buffer[1] ^ buffer[2];
     buffer[4] = FLAG;
 
-    unsigned int res = write(fd,buffer,5);
-    if(res==5){
-        return 1;
+    unsigned int res = write(fd,buffer,5);//writes to pipe the set command in the buffer
+
+    if(res==5){//if it wrote the whole buffer it will now atemp to read the confirmation for the receptor
+        res = 0;
+        alarm(TIMEOUT);//sets an alarm with the timeout value , to manage connection timeouts
+        while(res==0){
+            res = read(fd,buffer,5);
+            if(res==5){// if it reads it disables the alarms and marks the connection as successful and returns 1
+                alarm(0);
+                g_ctrl.hasTimesOut = FALSE;
+                g_ctrl.retryCounter = 0;
+                return 1;
+            }
+            if(g_ctrl.hasTimesOut){// if the connection is marked as timed out 0 is returned
+                return 0;
+            }
+        }
     }else{
         return 0;
     }
@@ -332,6 +348,8 @@ unsigned char sendSetCommand(unsigned int fd){
 }
 
 unsigned char sendDisconnectCommand(unsigned int fd){
+    g_ctrl.retryCounter = 0;
+
     unsigned char buffer[5];
     buffer[0] = FLAG;
     buffer[1] = ADDR;
@@ -341,7 +359,8 @@ unsigned char sendDisconnectCommand(unsigned int fd){
 
     unsigned int res = write(fd,buffer,5);
     if(res==5){
-        return 1;
+        //need to wait for response from the receptor
+
     }else{
         return 0;
     }
@@ -354,4 +373,15 @@ unsigned char sendData(unsigned int fd,const unsigned char data[]){
     unsigned int nFrames = allocateInformationFrames(frames,data);
     prepareInformationFrames(frames,nFrames);
     
+}
+
+void timeoutHandler(int sig){
+    if(g_ctrl.retryCounter>=MAX_TIMEOUT){
+        printf("Conection Timeout\n");
+        g_ctrl.hasTimesOut = TRUE;
+        return;
+    }else{
+        printf("Retrying Connection ... Attempt %d\n",g_ctrl.retryCounter+1);
+        alarm(TIMEOUT);
+    }
 }

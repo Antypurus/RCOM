@@ -14,6 +14,8 @@
 #define _POSIX_SOURCE 1 /* POSIX compliant source */
 #define FALSE 0
 #define TRUE 1
+#define TIMEOUT 3
+#define MAX_TIMEOUT 3
 
 #define FLAG_STR 0
 #define ADDR 1
@@ -49,11 +51,10 @@ struct termios oldtio,newtio; //structures with the information about the serial
 	This struct is used to manage the frame sending protocol and dealing with the responsees from the receptor
 */
 struct SEND_CONTROLL{
-	unsigned char** frames;
 	unsigned char* frameToSend;
-	unsigned int sendFrameNumber;
-	unsigned int currentlySendingNumber;
 	unsigned char currPar;
+	unsigned char retryCounter;
+	unsigned char hasTimedOut;
 }
 
 struct SEND_CONTROLL g_ctrl;//global controll structure for the protocol to use
@@ -219,5 +220,8 @@ unsigned char** allocateCharBuffers(unsigned int numberOfBuffers,unsigned int da
 
 //DOCUMENTATION MISSING
 void deallocatedCharBuffers(unsigned char** buffers,unsigned int numberOfBuffers);
+
+//DOCUMENTATION MISSING
+void timeoutHandler(int sig);
 
 #endif
