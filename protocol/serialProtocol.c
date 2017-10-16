@@ -303,3 +303,43 @@ char ReceptorResponseInterpreter(const unsigned char* receptorResponse){
 
     return ERR;//error code
 }
+
+//NEEDS TO BE COMMENTED
+unsigned char sendSetCommand(unsigned int fd){
+    unsigned char buffer[5];
+    buffer[0] = FLAG;
+    buffer[1] = ADDR;
+    buffer[2] = SET;
+    buffer[3] = buffer[1] ^ buffer[2];
+    buffer[4] = FLAG;
+
+    unsigned int res = write(fd,buffer,5);
+    if(res==5){
+        return 1;
+    }else{
+        return 0;
+    }
+    return 0;
+}
+
+unsigned char sendDisconnectCommand(unsigned int fd){
+    unsigned char buffer[5];
+    buffer[0] = FLAG;
+    buffer[1] = ADDR;
+    buffer[2] = DISC;
+    buffer[3] = buffer[1] ^ buffer[2];
+    buffer[4] = FLAG;
+
+    unsigned int res = write(fd,buffer,5);
+    if(res==5){
+        return 1;
+    }else{
+        return 0;
+    }
+    return 0;
+}
+
+//NEEDS COMMENTING
+unsigned char sendData(unsigned int fd,const unsigned char data[]){
+
+}

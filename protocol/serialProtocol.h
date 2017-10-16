@@ -7,6 +7,7 @@
 #define ADDRS 0x03
 #define SET 0x03
 #define ADDR2 0x01
+#define DISC 0x0B
 
 #define BAUDRATE B38400
 #define MODEMDEVICE "/dev/ttyS1"
@@ -209,7 +210,7 @@ unsigned char sendDisconnectCommand(unsigned int fd);
 	@param fd - the file descriptor of the receptor
 	@param data - data to be sent
 
-	@return - 1 in case of success , 0 in case an error occurred.
+	@return - ammount sent in case of success , 0 in case an error occurred.
 */
 unsigned char sendData(unsigned int fd,const unsigned char data[]);
 
