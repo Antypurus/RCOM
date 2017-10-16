@@ -104,9 +104,16 @@ void moveInformationToFrame(unsigned char* frame,const unsigned char data[]){
 
 void prepareInformationFrames(unsigned char** frames,unsigned int numberFrames){
     for(unsigned int i=0;i<numberFrames;++i){
+        
+        if(g_ctrl.currPar==0){
+            g_ctrl.currPar = 1;
+        }else{
+            g_ctrl.currPar = 0;
+        }
+
         frames[i][0]=FLAG;//FLAG
         frames[i][1]=ADDRS;//ADDRS
-        frames[i][2]=((i%2)<<5);//CTRL
+        frames[i][2]=g_ctrl.currPar;//CTRL
         frames[i][3]=frames[i][1] ^ frames[i][2];//BCC1
         frames[i][MAX_FRAME_SIZE-1]=FLAG;//FLAG
     }
@@ -306,6 +313,8 @@ char ReceptorResponseInterpreter(const unsigned char* receptorResponse){
 
 //NEEDS TO BE COMMENTED
 unsigned char sendSetCommand(unsigned int fd){
+    g_ctrl.currPar = 0;
+
     unsigned char buffer[5];
     buffer[0] = FLAG;
     buffer[1] = ADDR;
@@ -341,5 +350,8 @@ unsigned char sendDisconnectCommand(unsigned int fd){
 
 //NEEDS COMMENTING
 unsigned char sendData(unsigned int fd,const unsigned char data[]){
-
+    unsigned char**frames;
+    unsigned int nFrames = allocateInformationFrames(frames,data);
+    prepareInformationFrames(frames,nFrames);
+    
 }
