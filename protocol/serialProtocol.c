@@ -346,9 +346,12 @@ unsigned char sendSetCommand(unsigned int fd){
     unsigned int res = write(fd,buffer,5);//writes to pipe the set command in the buffer
 
     if(res==5){//if it wrote the whole buffer it will now atemp to read the confirmation for the receptor
-        buffer = getReceptorResponse(fd);
-        unsigned int rez = ReceptorResponseInterpreter(buffer);
-        if(rez == UA_R){
+        buffer = getReceptorResponse(fd);//get the response with the possibility of timeout
+        if(buffer==0){
+            return 0;
+        }
+        unsigned int rez = ReceptorResponseInterpreter(buffer);//check response type
+        if(rez == UA_R){//if correct response type return 1
             return 1;
         }else{
             return 0;
@@ -371,8 +374,16 @@ unsigned char sendDisconnectCommand(unsigned int fd){
 
     unsigned int res = write(fd,buffer,5);
     if(res==5){
-        //need to wait for response from the receptor
-
+        buffer = getReceptorResponse(fd);//get the response with the possibility of timeout
+        if(buffer==0){
+            return 0;
+        }
+        unsigned int rez = ReceptorResponseInterpreter(buffer);//check response type
+        if(rez == UA_R){//if correct response type return 1
+            return 1;
+        }else{
+            return 0;
+        }
     }else{
         return 0;
     }
