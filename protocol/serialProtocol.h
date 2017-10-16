@@ -224,4 +224,7 @@ void deallocatedCharBuffers(unsigned char** buffers,unsigned int numberOfBuffers
 //DOCUMENTATION MISSING
 void timeoutHandler(int sig);
 
+//DOCUMENTATION MISSING
+unsigned char* getReceptorResponse(unsigned int fd);
+
 #endif

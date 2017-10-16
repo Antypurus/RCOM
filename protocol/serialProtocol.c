@@ -312,6 +312,25 @@ char ReceptorResponseInterpreter(const unsigned char* receptorResponse){
 }
 
 //NEEDS TO BE COMMENTED
+unsigned char* getReceptorResponse(unsigned int fd){
+    unsigned int res = 0;
+    unsigned char buffer[5];
+    alarm(TIMEOUT);//sets an alarm with the timeout value , to manage connection timeouts
+    while(res==0){
+        res = read(fd,buffer,5);
+        if(res==5){// if it reads it disables the alarms and marks the connection as successful and returns 1
+            alarm(0);
+            g_ctrl.hasTimesOut = FALSE;
+            g_ctrl.retryCounter = 0;
+            return buffer;
+        }
+        if(g_ctrl.hasTimesOut){// if the connection is marked as timed out 0 is returned
+            return 0;
+        }
+    }
+}
+
+//NEEDS TO BE COMMENTED
 unsigned char sendSetCommand(unsigned int fd){
     g_ctrl.currPar = 0;
     g_ctrl.retryCounter = 0;
@@ -327,19 +346,12 @@ unsigned char sendSetCommand(unsigned int fd){
     unsigned int res = write(fd,buffer,5);//writes to pipe the set command in the buffer
 
     if(res==5){//if it wrote the whole buffer it will now atemp to read the confirmation for the receptor
-        res = 0;
-        alarm(TIMEOUT);//sets an alarm with the timeout value , to manage connection timeouts
-        while(res==0){
-            res = read(fd,buffer,5);
-            if(res==5){// if it reads it disables the alarms and marks the connection as successful and returns 1
-                alarm(0);
-                g_ctrl.hasTimesOut = FALSE;
-                g_ctrl.retryCounter = 0;
-                return 1;
-            }
-            if(g_ctrl.hasTimesOut){// if the connection is marked as timed out 0 is returned
-                return 0;
-            }
+        buffer = getReceptorResponse(fd);
+        unsigned int rez = ReceptorResponseInterpreter(buffer);
+        if(rez == UA_R){
+            return 1;
+        }else{
+            return 0;
         }
     }else{
         return 0;
