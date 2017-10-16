@@ -176,7 +176,7 @@ unsigned char[] byteStuffingOnData(const unsigned char data[],unsigned int* size
 				0 - Unordered ACK
 				-1 - Rejection ACK
 */
-unsigned char ReceptorResponseInterpreter(const unsigned char* receptorResponse);
+char ReceptorResponseInterpreter(const unsigned char* receptorResponse);
 
 /*
 	Level:Sender

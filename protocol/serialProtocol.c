@@ -214,7 +214,7 @@ unsigned char* byteStuffingOnData(const unsigned char data[],unsigned int* sizeO
 }
 
 //NEEDS TO BE DOCUMENTED
-unsigned char ReceptorResponseInterpreter(const unsigned char* receptorResponse){
+char ReceptorResponseInterpreter(const unsigned char* receptorResponse){
     unsigned int currntState = FLAG_STR;
     unsigned int responseType;
 
