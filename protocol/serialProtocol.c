@@ -23,7 +23,11 @@ unsigned int allocateInformationFrames(unsigned char** buff,const unsigned char 
 
     //this allocates the space required to send the data inside each frame
     for(unsigned int i=0;i<size:++i){
-        buff[i] = (unsigned char*)malloc(sizeof(unsigned char)*MAX_FRAME_SIZE);
+        if(size>1){
+            buff[i] = (unsigned char*)malloc(sizeof(unsigned char)*MAX_FRAME_SIZE);
+        }else{
+            buff[i] = (unsigned char*)malloc(sizeof(unsigned char)*(sizeof(data)+6));
+        }
 
         if(buff[i]==NULL){
             deallocateInformationFrames(buff,i);//since the was an error everything must be dealocated
@@ -124,7 +128,8 @@ void moveDataToFrames(unsigned char** frames,const unsigned char data[],unsigned
     unsigned char info[][] = divideData(data);//obtain the data divided into chunks
 
     for(unsigned int i=0;i<numberFrames;++i){
-        moveInformationToFrame(frames[i],info[i]);//moves the chunk of data into the frame
+        unsigned char*suffed = byteStuffingOnData(info[i],sizeof(info[i]));
+        moveInformationToFrame(frames[i],suffed[i]);//moves the chunk of data into the frame
         frames[i][MAX_FRAME_SIZE-2] = calculateBCC2(info[i]);//sets the BCC for the data chunk that was moved
     }
 
@@ -374,14 +379,16 @@ unsigned char sendDisconnectCommand(unsigned int fd){
 
     unsigned int res = write(fd,buffer,5);
     if(res==5){
-        buffer = getReceptorResponse(fd);//get the response with the possibility of timeout
-        if(buffer==0){
+        unsigned char *buff = getReceptorResponse(fd);//get the response with the possibility of timeout
+        if(buff==0){
             return 0;
         }
-        unsigned int rez = ReceptorResponseInterpreter(buffer);//check response type
+        unsigned int rez = ReceptorResponseInterpreter(buff);//check response type
         if(rez == UA_R){//if correct response type return 1
+            free(buff);
             return 1;
         }else{
+            free(buff);
             return 0;
         }
     }else{
@@ -395,7 +402,58 @@ unsigned char sendData(unsigned int fd,const unsigned char data[]){
     unsigned char**frames;
     unsigned int nFrames = allocateInformationFrames(frames,data);
     prepareInformationFrames(frames,nFrames);
-    
+    moveDataToFrames(frames,data,nFrames);
+    //the frames are now ready to be sent
+
+    for(unsigned int i=0;i<nFrames;++i){
+        unsigned int sent = write(fd,frames[i],sizeof(frames[i]));
+        if(sent==0){
+            printf("Connection Error Unable To Senda Data\n");
+            return 0;
+        }
+        unsigned char* buf = getReceptorResponse(fd);
+        if(buf==0){
+            return 0;
+        }
+        unsigned int rez = ReceptorResponseInterpreter(buf);
+
+        if(g_ctrl.currPar==1){
+            while(rez==REJ1){
+                free(buf);
+                buf = getReceptorResponse(fd);
+                if(buf==0){
+                    return 0;
+                }
+                rez = ReceptorResponseInterpreter(buf);
+            }
+            if(rez==RR1){
+                return sent;
+            }
+        }else{
+            while(rez==REJ0){
+                free(buf);
+                buf = getReceptorResponse(fd);
+                if(buf==0){
+                    return 0;
+                }
+                rez = ReceptorResponseInterpreter(buf);
+            }
+            if(rez==RR0){
+                return sent;
+            }
+        }
+
+        if(rez==UA_R){
+            printf("Incorrect Response Type Received\n");
+            return 0;
+        }
+
+        if(rez == ERR){
+            printf("Corrupted Response Received\n");
+            return 0;
+        }
+    }
+    return 0;
 }
 
 void timeoutHandler(int sig){
