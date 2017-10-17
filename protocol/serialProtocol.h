@@ -55,6 +55,7 @@ struct SEND_CONTROLL{
 	unsigned char currPar;
 	unsigned char retryCounter;
 	unsigned char hasTimedOut;
+	unsigned int fileDescriptor
 }
 
 struct SEND_CONTROLL g_ctrl;//global controll structure for the protocol to use

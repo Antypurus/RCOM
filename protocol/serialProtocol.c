@@ -337,8 +337,10 @@ unsigned char* getReceptorResponse(unsigned int fd){
 
 //NEEDS TO BE COMMENTED
 unsigned char sendSetCommand(unsigned int fd){
+    signal(SIGALRM,timeoutHandler);
     g_ctrl.currPar = 0;
     g_ctrl.retryCounter = 0;
+    g_ctrl.fileDescriptor = fd;
 
     //configures a buffer with the information for the set command
     unsigned char buffer[5];
@@ -347,6 +349,8 @@ unsigned char sendSetCommand(unsigned int fd){
     buffer[2] = SET;
     buffer[3] = buffer[1] ^ buffer[2];
     buffer[4] = FLAG;
+
+    g_ctrl.frameToSend = buffer;
 
     unsigned int res = write(fd,buffer,5);//writes to pipe the set command in the buffer
 
@@ -368,7 +372,9 @@ unsigned char sendSetCommand(unsigned int fd){
 }
 
 unsigned char sendDisconnectCommand(unsigned int fd){
+    signal(SIGALRM,timeoutHandler);
     g_ctrl.retryCounter = 0;
+    g_ctrl.fileDescriptor = fd;
 
     unsigned char buffer[5];
     buffer[0] = FLAG;
@@ -376,6 +382,8 @@ unsigned char sendDisconnectCommand(unsigned int fd){
     buffer[2] = DISC;
     buffer[3] = buffer[1] ^ buffer[2];
     buffer[4] = FLAG;
+
+    g_ctrl.frameToSend = buffer;
 
     unsigned int res = write(fd,buffer,5);
     if(res==5){
@@ -399,6 +407,10 @@ unsigned char sendDisconnectCommand(unsigned int fd){
 
 //NEEDS COMMENTING
 unsigned char sendData(unsigned int fd,const unsigned char data[]){
+    signal(SIGALRM,timeoutHandler);
+    g_ctrl.retryCounter = 0;
+    g_ctrl.fileDescriptor = fd;
+
     unsigned char**frames;
     unsigned int nFrames = allocateInformationFrames(frames,data);
     prepareInformationFrames(frames,nFrames);
@@ -406,6 +418,7 @@ unsigned char sendData(unsigned int fd,const unsigned char data[]){
     //the frames are now ready to be sent
 
     for(unsigned int i=0;i<nFrames;++i){
+        g_ctrl.frameToSend = frames[i];
         unsigned int sent = write(fd,frames[i],sizeof(frames[i]));
         if(sent==0){
             printf("Connection Error Unable To Senda Data\n");
@@ -463,6 +476,13 @@ void timeoutHandler(int sig){
         return;
     }else{
         printf("Retrying Connection ... Attempt %d\n",g_ctrl.retryCounter+1);
+        unsigned int res = write(g_ctrl.fileDescriptor,g_ctrl.frameToSend,5);
+        if(res==0){
+            printf("Conection Timeout\n");
+            g_ctrl.hasTimesOut = TRUE;
+            return;
+        }
+        g_ctrl.retryCounter++;
         alarm(TIMEOUT);
     }
 }
