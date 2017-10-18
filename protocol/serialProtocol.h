@@ -57,7 +57,7 @@ struct SEND_CONTROLL{
 	unsigned char hasTimedOut;
 	unsigned int fileDescriptor;
 	unsigned int lastFrameSize;
-}
+};
 
 struct SEND_CONTROLL g_ctrl;//global controll structure for the protocol to use
 
@@ -96,7 +96,7 @@ void deallocateInformationFrames(unsigned char** frames,unsigned int numberOfFra
 
 	@return a buffer with the divided data chunks
 */
-unsigned char** divideData(const unsigned char data[],unsigned int size);
+unsigned char** divideData(const unsigned char data[],unsigned int* sizeOf);
 
 /*
 	Level:Sender
@@ -132,7 +132,7 @@ void prepareInformationFrames(unsigned char** frames,unsigned int numberFrames);
 
 	@return the error checking block (BCC)
 */
-unsigned char calculateBCC2(const unsigned char data[]);
+unsigned char calculateBCC2(const unsigned char data[],unsigned int sizeOfData);
 
 /*
 	Level:Both
@@ -144,7 +144,7 @@ unsigned char calculateBCC2(const unsigned char data[]);
 
 	@return the file descriptor of the serial port specified
 */
-unsigned int openConnection(char* serialPort,unsgined unsigned int flags = 0);
+unsigned int openConnection(char* serialPort,unsigned int flags);
 
 /*
 	Level:Both
@@ -166,7 +166,7 @@ void closeConnection(unsigned int fd);
 
 	@return an array the data in its stuffed format
 */
-unsigned char[] byteStuffingOnData(const unsigned char data[],unsigned int* sizeOfData);
+unsigned char* byteStuffingOnData(const unsigned char data[],unsigned int* sizeOfData);
 
 /*
 	Level:Sender

@@ -1,13 +1,11 @@
 #include "serialProtocol.h"
-#include <Math.h>
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 #include <fcntl.h>
 #include <termios.h>
 #include <unistd.h>
 #include <signal.h>
-
-#define NULL 0
 
 unsigned int allocateInformationFrames(unsigned char** buff,const unsigned char data[],unsigned int sizeOf){
     //This bit of code determine how many frames will be necessary to send the data
@@ -22,7 +20,7 @@ unsigned int allocateInformationFrames(unsigned char** buff,const unsigned char 
     }
 
     //this allocates the space required to send the data inside each frame
-    for(unsigned int i=0;i<size:++i){
+    for(unsigned int i=0;i<size;++i){
         if(size>1){
             if(i = size -1){
                 double fraction = size - (sizeOf/MAX_DATA_PER_FRAME);//determines fraction of the max data per frame for the last frame
@@ -46,7 +44,7 @@ unsigned int allocateInformationFrames(unsigned char** buff,const unsigned char 
 
 void deallocateInformationFrames(unsigned char** frames,unsigned int numberOfFrames){
     //dealocates the memory space of each individual frame
-    for(unsigned int i=0;i<numberOfFrames:++i){
+    for(unsigned int i=0;i<numberOfFrames;++i){
         free(frames[i]);
     }
     //dealocates the frame buffer
@@ -79,7 +77,7 @@ unsigned char** allocateCharBuffers(unsigned int numberOfBuffers,unsigned int da
 
 void deallocatedCharBuffers(unsigned char** buffers,unsigned int numberOfBuffers){
     //dealocates the memory space of each buffer
-    for(unsigned int i=0:i<numberOfFrames){
+    for(unsigned int i=0;i<numberOfBuffers;++i){
         free(buffers[i]);
     }
     //delocates the buffer of buffers
@@ -132,7 +130,7 @@ void prepareInformationFrames(unsigned char** frames,unsigned int numberFrames){
         if(i == numberFrames-1){
             lastByte = g_ctrl.lastFrameSize;
         }else{
-            lastByte = MAX_FRAME_SIZE:
+            lastByte = MAX_FRAME_SIZE;
         }
 
         frames[i][0]=FLAG;//FLAG
@@ -146,17 +144,17 @@ void prepareInformationFrames(unsigned char** frames,unsigned int numberFrames){
 
 void moveDataToFrames(unsigned char** frames,const unsigned char data[],unsigned int size,unsigned int numberOfFrames){
     unsigned int s_size = size;
-    unsigned char info[][] = divideData(data,&s_size);//obtain the data divided into chunks
+    unsigned char** info = divideData(data,&s_size);//obtain the data divided into chunks
 
-    for(unsigned int i=0;i<numberFrames;++i){
+    for(unsigned int i=0;i<numberOfFrames;++i){
         unsigned int sizeOf = 0;//size of the current frame
-        if(i==numberFrames-1){
+        if(i==numberOfFrames-1){
             sizeOf = g_ctrl.lastFrameSize;
         }else{
             sizeOf = MAX_FRAME_SIZE;
         }
         unsigned char*suffed = byteStuffingOnData(info[i],&s_size);
-        moveInformationToFrame(frames[i],suffed[i]);//moves the chunk of data into the frame
+        moveInformationToFrame(frames[i],suffed[i],s_size);//moves the chunk of data into the frame
         frames[i][sizeOf-2] = calculateBCC2(info[i],s_size);//sets the BCC for the data chunk that was moved
     }
 
@@ -175,7 +173,7 @@ unsigned char calculateBCC2(const unsigned char data[],unsigned int sizeOfData){
 }
 
 //Need to document and properly adapt the code
-unsigned int openConnection(char* serialPort,unsgined unsigned int flags = 0){
+unsigned int openConnection(char* serialPort,unsigned int flags){
     
     if ( ((strcmp("/dev/ttyS0", serialPort)!=0) && (strcmp("/dev/ttyS1", serialPort)!=0) )) {
       printf("Usage:\tnserial SerialPort\n\tex: nserial /dev/ttyS1\n");
@@ -183,13 +181,9 @@ unsigned int openConnection(char* serialPort,unsgined unsigned int flags = 0){
     }
 
     unsigned int fd;
-    if(flags=0){
-        fd = open(serialPort, O_RDWR | O_NOCTTY | O_NONBLOCK);
-    }else{
-        fd = open(serialPort,flags);
-    }
+    fd = open(serialPort, O_RDWR | O_NOCTTY | O_NONBLOCK);
 
-    if (fd <0) {perror(argv[1]); exit(-1); }
+    if (fd <0) {perror(serialPort); exit(-1); }
 
     if ( tcgetattr(fd,&oldtio) == -1) { /* save current port settings */
       perror("tcgetattr");
@@ -262,7 +256,7 @@ char ReceptorResponseInterpreter(const unsigned char* receptorResponse){
 
             case(FLAG_STR):{
                 if(receptorResponse[i]==FLAG){
-                    currntState = ADDR
+                    currntState = ADDR;
                 }else{
                     return ERR;
                 }
@@ -352,11 +346,11 @@ unsigned char* getReceptorResponse(unsigned int fd){
         res = read(fd,buffer,5);
         if(res==5){// if it reads it disables the alarms and marks the connection as successful and returns 1
             alarm(0);
-            g_ctrl.hasTimesOut = FALSE;
+            g_ctrl.hasTimedOut = FALSE;
             g_ctrl.retryCounter = 0;
             return buffer;
         }
-        if(g_ctrl.hasTimesOut){// if the connection is marked as timed out 0 is returned
+        if(g_ctrl.hasTimedOut){// if the connection is marked as timed out 0 is returned
             return 0;
         }
     }
@@ -381,15 +375,19 @@ unsigned char sendSetCommand(unsigned int fd){
 
     unsigned int res = write(fd,buffer,5);//writes to pipe the set command in the buffer
 
+    unsigned char* buff;
+
     if(res==5){//if it wrote the whole buffer it will now atemp to read the confirmation for the receptor
-        buffer = getReceptorResponse(fd);//get the response with the possibility of timeout
-        if(buffer==0){
+        buff = getReceptorResponse(fd);//get the response with the possibility of timeout
+        if(buff==0){
             return 0;
         }
-        unsigned int rez = ReceptorResponseInterpreter(buffer);//check response type
+        unsigned int rez = ReceptorResponseInterpreter(buff);//check response type
         if(rez == UA_R){//if correct response type return 1
+	    free(buff);
             return 1;
         }else{
+	    free(buff);
             return 0;
         }
     }else{
@@ -505,14 +503,14 @@ unsigned char sendData(unsigned int fd,const unsigned char data[],unsigned int s
 void timeoutHandler(int sig){
     if(g_ctrl.retryCounter>=MAX_TIMEOUT){
         printf("Conection Timeout\n");
-        g_ctrl.hasTimesOut = TRUE;
+        g_ctrl.hasTimedOut = TRUE;
         return;
     }else{
         printf("Retrying Connection ... Attempt %d\n",g_ctrl.retryCounter+1);
         unsigned int res = write(g_ctrl.fileDescriptor,g_ctrl.frameToSend,5);
         if(res==0){
             printf("Conection Timeout\n");
-            g_ctrl.hasTimesOut = TRUE;
+            g_ctrl.hasTimedOut = TRUE;
             return;
         }
         g_ctrl.retryCounter++;
