@@ -55,7 +55,8 @@ struct SEND_CONTROLL{
 	unsigned char currPar;
 	unsigned char retryCounter;
 	unsigned char hasTimedOut;
-	unsigned int fileDescriptor
+	unsigned int fileDescriptor;
+	unsigned int lastFrameSize;
 }
 
 struct SEND_CONTROLL g_ctrl;//global controll structure for the protocol to use
@@ -73,7 +74,7 @@ struct SEND_CONTROLL g_ctrl;//global controll structure for the protocol to use
 
 	@return - the number of frames allocated
 */
-unsigned int allocateInformationFrames(unsigned char** buff,const unsigned char data[]);
+unsigned int allocateInformationFrames(unsigned char** buff,const unsigned char data[],unsigned int sizeOf);
 
 /*
     Level:Sender
@@ -95,7 +96,7 @@ void deallocateInformationFrames(unsigned char** frames,unsigned int numberOfFra
 
 	@return a buffer with the divided data chunks
 */
-unsigned char** divideData(const unsigned char data[]);
+unsigned char** divideData(const unsigned char data[],unsigned int size);
 
 /*
 	Level:Sender
@@ -106,10 +107,10 @@ unsigned char** divideData(const unsigned char data[]);
 	@param frame - the frame the data is going to be moved to
 	@param data - the data to move to the frame,this data must at most be of size MAX_DATA_PER_FRAME
 */
-void moveInformationToFrame(unsigned char* frame,const unsigned char data[]);
+void moveInformationToFrame(unsigned char* frame,const unsigned char data[],unsigned int size);
 
 //DOCUMENTATION MISSING
-void moveDataToFrames(unsigned char** frames,const unsigned char data[],unsigned int numberOfFrames);
+void moveDataToFrames(unsigned char** frames,const unsigned char data[],unsigned int size,unsigned int numberOfFrames);
 
 /*
 	Level:Sender
@@ -214,7 +215,7 @@ unsigned char sendDisconnectCommand(unsigned int fd);
 
 	@return - ammount sent in case of success , 0 in case an error occurred.
 */
-unsigned char sendData(unsigned int fd,const unsigned char data[]);
+unsigned char sendData(unsigned int fd,const unsigned char data[],unsigned int size);
 
 //DOCUMENTATION MISSING
 unsigned char** allocateCharBuffers(unsigned int numberOfBuffers,unsigned int dataPerBuffer);

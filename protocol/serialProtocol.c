@@ -9,9 +9,9 @@
 
 #define NULL 0
 
-unsigned int allocateInformationFrames(unsigned char** buff,const unsigned char data[]){
+unsigned int allocateInformationFrames(unsigned char** buff,const unsigned char data[],unsigned int sizeOf){
     //This bit of code determine how many frames will be necessary to send the data
-    unsigned int size = (unsigned int)floor(sizeof(data)/MAX_DATA_PER_FRAME);
+    unsigned int size = (unsigned int)floor(sizeOf/MAX_DATA_PER_FRAME);
 
     //this allocates the buffer with the ammount of frames necessary to send the data
     buff = (unsigned char**)malloc(sizeof(unsigned char*)*size);
@@ -25,13 +25,14 @@ unsigned int allocateInformationFrames(unsigned char** buff,const unsigned char 
     for(unsigned int i=0;i<size:++i){
         if(size>1){
             if(i = size -1){
-                double fraction = size - (sizeof(data)/MAX_DATA_PER_FRAME);//determines fraction of the max data per frame for the last frame
+                double fraction = size - (sizeOf/MAX_DATA_PER_FRAME);//determines fraction of the max data per frame for the last frame
+                g_ctrl.lastFrameSize = sizeof(unsigned char)*MAX_FRAME_SIZE*fraction;//saves the size of the last frame for easy acess
                 buff[i] = (unsigned char*)malloc(sizeof(unsigned char)*MAX_FRAME_SIZE*fraction);//allocates the frame with only the needed size
             }else{
                 buff[i] = (unsigned char*)malloc(sizeof(unsigned char)*MAX_FRAME_SIZE);
             }
         }else{
-            buff[i] = (unsigned char*)malloc(sizeof(unsigned char)*(sizeof(data)+6));
+            buff[i] = (unsigned char*)malloc(sizeof(unsigned char)*(sizeOf+6));
         }
 
         if(buff[i]==NULL){
@@ -86,8 +87,8 @@ void deallocatedCharBuffers(unsigned char** buffers,unsigned int numberOfBuffers
     return;
 }
 
-unsigned char** divideData(const unsigned char data[]){
-    unsigned int size = (unsigned int)floor(sizeof(data)/MAX_DATA_PER_FRAME);//determine the size of the data
+unsigned char** divideData(const unsigned char data[],unsigned int* sizeOf){
+    unsigned int size = (unsigned int)floor(*sizeOf/MAX_DATA_PER_FRAME);//determine the size of the data
     unsigned char** buffer = allocateCharBuffers(size,MAX_DATA_PER_FRAME);//allocates the required space for the data holders
 
     if(buffer==-1){
@@ -96,18 +97,25 @@ unsigned char** divideData(const unsigned char data[]){
 
     //moves each chunk of data to the buffers
     for(unsigned int i=0;i<size;++i){
-        memmove(buffer[i],data+i*MAX_DATA_PER_FRAME,MAX_DATA_PER_FRAME);
+        if((i*MAX_DATA_PER_FRAME+MAX_DATA_PER_FRAME)>*sizeOf){
+            unsigned int str = i*MAX_DATA_PER_FRAME;//calculate the start of the range
+            unsigned int end = *sizeOf-i*MAX_DATA_PER_FRAME;//calculate how much to copy at the end of the range
+            memmove(buffer[i],data+str,end);
+            *sizeOf = *sizeOf-i*MAX_DATA_PER_FRAME;
+        }else{
+            memmove(buffer[i],data+i*MAX_DATA_PER_FRAME,MAX_DATA_PER_FRAME);
+        }
     }
 
     return buffer;
 }
 
-void moveInformationToFrame(unsigned char* frame,const unsigned char data[]){
+void moveInformationToFrame(unsigned char* frame,const unsigned char data[],unsigned int size){
     if(sizeof(data)>MAX_DATA_PER_FRAME){
         return; //The data is too big for this frame;
     }
 
-    memmove(frame+4,data,sizeof(data));//moves the data to the data section of the frame
+    memmove(frame+4,data,size);//moves the data to the data section of the frame
     return;
 }
 
@@ -120,30 +128,44 @@ void prepareInformationFrames(unsigned char** frames,unsigned int numberFrames){
             g_ctrl.currPar = 0;
         }
 
+        unsigned int lastByte = 0;
+        if(i == numberFrames-1){
+            lastByte = g_ctrl.lastFrameSize;
+        }else{
+            lastByte = MAX_FRAME_SIZE:
+        }
+
         frames[i][0]=FLAG;//FLAG
         frames[i][1]=ADDRS;//ADDRS
         frames[i][2]=g_ctrl.currPar;//CTRL
         frames[i][3]=frames[i][1] ^ frames[i][2];//BCC1
-        frames[i][MAX_FRAME_SIZE-1]=FLAG;//FLAG
+        frames[i][lastByte-1]=FLAG;//FLAG
     }
     return;
 }
 
-void moveDataToFrames(unsigned char** frames,const unsigned char data[],unsigned int numberOfFrames){
-    unsigned char info[][] = divideData(data);//obtain the data divided into chunks
+void moveDataToFrames(unsigned char** frames,const unsigned char data[],unsigned int size,unsigned int numberOfFrames){
+    unsigned int s_size = size;
+    unsigned char info[][] = divideData(data,&s_size);//obtain the data divided into chunks
 
     for(unsigned int i=0;i<numberFrames;++i){
-        unsigned char*suffed = byteStuffingOnData(info[i],sizeof(info[i]));
+        unsigned int sizeOf = 0;//size of the current frame
+        if(i==numberFrames-1){
+            sizeOf = g_ctrl.lastFrameSize;
+        }else{
+            sizeOf = MAX_FRAME_SIZE;
+        }
+        unsigned char*suffed = byteStuffingOnData(info[i],&s_size);
         moveInformationToFrame(frames[i],suffed[i]);//moves the chunk of data into the frame
-        frames[i][MAX_FRAME_SIZE-2] = calculateBCC2(info[i]);//sets the BCC for the data chunk that was moved
+        frames[i][sizeOf-2] = calculateBCC2(info[i],s_size);//sets the BCC for the data chunk that was moved
     }
 
     return;
 }
 
-unsigned char calculateBCC2(const unsigned char data[]){
+unsigned char calculateBCC2(const unsigned char data[],unsigned int sizeOfData){
     unsigned char ret = 0;
-    unsigned int size = sizeof(data)/sizeof(unsigned char);//determine the size of the data
+    unsigned int size = sizeOfData/sizeof(unsigned char);//determine the size of the data
 
     for(unsigned int i=0;i<size;++i){
         ret = ret ^ data[i];//calculate the XOR of the whole data
@@ -411,20 +433,26 @@ unsigned char sendDisconnectCommand(unsigned int fd){
 }
 
 //NEEDS COMMENTING
-unsigned char sendData(unsigned int fd,const unsigned char data[]){
+unsigned char sendData(unsigned int fd,const unsigned char data[],unsigned int size){
     signal(SIGALRM,timeoutHandler);
     g_ctrl.retryCounter = 0;
     g_ctrl.fileDescriptor = fd;
 
     unsigned char**frames;
-    unsigned int nFrames = allocateInformationFrames(frames,data);
+    unsigned int nFrames = allocateInformationFrames(frames,data,size);
     prepareInformationFrames(frames,nFrames);
-    moveDataToFrames(frames,data,nFrames);
+    moveDataToFrames(frames,data,size,nFrames);
     //the frames are now ready to be sent
 
     for(unsigned int i=0;i<nFrames;++i){
+        unsigned int toSend = 0;
+        if(i==nFrames-1){
+            toSend = g_ctrl.lastFrameSize;
+        }else{
+            toSend = MAX_FRAME_SIZE;
+        }
         g_ctrl.frameToSend = frames[i];
-        unsigned int sent = write(fd,frames[i],sizeof(frames[i]));
+        unsigned int sent = write(fd,frames[i],toSend);
         if(sent==0){
             printf("Connection Error Unable To Senda Data\n");
             return 0;
