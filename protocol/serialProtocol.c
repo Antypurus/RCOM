@@ -24,7 +24,12 @@ unsigned int allocateInformationFrames(unsigned char** buff,const unsigned char 
     //this allocates the space required to send the data inside each frame
     for(unsigned int i=0;i<size:++i){
         if(size>1){
-            buff[i] = (unsigned char*)malloc(sizeof(unsigned char)*MAX_FRAME_SIZE);
+            if(i = size -1){
+                double fraction = size - (sizeof(data)/MAX_DATA_PER_FRAME);//determines fraction of the max data per frame for the last frame
+                buff[i] = (unsigned char*)malloc(sizeof(unsigned char)*MAX_FRAME_SIZE*fraction);//allocates the frame with only the needed size
+            }else{
+                buff[i] = (unsigned char*)malloc(sizeof(unsigned char)*MAX_FRAME_SIZE);
+            }
         }else{
             buff[i] = (unsigned char*)malloc(sizeof(unsigned char)*(sizeof(data)+6));
         }
