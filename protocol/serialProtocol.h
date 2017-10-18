@@ -57,7 +57,7 @@ struct SEND_CONTROLL{
 	unsigned char hasTimedOut;
 	unsigned int fileDescriptor;
 	unsigned int lastFrameSize;
-}
+};
 
 struct SEND_CONTROLL g_ctrl;//global controll structure for the protocol to use
 
