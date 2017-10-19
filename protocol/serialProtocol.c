@@ -452,7 +452,7 @@ unsigned char sendData(unsigned int fd,const unsigned char data[],unsigned int s
 
     unsigned char**frames;
     unsigned int nFrames = 0;
-    allocateInformationFrames(frames,data,size);
+    nFrames = allocateInformationFrames(frames,data,size);
     prepareInformationFrames(frames,nFrames);
     moveDataToFrames(frames,data,size,nFrames);
     //the frames are now ready to be sent
