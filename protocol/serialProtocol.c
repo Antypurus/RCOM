@@ -24,7 +24,7 @@ unsigned int allocateInformationFrames(unsigned char** buff,const unsigned char 
     //this allocates the space required to send the data inside each frame
     for(unsigned int i=0;i<size;++i){
         if(size>1){
-            if(i = size -1){
+            if(i == (size -1)){
                 double fraction = size - (sizeOf/MAX_DATA_PER_FRAME);//determines fraction of the max data per frame for the last frame
                 g_ctrl.lastFrameSize = sizeof(unsigned char)*MAX_FRAME_SIZE*fraction;//saves the size of the last frame for easy acess
                 buff[i] = (unsigned char*)malloc(sizeof(unsigned char)*MAX_FRAME_SIZE*fraction);//allocates the frame with only the needed size
@@ -58,7 +58,7 @@ unsigned char** allocateCharBuffers(unsigned int numberOfBuffers,unsigned int da
     //allocates the buffer of buffers
     unsigned char** buffer = (unsigned char**)malloc(sizeof(unsigned char*)*numberOfBuffers);
 
-    if(buffer = NULL){
+    if(buffer == NULL){
         deallocatedCharBuffers(buffer,0);//deallocates the buffer of buffers at is not needed
         return NULL;//indicates there has been an error with the allocation
     }
@@ -367,6 +367,7 @@ unsigned char* getReceptorResponse(unsigned int fd){
             return NULL;
         }
     }
+    return NULL;
 }
 
 //NEEDS TO BE COMMENTED
@@ -450,7 +451,8 @@ unsigned char sendData(unsigned int fd,const unsigned char data[],unsigned int s
     g_ctrl.fileDescriptor = fd;
 
     unsigned char**frames;
-    unsigned int nFrames = allocateInformationFrames(frames,data,size);
+    unsigned int nFrames = 0;
+    allocateInformationFrames(frames,data,size);
     prepareInformationFrames(frames,nFrames);
     moveDataToFrames(frames,data,size,nFrames);
     //the frames are now ready to be sent
