@@ -450,9 +450,12 @@ unsigned char sendData(unsigned int fd,const unsigned char data[],unsigned int s
     g_ctrl.retryCounter = 0;
     g_ctrl.fileDescriptor = fd;
 
-    unsigned char**frames;
-    unsigned int nFrames = 0;
-    nFrames = allocateInformationFrames(frames,data,size);
+    unsigned char**frames = NULL;
+    unsigned int nFrames = allocateInformationFrames(frames,data,size);
+    if(nFrames == 0){
+        printf("[ERROR]@allocation:There has been an allocation error on the inforation frames\n");
+        return 0;
+    }
     prepareInformationFrames(frames,nFrames);
     moveDataToFrames(frames,data,size,nFrames);
     //the frames are now ready to be sent
