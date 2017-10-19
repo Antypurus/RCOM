@@ -1,5 +1,6 @@
 #include "serialProtocol.h"
 #include <math.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <fcntl.h>
@@ -58,7 +59,7 @@ unsigned char** allocateCharBuffers(unsigned int numberOfBuffers,unsigned int da
 
     if(buffer = NULL){
         deallocatedCharBuffers(buffer,0);//deallocates the buffer of buffers at is not needed
-        return -1;//indicates there has been an error with the allocation
+        return NULL;//indicates there has been an error with the allocation
     }
 
     //allocate each individual buffer
@@ -67,7 +68,7 @@ unsigned char** allocateCharBuffers(unsigned int numberOfBuffers,unsigned int da
 
         if(buffer[i]==NULL){
             deallocatedCharBuffers(buffer,0);//deallocates the buffer of buffers at is not needed
-            return -1;//indicates there has been an error with the allocation
+            return NULL;//indicates there has been an error with the allocation
         }
 
     }
@@ -89,8 +90,8 @@ unsigned char** divideData(const unsigned char data[],unsigned int* sizeOf){
     unsigned int size = (unsigned int)floor(*sizeOf/MAX_DATA_PER_FRAME);//determine the size of the data
     unsigned char** buffer = allocateCharBuffers(size,MAX_DATA_PER_FRAME);//allocates the required space for the data holders
 
-    if(buffer==-1){
-        return -1;//return an error code, meaning there was an error with the allocation
+    if(buffer==NULL){
+        return NULL;//return an error code, meaning there was an error with the allocation
     }
 
     //moves each chunk of data to the buffers
@@ -109,7 +110,7 @@ unsigned char** divideData(const unsigned char data[],unsigned int* sizeOf){
 }
 
 void moveInformationToFrame(unsigned char* frame,const unsigned char data[],unsigned int size){
-    if(sizeof(data)>MAX_DATA_PER_FRAME){
+    if(size>MAX_DATA_PER_FRAME){
         return; //The data is too big for this frame;
     }
 
@@ -154,7 +155,12 @@ void moveDataToFrames(unsigned char** frames,const unsigned char data[],unsigned
             sizeOf = MAX_FRAME_SIZE;
         }
         unsigned char*suffed = byteStuffingOnData(info[i],&s_size);
-        moveInformationToFrame(frames[i],suffed[i],s_size);//moves the chunk of data into the frame
+        if(stuffed == NULL){
+            g_ctrl.allocError = 1;
+            return;
+        }
+        g_ctrl.allocError = 0;
+        moveInformationToFrame(frames[i],suffed,s_size);//moves the chunk of data into the frame
         frames[i][sizeOf-2] = calculateBCC2(info[i],s_size);//sets the BCC for the data chunk that was moved
     }
 
@@ -241,7 +247,10 @@ unsigned char* byteStuffingOnData(const unsigned char data[],unsigned int* sizeO
         currIndice++;
     }
 
-    realloc(buffer[0],postSize);
+    void* ret = realloc(buffer[0],postSize);
+    if(ret==NULL){
+        return NULL;
+    }
     *sizeOfData = postSize;
     return buffer[0];
 }
@@ -441,6 +450,11 @@ unsigned char sendData(unsigned int fd,const unsigned char data[],unsigned int s
     prepareInformationFrames(frames,nFrames);
     moveDataToFrames(frames,data,size,nFrames);
     //the frames are now ready to be sent
+
+    if(g_ctrl.allocError){
+        printf("[ERROR]@allocation:There has been an allocation error while moving information to frames,exiting\n");
+        return 0;
+    }
 
     for(unsigned int i=0;i<nFrames;++i){
         unsigned int toSend = 0;
