@@ -1,5 +1,6 @@
 #include "serialProtocol.h"
 #include <math.h>
+#include <strings.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -154,13 +155,13 @@ void moveDataToFrames(unsigned char** frames,const unsigned char data[],unsigned
         }else{
             sizeOf = MAX_FRAME_SIZE;
         }
-        unsigned char*suffed = byteStuffingOnData(info[i],&s_size);
+        unsigned char*stuffed = byteStuffingOnData(info[i],&s_size);
         if(stuffed == NULL){
             g_ctrl.allocError = 1;
             return;
         }
         g_ctrl.allocError = 0;
-        moveInformationToFrame(frames[i],suffed,s_size);//moves the chunk of data into the frame
+        moveInformationToFrame(frames[i],stuffed,s_size);//moves the chunk of data into the frame
         frames[i][sizeOf-2] = calculateBCC2(info[i],s_size);//sets the BCC for the data chunk that was moved
     }
 
@@ -349,7 +350,10 @@ char ReceptorResponseInterpreter(const unsigned char* receptorResponse){
 //NEEDS TO BE COMMENTED
 unsigned char* getReceptorResponse(unsigned int fd){
     unsigned int res = 0;
-    unsigned char buffer[5];
+    unsigned char* buffer = (unsigned char*)malloc(sizeof(unsigned char)*5);
+    if(buffer == NULL){
+        return NULL;
+    }
     alarm(TIMEOUT);//sets an alarm with the timeout value , to manage connection timeouts
     while(res==0){
         res = read(fd,buffer,5);
@@ -360,7 +364,7 @@ unsigned char* getReceptorResponse(unsigned int fd){
             return buffer;
         }
         if(g_ctrl.hasTimedOut){// if the connection is marked as timed out 0 is returned
-            return 0;
+            return NULL;
         }
     }
 }
@@ -388,7 +392,7 @@ unsigned char sendSetCommand(unsigned int fd){
 
     if(res==5){//if it wrote the whole buffer it will now atemp to read the confirmation for the receptor
         buff = getReceptorResponse(fd);//get the response with the possibility of timeout
-        if(buff==0){
+        if(buff==NULL){
             return 0;
         }
         unsigned int rez = ReceptorResponseInterpreter(buff);//check response type
@@ -422,7 +426,7 @@ unsigned char sendDisconnectCommand(unsigned int fd){
     unsigned int res = write(fd,buffer,5);
     if(res==5){
         unsigned char *buff = getReceptorResponse(fd);//get the response with the possibility of timeout
-        if(buff==0){
+        if(buff==NULL){
             return 0;
         }
         unsigned int rez = ReceptorResponseInterpreter(buff);//check response type
@@ -470,7 +474,7 @@ unsigned char sendData(unsigned int fd,const unsigned char data[],unsigned int s
             return 0;
         }
         unsigned char* buf = getReceptorResponse(fd);
-        if(buf==0){
+        if(buf==NULL){
             return 0;
         }
         unsigned int rez = ReceptorResponseInterpreter(buf);
@@ -479,7 +483,7 @@ unsigned char sendData(unsigned int fd,const unsigned char data[],unsigned int s
             while(rez==REJ1){
                 free(buf);
                 buf = getReceptorResponse(fd);
-                if(buf==0){
+                if(buf==NULL){
                     return 0;
                 }
                 rez = ReceptorResponseInterpreter(buf);
@@ -491,7 +495,7 @@ unsigned char sendData(unsigned int fd,const unsigned char data[],unsigned int s
             while(rez==REJ0){
                 free(buf);
                 buf = getReceptorResponse(fd);
-                if(buf==0){
+                if(buf==NULL){
                     return 0;
                 }
                 rez = ReceptorResponseInterpreter(buf);
