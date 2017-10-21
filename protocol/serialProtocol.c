@@ -110,6 +110,7 @@ void deallocatedCharBuffers(unsigned char** buffers,unsigned int numberOfBuffers
 }
 
 unsigned char** divideData(const unsigned char data[],unsigned int* sizeOf){
+    printf("[LOG]@divData\tStarting data division process\n");
     unsigned int size = (unsigned int)floor(*sizeOf/MAX_DATA_PER_FRAME);//determine the size of the data
     unsigned char** buffer = allocateCharBuffers(size,MAX_DATA_PER_FRAME);//allocates the required space for the data holders
 
@@ -123,27 +124,33 @@ unsigned char** divideData(const unsigned char data[],unsigned int* sizeOf){
             unsigned int str = i*MAX_DATA_PER_FRAME;//calculate the start of the range
             unsigned int end = *sizeOf-i*MAX_DATA_PER_FRAME;//calculate how much to copy at the end of the range
             memmove(buffer[i],data+str,end);
+            printf("[LOG]@divData\tMoved data from range[%d,%d] to buffer\n",str,end);
             *sizeOf = *sizeOf-i*MAX_DATA_PER_FRAME;
         }else{
             memmove(buffer[i],data+i*MAX_DATA_PER_FRAME,MAX_DATA_PER_FRAME);
+            printf("[LOG]@divData\tMoved data from range[%d,%d] to buffer\n",i*MAX_DATA_PER_FRAME,MAX_DATA_PER_FRAME);
         }
     }
-
+    printf("[LOG]@divData\Finished data division process\n");
     return buffer;
 }
 
 void moveInformationToFrame(unsigned char* frame,const unsigned char data[],unsigned int size){
-    if(size>MAX_DATA_PER_FRAME){
+    printf("[LOG]@movData\tStarting data move to frame\n");
+    if(size>MAX_DATA_PER_FRAME*2){
+        printf("[ERROR]@movData\tData to large for a single frame\n");
         return; //The data is too big for this frame;
     }
 
     memmove(frame+4,data,size);//moves the data to the data section of the frame
+    printf("[LOG]@movData\tData moved to frame\n");
     return;
 }
 
 void prepareInformationFrames(unsigned char** frames,unsigned int numberFrames){
+    printf("[LOG]@frameSet\tFrame Set Up starded\n");
     for(unsigned int i=0;i<numberFrames;++i){
-        
+        printf("[LOG]@frameSet\tsetting up frame %d\n",i);
         if(g_ctrl.currPar==0){
             g_ctrl.currPar = 1;
         }else{
@@ -162,7 +169,9 @@ void prepareInformationFrames(unsigned char** frames,unsigned int numberFrames){
         frames[i][2]=g_ctrl.currPar;//CTRL
         frames[i][3]=frames[i][1] ^ frames[i][2];//BCC1
         frames[i][lastByte-1]=FLAG;//FLAG
+        printf("[LOG]@frameSet\tfinished setting up frame %d\n",i);
     }
+    printf("[LOG]@frameSet\tFrame Set Up finished\n");
     return;
 }
 
