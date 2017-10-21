@@ -110,7 +110,18 @@ unsigned char** divideData(const unsigned char data[],unsigned int* sizeOf);
 */
 void moveInformationToFrame(unsigned char* frame,const unsigned char data[],unsigned int size);
 
-//DOCUMENTATION MISSING
+/*
+	Level:Sender
+
+	This function moves the supplied data into the network frames for sending,before executing the move it
+	splits the data and executes the byte stuffing functions as specified by the protocol on the data ,
+	 as such we must guarante that the frame can hold 2x the size of the data supplied here.
+
+	@param frames - the frames to move the data into
+	@param data - the data that needs to be moved into the frames
+	@param size - the size in bytes of the data supplied
+	@parm numberOfFrames - the number of frames in the frame buffer
+*/
 void moveDataToFrames(unsigned char** frames,const unsigned char data[],unsigned int size,unsigned int numberOfFrames);
 
 /*
@@ -218,16 +229,49 @@ unsigned char sendDisconnectCommand(unsigned int fd);
 */
 unsigned char sendData(unsigned int fd,const unsigned char data[],unsigned int size);
 
-//DOCUMENTATION MISSING
+/*
+	Level:Both
+
+	This function allocated a number of generic unsinged char frame buffers
+
+	@param numberOfBufefrs - the number of buffers that need to be allocated
+	@param dataPerBuffer - the ammount of data that needs to be allocated per buffer
+
+	@return - a set of dinamically allocated unsigned char buffers
+*/
 unsigned char** allocateCharBuffers(unsigned int numberOfBuffers,unsigned int dataPerBuffer);
 
-//DOCUMENTATION MISSING
+/*
+	Level:Both
+
+	This function deallocates a generic unsigned char frame buffer
+
+	@param buffers - The buffers that were allocated
+	@param numberOfBuffers - The number of buffers that sould be deallocated
+*/
 void deallocatedCharBuffers(unsigned char** buffers,unsigned int numberOfBuffers);
 
-//DOCUMENTATION MISSING
+/*
+	Level:Sender
+
+	This function is a handler for the SIGALRM signal , it is used when sending a frame over the network
+	it has inbued retransmission to a specified ammount, marks in the g_ctrl structure that there has 
+	been a timeout if such occurs
+
+	@param sig - as per specified for this handler the ammount of time of the alarm.
+*/
 void timeoutHandler(int sig);
 
-//DOCUMENTATION MISSING
+/*
+	Level: Sender
+
+	This function reads from the file descriptor the acknoledgement from the receiver,it also times out if that is
+	needed.
+
+	@param fd - file descriptor of the serial prot to read from
+
+	@return - a dynamically allocated 5 byte buffer with the response from the receiver
+*/
 unsigned char* getReceptorResponse(unsigned int fd);
 
 #endif
