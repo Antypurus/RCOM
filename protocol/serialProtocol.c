@@ -581,6 +581,8 @@ unsigned char* destuffData(unsigned char* data, unsigned int*sizeOf){
     unsigned int initialSize = *sizeOf;
     unsigned int currSize = *sizeOf;
 
+    unsigned int currInd = 0;
+
     unsigned char* retData = (unsigned char*)malloc(sizeof(unsigned char)*initialSize);
     if(retData==NULL){
         printf("[ERROR]@destuffing\tFailed to allocated buffer for destuffed data\n");
@@ -588,7 +590,23 @@ unsigned char* destuffData(unsigned char* data, unsigned int*sizeOf){
     }
 
     for(unsigned int i=0;i<initialSize;++i){
-        //actual destuffing
+        if(data[i]==0x7D){
+            if(data[i+1]==0x5d){
+                retData[currInd]= 0x7D;
+                currSize--;
+                i++;
+            }else if(data[i+1]==0x5E){
+                retData[currInd]= 0x7E;
+                currSize--;
+                i++;
+            }else{
+                retData[currInd]= data[i];
+            }
+            currInd++;
+        }else{
+            retData[currInd]= data[i];
+            currInd++;
+        }
     }
 
     void*chk = realloc(retData,currSize);
@@ -599,6 +617,6 @@ unsigned char* destuffData(unsigned char* data, unsigned int*sizeOf){
 
     *sizeOf = currSize;
 
-    printf("[LOG]@destuffing\Finished Data Destuffing Proccess\n");
+    printf("[LOG]@destuffing\tFinished Data Destuffing Proccess\n");
     return retData;
 }
