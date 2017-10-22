@@ -269,9 +269,13 @@ unsigned char* byteStuffingOnData(const unsigned char data[],unsigned int* sizeO
 
     unsigned int currIndice = 0;
     for(unsigned int i=0;i<originalSize;++i){
-        if(data[i]==0x7E || data[i]==0x7D){
+        if(data[i]==0x7D){
             buffer[0][currIndice] = 0x7D;
             buffer[0][++currIndice] = 0x5D;
+            postSize++;
+        }else if(data[i]==0x7E){
+            buffer[0][currIndice] = 0x7D;
+            buffer[0][++currIndice] = 0x5E;
             postSize++;
         }else{
             buffer[0][currIndice] = data[i];
