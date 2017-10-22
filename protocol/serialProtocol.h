@@ -274,4 +274,7 @@ void timeoutHandler(int sig);
 */
 unsigned char* getReceptorResponse(unsigned int fd);
 
+//DOCUMENTATION MISSING
+unsigned char*destuffData(unsigned char* data,unsigned int *sizeOF);
+
 #endif

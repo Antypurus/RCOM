@@ -571,3 +571,30 @@ void timeoutHandler(int sig){
         alarm(TIMEOUT);
     }
 }
+
+unsigned char* destuffData(unsigned char* data, unsigned int*sizeOf){
+    printf("[LOG]@destuffing\tStarting Data Destuffing Proccess\n");
+    unsigned int initialSize = *sizeOf;
+    unsigned int currSize = *sizeOf;
+
+    unsigned char* retData = (unsigned char*)malloc(sizeof(unsigned char)*initialSize);
+    if(retData==NULL){
+        printf("[ERROR]@destuffing\tFailed to allocated buffer for destuffed data\n");
+        return NULL;
+    }
+
+    for(unsigned int i=0;i<initialSize;++i){
+        //actual destuffing
+    }
+
+    void*chk = realloc(retData,currSize);
+    if(chk==NULL){
+        printf("[ERROR]@destuffing\tFailed to resize destuffed data buffer\n");
+        return NULL;
+    }
+
+    *sizeOf = currSize;
+
+    printf("[LOG]@destuffing\Finished Data Destuffing Proccess\n");
+    return retData;
+}
