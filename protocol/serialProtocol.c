@@ -662,3 +662,83 @@ unsigned char sendRRCommand(unsigned int fd){
 
     return 0;
 }
+
+unsigned char sendREJCommand(unsigned int fd){
+    printf("[LOG]@cmdRec\tStarting REJ commander sending proccess\n");
+    unsigned char buff[5];
+
+    printf("[LOG]@cmdRec\tpreparing command buffer\n");
+    buff[0] = FLAG;
+    buff[1] = ADDR2;
+    if(g_ctrl.currPar==0){
+        buff[2] = REJ0;
+    }else{
+        buff[2] = REJ1;
+    }
+    buff[3] = buff[1]^buff[2];
+    buff[4] = FLAG;
+    printf("[LOG]@cmdRec\tCommand buffer ready\n");
+
+    unsigned int retryCounter = 0;
+    unsigned int sent = 0;
+    while(sent == 0){
+        retryCounter++;
+
+        printf("[LOG]@cmdRec\tSending Command Buffer\n");
+        sent = write(fd,buff,sizeof(buff));
+
+        if(sent!=sizeof(buff)){
+            sleep(TIMEOUT);
+        }
+
+        if(retryCounter>(MAX_TIMEOUT+1)&&sent!=sizeof(buff)){
+            printf("[ERROR]@cmdRec\tFailed to send command to specified file descriptor more than %d times\n",retryCounter);
+            return 0;
+        }
+    }
+
+    if(sent == 5){
+        printf("[SUCCESS]@cmdRec\tSent REJ Command Successfully\n");
+        return 1;
+    }
+
+    return 0;
+}
+
+unsigned char sendUACommand(unsigned int fd){
+    printf("[LOG]@cmdRec\tStarting UA commander sending proccess\n");
+    unsigned char buff[5];
+
+    printf("[LOG]@cmdRec\tpreparing command buffer\n");
+    buff[0] = FLAG;
+    buff[1] = ADDR2;
+    buff[2] = UA;
+    buff[3] = buff[1]^buff[2];
+    buff[4] = FLAG;
+    printf("[LOG]@cmdRec\tCommand buffer ready\n");
+
+    unsigned int retryCounter = 0;
+    unsigned int sent = 0;
+    while(sent == 0){
+        retryCounter++;
+
+        printf("[LOG]@cmdRec\tSending Command Buffer\n");
+        sent = write(fd,buff,sizeof(buff));
+
+        if(sent!=sizeof(buff)){
+            sleep(TIMEOUT);
+        }
+
+        if(retryCounter>(MAX_TIMEOUT+1)&&sent!=sizeof(buff)){
+            printf("[ERROR]@cmdRec\tFailed to send command to specified file descriptor more than %d times\n",retryCounter);
+            return 0;
+        }
+    }
+
+    if(sent == 5){
+        printf("[SUCCESS]@cmdRec\tSent UA Command Successfully\n");
+        return 1;
+    }
+
+    return 0;
+}
