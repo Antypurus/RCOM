@@ -277,4 +277,13 @@ unsigned char* getReceptorResponse(unsigned int fd);
 //DOCUMENTATION MISSING
 unsigned char*destuffData(unsigned char* data,unsigned int *sizeOF);
 
+//DOCUMENTATION MISSING
+unsigned char sendRRCommand(unsigned int fd);
+
+//DOCUMENTATION MISSING
+unsigned char sendREJCommand(unsigned int fd);
+
+//DOCUMENTATION MISSING
+unsigned char sendUACommand(unsigned int fd);
+
 #endif
