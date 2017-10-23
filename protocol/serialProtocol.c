@@ -176,6 +176,7 @@ void prepareInformationFrames(unsigned char** frames,unsigned int numberFrames){
 }
 
 void moveDataToFrames(unsigned char** frames,const unsigned char data[],unsigned int size,unsigned int numberOfFrames){
+    printf("[LOG]@dataMv\tStarting move of data to frame\n");
     unsigned int s_size = size;
     unsigned char** info = divideData(data,&s_size);//obtain the data divided into chunks
 
@@ -631,8 +632,10 @@ unsigned char sendRRCommand(unsigned int fd){
     buff[1] = ADDR2;
     if(g_ctrl.currPar==0){
         buff[2] = RR0;
+        g_ctrl.currPar=1;
     }else{
         buff[2] = RR1;
+        g_ctrl.currPar=0;
     }
     buff[3] = buff[1]^buff[2];
     buff[4] = FLAG;
@@ -912,10 +915,10 @@ unsigned char validateFrame(unsigned char* data,unsigned int sizeOf){
 
         if(currStt == DONE_PROC){
             if(set==1){
-                //TODO handle set command
+                setHandler();
                 return 1;
             }else if(dis == 1){
-                //TODO handle disc command
+                discHandler();
                 return 1;
             }
 
@@ -1031,11 +1034,9 @@ unsigned char validateFrame(unsigned char* data,unsigned int sizeOf){
             if(currStt==DONE_PROC){
                 if(g_ctrl.currPar==0){
                     printf("[LOG]@valid\tFinished Frame Validation for information frame\n");
-                    g_ctrl.currPar=1;
                     return 2;
                 }else if(g_ctrl.currPar==1){
                     printf("[LOG]@valid\tFinished Frame Validation for information frame\n");
-                    g_ctrl.currPar=0;
                     return 2;
                 }else{
                     printf("[ERROR]@valid\tInternal Receiver Parity Issue\n");
@@ -1047,4 +1048,15 @@ unsigned char validateFrame(unsigned char* data,unsigned int sizeOf){
 
         printf("[LOG]@valid\tFinished Frame Validation for information frame\n");
     }
+}
+
+void setHandler(){
+    g_ctrl.currPar=0;
+    g_ctrl.retryCounter=0;
+    g_ctrl.hasTimedOut=FALSE;
+    g_ctrl.shouldDC=FALSE;
+}
+
+void discHandler(){
+    g_ctrl.shouldDC=TRUE;
 }
