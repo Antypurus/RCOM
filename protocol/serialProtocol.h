@@ -8,8 +8,8 @@
 #define SET 0x03
 #define ADDR2 0x01
 #define DISC 0x0B
-#define CTR_PAR0 2
-#define CTR_PAR1 3
+#define CTR_PAR0 0x00
+#define CTR_PAR1 0x40
 
 #define BAUDRATE B38400
 #define MODEMDEVICE "/dev/ttyS1"

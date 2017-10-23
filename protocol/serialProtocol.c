@@ -953,24 +953,95 @@ unsigned char validateFrame(unsigned char* data,unsigned int sizeOf){
                     }
                 }
                 case(CTRL):{
-                    if(data[i]==ADDRS){
-                        printf("[SUCCESS]@valid\tAddress field is validated\n");
-                        currStt = CTRL;
-                        break;
+                    if(g_ctrl.currPar==0){
+                        if(data[i]==CTR_PAR0){
+                            printf("[SUCCESS]@valid\tControll field is validated\n");
+                            currStt = BCC;
+                            break;
+                        }else if(data[i]==CTR_PAR1){
+                            printf("[ERROR]@valid\tAddress field is not validated, has incorrect parity\n");
+                            return 0;
+                        }else{
+                            printf("[ERROR]@valid\tAddress field is not validated, unrecognized value\n");
+                            return 0;
+                        }
+                    }else if(g_ctrl.currPar==1){
+                        if(data[i]==CTR_PAR0){
+                            printf("[ERROR]@valid\tAddress field is not validated, has incorrect parity\n");
+                            return 0;
+                        }else if(data[i]==CTR_PAR1){
+                            printf("[SUCCESS]@valid\tControll field is validated\n");
+                            currStt = BCC;
+                            break;
+                        }else{
+                            printf("[ERROR]@valid\tAddress field is not validated, unrecognized value\n");
+                            return 0;
+                        }
                     }else{
-                        printf("[ERROR]@valid\tAddress field is not validated\n");
+                        printf("[ERROR]@valid\tInternal Receiver Parity Issue\n");
                         return 0;
                     }
                 }
                 case(BCC):{
-                    
+                    if(data[i]==data[i-1]^data[i-2]){
+                        printf("[SUCCESS]@valid\tBCC field is validated\n");
+                        currStt = BCC2;
+                        break;
+                    }else{
+                        printf("[ERROR]@valid\tBCC field is not validated\n");
+                        return 0;
+                    }
                 }
                 case(BCC2):{
-                    
+                    unsigned int sz = sizeOf;
+
+                    unsigned char* buff = extractDataFromFrame(data,&sz);
+                    if(buff==NULL){
+                        //error
+                        return 0;
+                    }
+                    unsigned char* bf = destuffData(buff,&sz);
+                    if(bf==NULL){
+                        //error
+                        return 0;
+                    }
+
+                    unsigned char b2 = calculateBCC2(bf,sz);
+
+                    if(data[sizeOf-2]==b2){
+                        printf("[SUCCESS]@valid\tBCC2 field is validated\n");
+                        currStt = FLAG_END;
+                        break;
+                    }else{
+                        printf("[ERROR]@valid\tBCC2 field is not validated\n");
+                        return 0;
+                    }
                 }
                 case(FLAG_END):{
-                    
+                    if(data[sizeOf-1]==FLAG){
+                        printf("[SUCCESS]@valid\tEnd Flag field is validated\n");
+                        currStt = DONE_PROC;
+                        break;
+                    }else{
+                        printf("[ERROR]@valid\tEnd Flag is not validated\n");
+                        return 0;
+                    }
                 }
+            }
+            if(currStt==DONE_PROC){
+                if(g_ctrl.currPar==0){
+                    printf("[LOG]@valid\tFinished Frame Validation for information frame\n");
+                    g_ctrl.currPar=1;
+                    return 2;
+                }else if(g_ctrl.currPar==1){
+                    printf("[LOG]@valid\tFinished Frame Validation for information frame\n");
+                    g_ctrl.currPar=0;
+                    return 2;
+                }else{
+                    printf("[ERROR]@valid\tInternal Receiver Parity Issue\n");
+                    return 0;
+                }
+                break;
             }
         }
 
