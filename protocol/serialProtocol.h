@@ -286,4 +286,7 @@ unsigned char sendREJCommand(unsigned int fd);
 //DOCUMENTATION MISSING
 unsigned char sendUACommand(unsigned int fd);
 
+//DOCUMENTATION MISSING
+unsigned char* extractDataFromFrame(unsigned char* data,unsigned int* sizeOf);
+
 #endif

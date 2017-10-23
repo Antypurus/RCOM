@@ -742,3 +742,24 @@ unsigned char sendUACommand(unsigned int fd){
 
     return 0;
 }
+
+unsigned char* extractDataFromFrame(unsigned char* data,unsigned int* sizeOf){
+    printf("[LOG]@extract\tStarting Data Extraction proccess\n");
+
+    unsigned int sz = (*sizeOf-6);//size of the data section in the frame
+
+    printf("[LOG]@extract\tAtempting to allocate buffer for data of size:%d\n",sz);
+    unsigned char* buff = (unsigned char*)malloc(sizeof(unsigned char)*sz);
+
+    if(buff==NULL){
+        printf("[ERROR]@extract\tFailed To allocate buffer for data\n");
+        return NULL;
+    }else{
+        printf("[SUCCESS]@extract\tSuccessfully allocated buffer for data\n");
+    }
+
+    memmove(buff,data+4,sz);
+    *sizeOf = sz;
+    printf("[SUCCESS]@extract\tData Extraction Complete\n");
+    return buff;
+}
