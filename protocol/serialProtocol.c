@@ -365,7 +365,8 @@ char ReceptorResponseInterpreter(const unsigned char* receptorResponse){
 
             case(FLAG_END):{
                 if(receptorResponse[i]==FLAG){
-                    currntState = DONE_PROC;                                      
+                    currntState = DONE_PROC;     
+                    break;                                 
                 }else{
                     return ERR;
                 }
@@ -833,10 +834,104 @@ unsigned char* readSentData(unsigned int fd,unsigned int* sizeOf){
 unsigned char validateFrame(unsigned char* data,unsigned int sizeOf){
     printf("[LOG]@valid\tStarting Frame Validation\n");
 
-    if(sizeOf<5){
+    if(sizeOf<5||sizeOf == 6){// impossible for a valid frame to be smaller than 5 or size 6
         printf("[ERROR]@valid\tFrame Is Too Small to be a valid Frame\n");
         return 0;
     }
 
-    
+    //Means its a command frame
+    if(sizeOf==5){
+        printf("[LOG]@valid\tStarting Frame Validation for command frame\n");
+
+        unsigned int currStt = FLAG_STR;
+        unsigned int set = 0;
+        unsigned int dis = 0;
+
+        for(unsigned int i = 0;i<5;++i){
+            switch(currStt){
+                case(FLAG_STR):{
+                    if(data[i]==FLAG){
+                        printf("[SUCCESS]@valid\tStart Flag field is validated\n");
+                        currStt = ADDR;
+                        break;
+                    }else{
+                        printf("[ERROR]@valid\tStart Byte does not contain Flag\n");
+                        return 0;
+                    }
+                }
+                case(ADDR):{
+                    if(data[i]==ADDRS){
+                        printf("[SUCCESS]@valid\tAddress field is validated\n");
+                        currStt = CTRL;
+                        break;
+                    }else{
+                        printf("[ERROR]@valid\tAddress field is incorrect\n");
+                        return 0;
+                    }
+                }
+                case(CTRL):{
+                    if(data[i]==SET){
+                        printf("[SUCCESS]@valid\tControll field is validated as set command\n");
+                        currStt = BCC;
+                        set = 1;
+                        break;
+                    }else if(data[i]==DISC){
+                        printf("[SUCCESS]@valid\tControll field is validated as disc command\n");
+                        currStt = BCC;
+                        dis = 1;
+                        break;
+                    }else{
+                        printf("[ERROR]@valid\tControll field is incorrect\n");
+                        return 0;
+                    }
+                }
+                case(BCC):{
+                    if(data[i]==data[i-1]^data[i-2]){
+                        printf("[SUCCESS]@valid\tBCC field is validated\n");
+                        currStt = FLAG_END;
+                        break;
+                    }else{
+                        printf("[ERROR]@valid\tBCC field is incorrect\n");
+                        return 0;
+                    }
+                }
+                case(FLAG_END):{
+                    if(data[i]==FLAG){
+                        printf("[SUCCESS]@valid\tEnd Flag field is validated\n");
+                        currStt = DONE_PROC;
+                        break;
+                    }else{
+                        printf("[ERROR]@valid\tEnd Flag is incorrect\n");
+                        return 0;
+                    }
+                }
+            }
+        }
+
+        printf("[LOG]@valid\tFinished Frame Validation for command frame\n");
+
+        if(currStt == DONE_PROC){
+            if(set==1){
+                //TODO handle set command
+                return 1;
+            }else if(dis == 1){
+                //TODO handle disc command
+                return 1;
+            }
+
+            printf("[ERROR]@valid\tUnrecognized Command Received\n");
+            return 0;
+        }
+    }
+
+    //means its an information frame
+    if(sizeOf>=7){
+        printf("[LOG]@valid\tStarting Frame Validation for information frame\n");
+
+        for(unsigned int i = 0;i<sizeOf;++i){
+
+        }
+
+        printf("[LOG]@valid\tFinished Frame Validation for information frame\n");
+    }
 }
