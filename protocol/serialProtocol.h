@@ -8,6 +8,8 @@
 #define SET 0x03
 #define ADDR2 0x01
 #define DISC 0x0B
+#define CTR_PAR0 2
+#define CTR_PAR1 3
 
 #define BAUDRATE B38400
 #define MODEMDEVICE "/dev/ttyS1"
@@ -23,6 +25,7 @@
 #define BCC 3
 #define FLAG_END 4
 #define DONE_PROC 5
+#define BCC2 6
 
 /*
 	Response types calculated for each of the 2 possible frame parities, 0 or 1

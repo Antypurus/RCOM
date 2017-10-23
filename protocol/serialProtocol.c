@@ -928,8 +928,50 @@ unsigned char validateFrame(unsigned char* data,unsigned int sizeOf){
     if(sizeOf>=7){
         printf("[LOG]@valid\tStarting Frame Validation for information frame\n");
 
-        for(unsigned int i = 0;i<sizeOf;++i){
+        unsigned int currStt = FLAG_STR;
 
+        for(unsigned int i = 0;i<sizeOf;++i){
+            switch(currStt){
+                case(FLAG_STR):{
+                    if(data[i]==FLAG){
+                        printf("[SUCCESS]@valid\tStart Flag field is validated\n");
+                        currStt = ADDR;
+                        break;
+                    }else{
+                        printf("[ERROR]@valid\tStart Byte does not contain Flag\n");
+                        return 0;
+                    }
+                }
+                case(ADDRS):{
+                    if(data[i]==ADDRS){
+                        printf("[SUCCESS]@valid\tAddress field is validated\n");
+                        currStt = CTRL;
+                        break;
+                    }else{
+                        printf("[ERROR]@valid\tAddress field is not validated\n");
+                        return 0;
+                    }
+                }
+                case(CTRL):{
+                    if(data[i]==ADDRS){
+                        printf("[SUCCESS]@valid\tAddress field is validated\n");
+                        currStt = CTRL;
+                        break;
+                    }else{
+                        printf("[ERROR]@valid\tAddress field is not validated\n");
+                        return 0;
+                    }
+                }
+                case(BCC):{
+                    
+                }
+                case(BCC2):{
+                    
+                }
+                case(FLAG_END):{
+                    
+                }
+            }
         }
 
         printf("[LOG]@valid\tFinished Frame Validation for information frame\n");
