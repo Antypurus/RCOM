@@ -32,7 +32,7 @@ unsigned int allocateInformationFrames(unsigned char** buff,const unsigned char 
                 double fraction = size - (sizeOf/MAX_DATA_PER_FRAME);//determines fraction of the max data per frame for the last frame
                 g_ctrl.lastFrameSize = sizeof(unsigned char)*MAX_FRAME_SIZE*fraction;//saves the size of the last frame for easy acess
                 buff[i] = (unsigned char*)malloc(sizeof(unsigned char)*MAX_FRAME_SIZE*fraction);//allocates the frame with only the needed size
-                printf("[LOG]@memory\tAttempting to allocate an information frame of %d bytes",MAX_FRAME_SIZE*fraction);
+                printf("[LOG]@memory\tAttempting to allocate an information frame of %f bytes",MAX_FRAME_SIZE*fraction);
             }else{
                 buff[i] = (unsigned char*)malloc(sizeof(unsigned char)*MAX_FRAME_SIZE);
                 printf("[LOG]@memory\tAttempting to allocate an information frame of %d bytes",MAX_FRAME_SIZE);
@@ -131,7 +131,7 @@ unsigned char** divideData(const unsigned char data[],unsigned int* sizeOf){
             printf("[LOG]@divData\tMoved data from range[%d,%d] to buffer\n",i*MAX_DATA_PER_FRAME,MAX_DATA_PER_FRAME);
         }
     }
-    printf("[LOG]@divData\Finished data division process\n");
+    printf("[LOG]@divData\tFinished data division process\n");
     return buffer;
 }
 
