@@ -298,4 +298,9 @@ unsigned char* readSentData(unsigned int fd,unsigned int* sizeOf);
 //DOCUMENTATION MISSING
 unsigned char validateFrame(unsigned char* data,unsigned int sizeOf);
 
+//DOCUMENTATION MISSING
+void setHandler();
+
+//DOCUMENTATION MISSING
+void discHandler();
 #endif
