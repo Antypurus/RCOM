@@ -763,3 +763,80 @@ unsigned char* extractDataFromFrame(unsigned char* data,unsigned int* sizeOf){
     printf("[SUCCESS]@extract\tData Extraction Complete\n");
     return buff;
 }
+
+unsigned char* readSentData(unsigned int fd,unsigned int* sizeOf){
+    printf("[LOG]@rcRd\tStarting to read sent data\n");
+    unsigned int readFlag1 = 0;
+    unsigned int readFlag2 = 0;
+    unsigned int stop=0;
+
+    printf("[LOG]@rcRd\tAttempting to allocate buffer with max frame size\n");
+    unsigned char* buff = (unsigned char*)malloc(sizeof(unsigned char)*MAX_FRAME_SIZE);
+
+    if(buff==NULL){
+        printf("[ERROR]@rcRd\tFailed to allocated buffer\n");
+        return NULL;
+    }else{
+        printf("[SUCCESS]@rcRd\tSuccessfully allocated buffer\n");
+    }
+
+    unsigned char rd;
+    unsigned int sz = 0;
+
+    printf("[LOG]@rcRd\tReading Data\n");
+    while(!stop){
+        unsigned int res = read(fd,&rd,1);
+        if(res==1){
+
+            if(sz>MAX_FRAME_SIZE && stop == 0){
+                printf("[ERROR]@rcRd\tToo much data read without escape Flag\n");
+                return NULL;
+            }
+
+            printf("[LOG]@rcRd\tRead One Byte\n");
+            if(readFlag1 == 0 && rd == FLAG){
+                printf("[LOG]@rcRd\tRead Start Frame Flag Byte\n");
+                readFlag1 = 1;
+                buff[sz] = rd;
+                sz++;
+            }
+            if(readFlag1 == 1 && readFlag2 == 0){
+                printf("[LOG]@rcRd\tRead Intermediate Byte Byte\n");
+                buff[sz] = rd;
+                sz++;
+            }
+            if(readFlag1 == 1 && readFlag2 == 0 && rd == FLAG){
+                printf("[LOG]@rcRd\tRead End Frame Flag Byte\n");
+                readFlag2 = 1;
+                buff[sz] = rd;
+                sz++;
+                stop = 1;
+            }
+        }
+    }
+    printf("[LOG]@rcRd\tFinished reading Data\n");
+
+    printf("[LOG]@rcRd\tAttempting to resize frame buffer\n");
+    void* ck = realloc(buff,sz);
+
+    if(ck==NULL){
+        printf("[ERROR]@rcRd\tFailed to resize frame buffer\n");
+        return NULL;
+    }else{
+        printf("[SUCCESS]@rcRd\tSuccessfully resized buffer\n");
+    }
+
+    *sizeOf = sz;
+    return buff;
+}
+
+unsigned char validateFrame(unsigned char* data,unsigned int sizeOf){
+    printf("[LOG]@valid\tStarting Frame Validation\n");
+
+    if(sizeOf<5){
+        printf("[ERROR]@valid\tFrame Is Too Small to be a valid Frame\n");
+        return 0;
+    }
+
+    
+}

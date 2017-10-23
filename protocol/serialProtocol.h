@@ -289,4 +289,10 @@ unsigned char sendUACommand(unsigned int fd);
 //DOCUMENTATION MISSING
 unsigned char* extractDataFromFrame(unsigned char* data,unsigned int* sizeOf);
 
+//DOCUMENTATION MISSING
+unsigned char* readSentData(unsigned int fd,unsigned int* sizeOf);
+
+//DOCUMENTATION MISSING
+unsigned char validateFrame(unsigned char* data,unsigned int sizeOf);
+
 #endif
