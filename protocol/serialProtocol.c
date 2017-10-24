@@ -295,7 +295,7 @@ unsigned int openConnection(char *serialPort, unsigned int flags)
         perror(serialPort);
         exit(-1);
     }else{
-        //TODO
+        printf("[SUCCESS]@openc\tFile descriptor obatained\n");
     }
 
     printf("[LOG]@openc\tAttempting to  obtain file descriptor current attributes\n");
@@ -305,7 +305,7 @@ unsigned int openConnection(char *serialPort, unsigned int flags)
         perror("tcgetattr");
         exit(-1);
     }else{
-        //TODO
+        printf("[SUCCESS]@openc\tObtained file descriptor attributes\n");
     }
 
     bzero(&newtio, sizeof(newtio));
@@ -321,23 +321,31 @@ unsigned int openConnection(char *serialPort, unsigned int flags)
 
     tcflush(fd, TCIOFLUSH);
 
+    printf("[LOG]@openc\tAttempting to set file descriptor current attributes\n");
     if (tcsetattr(fd, TCSANOW, &newtio) == -1)
     {
+        printf("[ERROR]@openc\tFailed to set file descriptor current attributes\n");
         perror("tcsetattr");
-        exit(-1);
+        return -1;
+    }else{
+        printf("[SUCCESS]@openc\tSet file descriptor current attributes\n");
     }
 
     printf("New termios structure set\n");
-
+    printf("[LOG]@openc\tFinished estableshing serial porto conenction to:%s\n",serialPort);
     return fd;
 }
 
 void closeConnection(unsigned int fd)
 {
+    printf("[LOG]@closec\tAttempting to close serial port file descriptor\n");
     if (tcsetattr(fd, TCSANOW, &oldtio) == -1)
     {
+        printf("[ERROR]@closec\tFailed to close serial port file descriptor\n");
         perror("tcsetattr");
         exit(-1);
+    }else{
+        printf("[SUCCESS]@closec\tClosed serial port file descriptor\n");
     }
 
     close(fd);
