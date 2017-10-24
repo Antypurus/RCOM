@@ -9,56 +9,67 @@
 #include <unistd.h>
 #include <signal.h>
 
-unsigned int allocateInformationFrames(unsigned char** buff,const unsigned char data[],unsigned int sizeOf){
+unsigned int allocateInformationFrames(unsigned char **buff, const unsigned char data[], unsigned int sizeOf)
+{
     printf("[LOG]@memory\tStarting Allocation of information frames process\n");
     //This bit of code determine how many frames will be necessary to send the data
-    unsigned int size = (unsigned int)floor(sizeOf/MAX_DATA_PER_FRAME);
-    
+    unsigned int size = (unsigned int)floor(sizeOf / MAX_DATA_PER_FRAME);
+
     //this allocates the buffer with the ammount of frames necessary to send the data
-    buff = (unsigned char**)malloc(sizeof(unsigned char*)*size);
-    
-    if(buff == NULL){
+    buff = (unsigned char **)malloc(sizeof(unsigned char *) * size);
+
+    if (buff == NULL)
+    {
         printf("[ERROR]@memory\tAllocation of the information frame failed\n");
-        deallocateInformationFrames(buff,0);//since the was an error everything must be dealocated
-        return -1;// this indicates there was an issue allocating the requires space
+        deallocateInformationFrames(buff, 0); //since the was an error everything must be dealocated
+        return -1;                            // this indicates there was an issue allocating the requires space
     }
 
-    printf("[LOG]@memory\tAllocated information frame buffer of size %d\n",size);
+    printf("[LOG]@memory\tAllocated information frame buffer of size %d\n", size);
 
     //this allocates the space required to send the data inside each frame
-    for(unsigned int i=0;i<size;++i){
-        if(size>1){
-            if(i == (size -1)){
-                double fraction = size - (sizeOf/MAX_DATA_PER_FRAME);//determines fraction of the max data per frame for the last frame
-                g_ctrl.lastFrameSize = sizeof(unsigned char)*MAX_FRAME_SIZE*fraction;//saves the size of the last frame for easy acess
-                buff[i] = (unsigned char*)malloc(sizeof(unsigned char)*MAX_FRAME_SIZE*fraction);//allocates the frame with only the needed size
-                printf("[LOG]@memory\tAttempting to allocate an information frame of %f bytes",MAX_FRAME_SIZE*fraction);
-            }else{
-                buff[i] = (unsigned char*)malloc(sizeof(unsigned char)*MAX_FRAME_SIZE);
-                printf("[LOG]@memory\tAttempting to allocate an information frame of %d bytes",MAX_FRAME_SIZE);
-                
+    for (unsigned int i = 0; i < size; ++i)
+    {
+        if (size > 1)
+        {
+            if (i == (size - 1))
+            {
+                double fraction = size - (sizeOf / MAX_DATA_PER_FRAME);                               //determines fraction of the max data per frame for the last frame
+                g_ctrl.lastFrameSize = sizeof(unsigned char) * MAX_FRAME_SIZE * fraction;             //saves the size of the last frame for easy acess
+                buff[i] = (unsigned char *)malloc(sizeof(unsigned char) * MAX_FRAME_SIZE * fraction); //allocates the frame with only the needed size
+                printf("[LOG]@memory\tAttempting to allocate an information frame of %f bytes", MAX_FRAME_SIZE * fraction);
             }
-        }else{
-            buff[i] = (unsigned char*)malloc(sizeof(unsigned char)*(sizeOf+6));
-            printf("[LOG]@memory\tAttempting to allocate an information frame of %d bytes",(sizeOf+6));
+            else
+            {
+                buff[i] = (unsigned char *)malloc(sizeof(unsigned char) * MAX_FRAME_SIZE);
+                printf("[LOG]@memory\tAttempting to allocate an information frame of %d bytes", MAX_FRAME_SIZE);
+            }
+        }
+        else
+        {
+            buff[i] = (unsigned char *)malloc(sizeof(unsigned char) * (sizeOf + 6));
+            printf("[LOG]@memory\tAttempting to allocate an information frame of %d bytes", (sizeOf + 6));
         }
 
-        if(buff[i]==NULL){
+        if (buff[i] == NULL)
+        {
             printf("[ERROR]@memory\tInformation Frame Failed to Allocate\n");
-            deallocateInformationFrames(buff,i);//since the was an error everything must be dealocated
-            return -1;// this indicates there was an issue allocating the requires space
+            deallocateInformationFrames(buff, i); //since the was an error everything must be dealocated
+            return -1;                            // this indicates there was an issue allocating the requires space
         }
 
         printf("[SUCCES]@memory\tInformation Frame Successfully Allocated\n");
     }
     printf("[LOG]@memory\tAllocation of Information frames process ended\n");
-    return size;//returns the ammount of frames allocated
+    return size; //returns the ammount of frames allocated
 }
 
-void deallocateInformationFrames(unsigned char** frames,unsigned int numberOfFrames){
+void deallocateInformationFrames(unsigned char **frames, unsigned int numberOfFrames)
+{
     printf("[LOG]@memory\tStarting deallocation of information frames\n");
     //dealocates the memory space of each individual frame
-    for(unsigned int i=0;i<numberOfFrames;++i){
+    for (unsigned int i = 0; i < numberOfFrames; ++i)
+    {
         free(frames[i]);
     }
     //dealocates the frame buffer
@@ -67,28 +78,32 @@ void deallocateInformationFrames(unsigned char** frames,unsigned int numberOfFra
     return;
 }
 
-unsigned char** allocateCharBuffers(unsigned int numberOfBuffers,unsigned int dataPerBuffer){
+unsigned char **allocateCharBuffers(unsigned int numberOfBuffers, unsigned int dataPerBuffer)
+{
     printf("[LOG]@memory\tStarting allocation of generic buffer\n");
     //allocates the buffer of buffers
-    printf("[LOG]@memory\tAtempting to allocate buffer of size %d\n",numberOfBuffers);
-    unsigned char** buffer = (unsigned char**)malloc(sizeof(unsigned char*)*numberOfBuffers);
+    printf("[LOG]@memory\tAtempting to allocate buffer of size %d\n", numberOfBuffers);
+    unsigned char **buffer = (unsigned char **)malloc(sizeof(unsigned char *) * numberOfBuffers);
 
-    if(buffer == NULL){
+    if (buffer == NULL)
+    {
         printf("[ERROR]@memory\tFailed to allocated buffer\n");
-        deallocatedCharBuffers(buffer,0);//deallocates the buffer of buffers at is not needed
-        return NULL;//indicates there has been an error with the allocation
+        deallocatedCharBuffers(buffer, 0); //deallocates the buffer of buffers at is not needed
+        return NULL;                       //indicates there has been an error with the allocation
     }
     printf("[SUCCESS]@memory\tBuffer holder allocated\n");
 
     //allocate each individual buffer
-    for(unsigned int i=0;i<numberOfBuffers;++i){
-        buffer[i] = (unsigned char*)malloc(sizeof(unsigned char)*dataPerBuffer);
-        printf("[LOG]@memory\tAttempting to allocated generic buffer of size %d\n",dataPerBuffer);
+    for (unsigned int i = 0; i < numberOfBuffers; ++i)
+    {
+        buffer[i] = (unsigned char *)malloc(sizeof(unsigned char) * dataPerBuffer);
+        printf("[LOG]@memory\tAttempting to allocated generic buffer of size %d\n", dataPerBuffer);
 
-        if(buffer[i]==NULL){
+        if (buffer[i] == NULL)
+        {
             printf("[ERROR]@memory\tFailed to allocated buffer\n");
-            deallocatedCharBuffers(buffer,0);//deallocates the buffer of buffers at is not needed
-            return NULL;//indicates there has been an error with the allocation
+            deallocatedCharBuffers(buffer, 0); //deallocates the buffer of buffers at is not needed
+            return NULL;                       //indicates there has been an error with the allocation
         }
         printf("[SUCCESS]@memory\tBuffer allocated\n");
     }
@@ -96,10 +111,12 @@ unsigned char** allocateCharBuffers(unsigned int numberOfBuffers,unsigned int da
     return buffer;
 }
 
-void deallocatedCharBuffers(unsigned char** buffers,unsigned int numberOfBuffers){
+void deallocatedCharBuffers(unsigned char **buffers, unsigned int numberOfBuffers)
+{
     printf("[LOG]@memory\tStarting generic buffer deallocation\n");
     //dealocates the memory space of each buffer
-    for(unsigned int i=0;i<numberOfBuffers;++i){
+    for (unsigned int i = 0; i < numberOfBuffers; ++i)
+    {
         free(buffers[i]);
     }
     printf("[LOG]@memory\tgeneric buffers freed\n");
@@ -109,124 +126,186 @@ void deallocatedCharBuffers(unsigned char** buffers,unsigned int numberOfBuffers
     return;
 }
 
-unsigned char** divideData(const unsigned char data[],unsigned int* sizeOf){
+unsigned char **divideData(const unsigned char data[], unsigned int *sizeOf)
+{
     printf("[LOG]@divData\tStarting data division process\n");
-    unsigned int size = (unsigned int)floor(*sizeOf/MAX_DATA_PER_FRAME);//determine the size of the data
-    unsigned char** buffer = allocateCharBuffers(size,MAX_DATA_PER_FRAME);//allocates the required space for the data holders
+    unsigned int size = (unsigned int)floor(*sizeOf / MAX_DATA_PER_FRAME);  //determine the size of the data
+    unsigned char **buffer = allocateCharBuffers(size, MAX_DATA_PER_FRAME); //allocates the required space for the data holders
 
-    if(buffer==NULL){
-        return NULL;//return an error code, meaning there was an error with the allocation
+    if (buffer == NULL)
+    {
+        return NULL; //return an error code, meaning there was an error with the allocation
     }
 
     //moves each chunk of data to the buffers
-    for(unsigned int i=0;i<size;++i){
-        if((i*MAX_DATA_PER_FRAME+MAX_DATA_PER_FRAME)>*sizeOf){
-            unsigned int str = i*MAX_DATA_PER_FRAME;//calculate the start of the range
-            unsigned int end = *sizeOf-i*MAX_DATA_PER_FRAME;//calculate how much to copy at the end of the range
-            memmove(buffer[i],data+str,end);
-            printf("[LOG]@divData\tMoved data from range[%d,%d] to buffer\n",str,end);
-            *sizeOf = *sizeOf-i*MAX_DATA_PER_FRAME;
-        }else{
-            memmove(buffer[i],data+i*MAX_DATA_PER_FRAME,MAX_DATA_PER_FRAME);
-            printf("[LOG]@divData\tMoved data from range[%d,%d] to buffer\n",i*MAX_DATA_PER_FRAME,MAX_DATA_PER_FRAME);
+    for (unsigned int i = 0; i < size; ++i)
+    {
+        if ((i * MAX_DATA_PER_FRAME + MAX_DATA_PER_FRAME) > *sizeOf)
+        {
+            unsigned int str = i * MAX_DATA_PER_FRAME;           //calculate the start of the range
+            unsigned int end = *sizeOf - i * MAX_DATA_PER_FRAME; //calculate how much to copy at the end of the range
+            memmove(buffer[i], data + str, end);
+            printf("[LOG]@divData\tMoved data from range[%d,%d] to buffer\n", str, end);
+            *sizeOf = *sizeOf - i * MAX_DATA_PER_FRAME;
+        }
+        else
+        {
+            memmove(buffer[i], data + i * MAX_DATA_PER_FRAME, MAX_DATA_PER_FRAME);
+            printf("[LOG]@divData\tMoved data from range[%d,%d] to buffer\n", i * MAX_DATA_PER_FRAME, MAX_DATA_PER_FRAME);
         }
     }
     printf("[LOG]@divData\tFinished data division process\n");
     return buffer;
 }
 
-void moveInformationToFrame(unsigned char* frame,const unsigned char data[],unsigned int size){
+void moveInformationToFrame(unsigned char *frame, const unsigned char data[], unsigned int size)
+{
     printf("[LOG]@movData\tStarting data move to frame\n");
-    if(size>MAX_DATA_PER_FRAME*2){
+    if (size > MAX_DATA_PER_FRAME * 2)
+    {
         printf("[ERROR]@movData\tData to large for a single frame\n");
         return; //The data is too big for this frame;
     }
 
-    memmove(frame+4,data,size);//moves the data to the data section of the frame
+    memmove(frame + 4, data, size); //moves the data to the data section of the frame
     printf("[LOG]@movData\tData moved to frame\n");
     return;
 }
 
-void prepareInformationFrames(unsigned char** frames,unsigned int numberFrames){
+void prepareInformationFrames(unsigned char **frames, unsigned int numberFrames)
+{
     printf("[LOG]@frameSet\tFrame Set Up starded\n");
-    for(unsigned int i=0;i<numberFrames;++i){
-        printf("[LOG]@frameSet\tsetting up frame %d\n",i);
-        if(g_ctrl.currPar==0){
+    for (unsigned int i = 0; i < numberFrames; ++i)
+    {
+        printf("[LOG]@frameSet\tsetting up frame %d\n", i);
+        if (g_ctrl.currPar == 0)
+        {
             g_ctrl.currPar = 1;
-        }else{
+        }
+        else
+        {
             g_ctrl.currPar = 0;
         }
 
         unsigned int lastByte = 0;
-        if(i == numberFrames-1){
+        if (i == numberFrames - 1)
+        {
             lastByte = g_ctrl.lastFrameSize;
-        }else{
+        }
+        else
+        {
             lastByte = MAX_FRAME_SIZE;
         }
 
-        frames[i][0]=FLAG;//FLAG
-        frames[i][1]=ADDRS;//ADDRS
-        frames[i][2]=g_ctrl.currPar;//CTRL
-        frames[i][3]=frames[i][1] ^ frames[i][2];//BCC1
-        frames[i][lastByte-1]=FLAG;//FLAG
-        printf("[LOG]@frameSet\tfinished setting up frame %d\n",i);
+        frames[i][0] = FLAG;                        //FLAG
+        frames[i][1] = ADDRS;                       //ADDRS
+        frames[i][2] = g_ctrl.currPar;              //CTRL
+        frames[i][3] = frames[i][1] ^ frames[i][2]; //BCC1
+        frames[i][lastByte - 1] = FLAG;             //FLAG
+        printf("[LOG]@frameSet\tfinished setting up frame %d\n", i);
     }
     printf("[LOG]@frameSet\tFrame Set Up finished\n");
     return;
 }
 
-void moveDataToFrames(unsigned char** frames,const unsigned char data[],unsigned int size,unsigned int numberOfFrames){
+unsigned char moveDataToFrames(unsigned char **frames, const unsigned char data[], unsigned int size, unsigned int numberOfFrames)
+{
     printf("[LOG]@dataMv\tStarting move of data to frame\n");
     unsigned int s_size = size;
-    unsigned char** info = divideData(data,&s_size);//obtain the data divided into chunks
 
-    for(unsigned int i=0;i<numberOfFrames;++i){
-        unsigned int sizeOf = 0;//size of the current frame
-        if(i==numberOfFrames-1){
+    printf("[LOG]@dataMv\tAttempting to divide data\n");
+    unsigned char **info = divideData(data, &s_size); //obtain the data divided into chunks
+
+    if (info == NULL)
+    {
+        printf("[ERROR]@dataMv\tFailed to split data into chunks\n");
+        return 0;
+    }
+    else
+    {
+        printf("[SUCCESS]@dataMv\tData has been split\n");
+    }
+
+    for (unsigned int i = 0; i < numberOfFrames; ++i)
+    {
+        unsigned int sizeOf = 0; //size of the current frame
+        if (i == numberOfFrames - 1)
+        {
             sizeOf = g_ctrl.lastFrameSize;
-        }else{
+        }
+        else
+        {
             sizeOf = MAX_FRAME_SIZE;
         }
-        unsigned char*stuffed = byteStuffingOnData(info[i],&s_size);
-        if(stuffed == NULL){
+
+        printf("[LOG]@dataMv\tAttempting to bytte stuff data\n");
+        unsigned char *stuffed = byteStuffingOnData(info[i], &s_size);
+        if (stuffed == NULL)
+        {
+            printf("[ERROR]@dataMv\tByte stuffing failed\n");
             g_ctrl.allocError = 1;
-            return;
+            return 0;
+        }
+        else
+        {
+            printf("[SUCCESS]@dataMv\tByte stuffing complete\n");
         }
         g_ctrl.allocError = 0;
-        moveInformationToFrame(frames[i],stuffed,s_size);//moves the chunk of data into the frame
-        frames[i][sizeOf-2] = calculateBCC2(info[i],s_size);//sets the BCC for the data chunk that was moved
+        moveInformationToFrame(frames[i], stuffed, s_size);     //moves the chunk of data into the frame
+        frames[i][sizeOf - 2] = calculateBCC2(info[i], s_size); //sets the BCC for the data chunk that was moved
     }
-
-    return;
+    printf("[SUCCESS]@dataMv\tInformation and BCC2 have been set for the frames\n");
+    return 1;
 }
 
-unsigned char calculateBCC2(const unsigned char data[],unsigned int sizeOfData){
+unsigned char calculateBCC2(const unsigned char data[], unsigned int sizeOfData)
+{
+    printf("[LOG]@bcc2\tStarting BCC2 calculation\n");
     unsigned char ret = 0;
-    unsigned int size = sizeOfData/sizeof(unsigned char);//determine the size of the data
+    unsigned int size = sizeOfData / sizeof(unsigned char); //determine the size of the data
 
-    for(unsigned int i=0;i<size;++i){
-        ret = ret ^ data[i];//calculate the XOR of the whole data
+    for (unsigned int i = 0; i < size; ++i)
+    {
+        ret = ret ^ data[i]; //calculate the XOR of the whole data
     }
-
+    printf("[LOG]@bcc2\tFinished BCC2 calculation\n");
     return ret;
 }
 
 //Need to document and properly adapt the code
-unsigned int openConnection(char* serialPort,unsigned int flags){
-    
-    if ( ((strcmp("/dev/ttyS0", serialPort)!=0) && (strcmp("/dev/ttyS1", serialPort)!=0) )) {
-      printf("Usage:\tnserial SerialPort\n\tex: nserial /dev/ttyS1\n");
-      exit(1);
+unsigned int openConnection(char *serialPort, unsigned int flags)
+{
+
+    printf("[LOG]@openc\tOpening Connection to serial port:%s\n", serialPort);
+
+    if (((strcmp("/dev/ttyS0", serialPort) != 0) && (strcmp("/dev/ttyS1", serialPort) != 0)))
+    {
+        printf("[ERROR]@openc\tInvalid serial port supplied\n");
+        printf("Usage:\tnserial SerialPort\n\tex: nserial /dev/ttyS1\n");
+        exit(1);
     }
 
+    printf("[LOG]@openc\tAttempting to open file descriptor\n");
     unsigned int fd;
     fd = open(serialPort, O_RDWR | O_NOCTTY | O_NONBLOCK);
 
-    if (fd <0) {perror(serialPort); exit(-1); }
+    if (fd < 0)
+    {
+        printf("[ERROR]@openc\tFile descriptor failed to open\n");
+        perror(serialPort);
+        exit(-1);
+    }else{
+        //TODO
+    }
 
-    if ( tcgetattr(fd,&oldtio) == -1) { /* save current port settings */
-      perror("tcgetattr");
-      exit(-1);
+    printf("[LOG]@openc\tAttempting to  obtain file descriptor current attributes\n");
+    if (tcgetattr(fd, &oldtio) == -1)
+    { /* save current port settings */
+        printf("[ERROR]@openc\tFailed to obtain file descriptor current attributes\n");
+        perror("tcgetattr");
+        exit(-1);
+    }else{
+        //TODO
     }
 
     bzero(&newtio, sizeof(newtio));
@@ -237,14 +316,15 @@ unsigned int openConnection(char* serialPort,unsigned int flags){
     /* set input mode (non-canonical, no echo,...) */
     newtio.c_lflag = 0;
 
-    newtio.c_cc[VTIME]    = 0;   /* inter-character timer unused */
-    newtio.c_cc[VMIN]     = 5;   /* blocking read until 5 chars received */
+    newtio.c_cc[VTIME] = 0; /* inter-character timer unused */
+    newtio.c_cc[VMIN] = 5;  /* blocking read until 5 chars received */
 
     tcflush(fd, TCIOFLUSH);
 
-    if ( tcsetattr(fd,TCSANOW,&newtio) == -1) {
-      perror("tcsetattr");
-      exit(-1);
+    if (tcsetattr(fd, TCSANOW, &newtio) == -1)
+    {
+        perror("tcsetattr");
+        exit(-1);
     }
 
     printf("New termios structure set\n");
@@ -252,40 +332,50 @@ unsigned int openConnection(char* serialPort,unsigned int flags){
     return fd;
 }
 
-void closeConnection(unsigned int fd){
-    if ( tcsetattr(fd,TCSANOW,&oldtio) == -1) {
+void closeConnection(unsigned int fd)
+{
+    if (tcsetattr(fd, TCSANOW, &oldtio) == -1)
+    {
         perror("tcsetattr");
         exit(-1);
-      }
-  
+    }
+
     close(fd);
 }
 
 //NEED TO DOCUMENT - MISSING ERROR CHECKING
-unsigned char* byteStuffingOnData(const unsigned char data[],unsigned int* sizeOfData){
+unsigned char *byteStuffingOnData(const unsigned char data[], unsigned int *sizeOfData)
+{
     unsigned int originalSize = *sizeOfData;
     unsigned int postSize = originalSize;
 
-    unsigned char** buffer = allocateCharBuffers(1,originalSize*2);// we really should not use this but as a barebones implementation it can pass
+    unsigned char **buffer = allocateCharBuffers(1, originalSize * 2); // we really should not use this but as a barebones implementation it can pass
 
     unsigned int currIndice = 0;
-    for(unsigned int i=0;i<originalSize;++i){
-        if(data[i]==0x7D){
+    for (unsigned int i = 0; i < originalSize; ++i)
+    {
+        if (data[i] == 0x7D)
+        {
             buffer[0][currIndice] = 0x7D;
             buffer[0][++currIndice] = 0x5D;
             postSize++;
-        }else if(data[i]==0x7E){
+        }
+        else if (data[i] == 0x7E)
+        {
             buffer[0][currIndice] = 0x7D;
             buffer[0][++currIndice] = 0x5E;
             postSize++;
-        }else{
+        }
+        else
+        {
             buffer[0][currIndice] = data[i];
         }
         currIndice++;
     }
 
-    void* ret = realloc(buffer[0],postSize);
-    if(ret==NULL){
+    void *ret = realloc(buffer[0], postSize);
+    if (ret == NULL)
+    {
         return NULL;
     }
     *sizeOfData = postSize;
@@ -293,114 +383,158 @@ unsigned char* byteStuffingOnData(const unsigned char data[],unsigned int* sizeO
 }
 
 //NEEDS TO BE DOCUMENTED
-char ReceptorResponseInterpreter(const unsigned char* receptorResponse){
+char ReceptorResponseInterpreter(const unsigned char *receptorResponse)
+{
     unsigned int currntState = FLAG_STR;
     unsigned int responseType;
 
-    for(unsigned int i=0;i<5;++i){
-        switch(currntState){
+    for (unsigned int i = 0; i < 5; ++i)
+    {
+        switch (currntState)
+        {
 
-            case(FLAG_STR):{
-                if(receptorResponse[i]==FLAG){
-                    currntState = ADDR;
-                }else{
-                    return ERR;
-                }
-                break;
+        case (FLAG_STR):
+        {
+            if (receptorResponse[i] == FLAG)
+            {
+                currntState = ADDR;
             }
-
-            case(ADDR):{
-                if(receptorResponse[i]==ADDR2){
-                    currntState = CTRL;
-                }else{
-                    return ERR;
-                }
-                break;
+            else
+            {
+                return ERR;
             }
+            break;
+        }
 
-            case(CTRL):{
-                if(g_ctrl.currPar==0){
-                    if(receptorResponse[i]==UA){
-                        responseType = UA_R;
-                        currntState = BCC;
-                        break;
-                    }else if(receptorResponse[i]==RR0){
-                        responseType = ACPT;
-                        currntState = BCC;
-                        break;
-                    }else if(receptorResponse[i]==REJ0){
-                        responseType = REJ;
-                        currntState = BCC;
-                        break;
-                    }else{
-                        return ERR;
-                    }
-                }else if(g_ctrl.currPar==1){
-                    if(receptorResponse[i]==UA){
-                        responseType = UA_R;
-                        currntState = BCC;
-                        break;
-                    }else if(receptorResponse[i]==RR1){
-                        responseType = ACPT;
-                        currntState = BCC;
-                        break;
-                    }else if(receptorResponse[i]==REJ1){
-                        responseType = REJ;
-                        currntState = BCC;
-                        break;
-                    }else{
-                        return ERR;
-                    }
-                }
-                break;
+        case (ADDR):
+        {
+            if (receptorResponse[i] == ADDR2)
+            {
+                currntState = CTRL;
             }
+            else
+            {
+                return ERR;
+            }
+            break;
+        }
 
-            case(BCC):{
-                if(receptorResponse[i]==(receptorResponse[i-1]^receptorResponse[i-2])){
-                    currntState = FLAG_END;
+        case (CTRL):
+        {
+            if (g_ctrl.currPar == 0)
+            {
+                if (receptorResponse[i] == UA)
+                {
+                    responseType = UA_R;
+                    currntState = BCC;
                     break;
-                }else{
+                }
+                else if (receptorResponse[i] == RR0)
+                {
+                    responseType = ACPT;
+                    currntState = BCC;
+                    break;
+                }
+                else if (receptorResponse[i] == REJ0)
+                {
+                    responseType = REJ;
+                    currntState = BCC;
+                    break;
+                }
+                else
+                {
                     return ERR;
                 }
             }
-
-            case(FLAG_END):{
-                if(receptorResponse[i]==FLAG){
-                    currntState = DONE_PROC;     
-                    break;                                 
-                }else{
+            else if (g_ctrl.currPar == 1)
+            {
+                if (receptorResponse[i] == UA)
+                {
+                    responseType = UA_R;
+                    currntState = BCC;
+                    break;
+                }
+                else if (receptorResponse[i] == RR1)
+                {
+                    responseType = ACPT;
+                    currntState = BCC;
+                    break;
+                }
+                else if (receptorResponse[i] == REJ1)
+                {
+                    responseType = REJ;
+                    currntState = BCC;
+                    break;
+                }
+                else
+                {
                     return ERR;
                 }
             }
+            break;
+        }
 
-            default:break;
+        case (BCC):
+        {
+            if (receptorResponse[i] == (receptorResponse[i - 1] ^ receptorResponse[i - 2]))
+            {
+                currntState = FLAG_END;
+                break;
+            }
+            else
+            {
+                return ERR;
+            }
+        }
+
+        case (FLAG_END):
+        {
+            if (receptorResponse[i] == FLAG)
+            {
+                currntState = DONE_PROC;
+                break;
+            }
+            else
+            {
+                return ERR;
+            }
+        }
+
+        default:
+            break;
         }
     }
 
-    if( currntState == DONE_PROC){
+    if (currntState == DONE_PROC)
+    {
         return responseType;
     }
 
-    return ERR;//error code
+    return ERR; //error code
 }
 
 //NEEDS TO BE COMMENTED
-unsigned char* getReceptorResponse(unsigned int fd){
+unsigned char *getReceptorResponse(unsigned int fd)
+{
     unsigned int res = 0;
-    unsigned char* buffer = (unsigned char*)malloc(sizeof(unsigned char)*5);
-    if(buffer == NULL){
+    unsigned char *buffer = (unsigned char *)malloc(sizeof(unsigned char) * 5);
+    if (buffer == NULL)
+    {
         return NULL;
     }
-    alarm(TIMEOUT);//sets an alarm with the timeout value , to manage connection timeouts
-    while(res==0){
-        res = read(fd,buffer,5);
-        if(res==5){// if it reads it disables the alarms and marks the connection as successful and returns 1
+    alarm(TIMEOUT); //sets an alarm with the timeout value , to manage connection timeouts
+    while (res == 0)
+    {
+        res = read(fd, buffer, 5);
+        if (res == 5)
+        { // if it reads it disables the alarms and marks the connection as successful and returns 1
             alarm(0);
             g_ctrl.hasTimedOut = FALSE;
             g_ctrl.retryCounter = 0;
             return buffer;
         }
-        if(g_ctrl.hasTimedOut){// if the connection is marked as timed out 0 is returned
+        if (g_ctrl.hasTimedOut)
+        { // if the connection is marked as timed out 0 is returned
             return NULL;
         }
     }
@@ -408,8 +542,9 @@ unsigned char* getReceptorResponse(unsigned int fd){
 }
 
 //NEEDS TO BE COMMENTED
-unsigned char sendSetCommand(unsigned int fd){
-    signal(SIGALRM,timeoutHandler);
+unsigned char sendSetCommand(unsigned int fd)
+{
+    signal(SIGALRM, timeoutHandler);
     g_ctrl.currPar = 0;
     g_ctrl.retryCounter = 0;
     g_ctrl.fileDescriptor = fd;
@@ -424,31 +559,39 @@ unsigned char sendSetCommand(unsigned int fd){
 
     g_ctrl.frameToSend = buffer;
 
-    unsigned int res = write(fd,buffer,5);//writes to pipe the set command in the buffer
+    unsigned int res = write(fd, buffer, 5); //writes to pipe the set command in the buffer
 
-    unsigned char* buff;
+    unsigned char *buff;
 
-    if(res==5){//if it wrote the whole buffer it will now atemp to read the confirmation for the receptor
-        buff = getReceptorResponse(fd);//get the response with the possibility of timeout
-        if(buff==NULL){
+    if (res == 5)
+    {                                   //if it wrote the whole buffer it will now atemp to read the confirmation for the receptor
+        buff = getReceptorResponse(fd); //get the response with the possibility of timeout
+        if (buff == NULL)
+        {
             return 0;
         }
-        unsigned int rez = ReceptorResponseInterpreter(buff);//check response type
-        if(rez == UA_R){//if correct response type return 1
-	    free(buff);
+        unsigned int rez = ReceptorResponseInterpreter(buff); //check response type
+        if (rez == UA_R)
+        { //if correct response type return 1
+            free(buff);
             return 1;
-        }else{
-	    free(buff);
+        }
+        else
+        {
+            free(buff);
             return 0;
         }
-    }else{
+    }
+    else
+    {
         return 0;
     }
     return 0;
 }
 
-unsigned char sendDisconnectCommand(unsigned int fd){
-    signal(SIGALRM,timeoutHandler);
+unsigned char sendDisconnectCommand(unsigned int fd)
+{
+    signal(SIGALRM, timeoutHandler);
     g_ctrl.retryCounter = 0;
     g_ctrl.fileDescriptor = fd;
 
@@ -461,98 +604,125 @@ unsigned char sendDisconnectCommand(unsigned int fd){
 
     g_ctrl.frameToSend = buffer;
 
-    unsigned int res = write(fd,buffer,5);
-    if(res==5){
-        unsigned char *buff = getReceptorResponse(fd);//get the response with the possibility of timeout
-        if(buff==NULL){
+    unsigned int res = write(fd, buffer, 5);
+    if (res == 5)
+    {
+        unsigned char *buff = getReceptorResponse(fd); //get the response with the possibility of timeout
+        if (buff == NULL)
+        {
             return 0;
         }
-        unsigned int rez = ReceptorResponseInterpreter(buff);//check response type
-        if(rez == UA_R){//if correct response type return 1
+        unsigned int rez = ReceptorResponseInterpreter(buff); //check response type
+        if (rez == UA_R)
+        { //if correct response type return 1
             free(buff);
             return 1;
-        }else{
+        }
+        else
+        {
             free(buff);
             return 0;
         }
-    }else{
+    }
+    else
+    {
         return 0;
     }
     return 0;
 }
 
 //NEEDS COMMENTING
-unsigned char sendData(unsigned int fd,const unsigned char data[],unsigned int size){
-    signal(SIGALRM,timeoutHandler);
+unsigned char sendData(unsigned int fd, const unsigned char data[], unsigned int size)
+{
+    signal(SIGALRM, timeoutHandler);
     g_ctrl.retryCounter = 0;
     g_ctrl.fileDescriptor = fd;
 
-    unsigned char**frames = NULL;
-    unsigned int nFrames = allocateInformationFrames(frames,data,size);
-    if(nFrames == 0){
+    unsigned char **frames = NULL;
+    unsigned int nFrames = allocateInformationFrames(frames, data, size);
+    if (nFrames == 0)
+    {
         printf("[ERROR]@allocation:There has been an allocation error on the inforation frames\n");
         return 0;
     }
-    prepareInformationFrames(frames,nFrames);
-    moveDataToFrames(frames,data,size,nFrames);
+    prepareInformationFrames(frames, nFrames);
+    moveDataToFrames(frames, data, size, nFrames);
     //the frames are now ready to be sent
 
-    if(g_ctrl.allocError){
+    if (g_ctrl.allocError)
+    {
         printf("[ERROR]@allocation:There has been an allocation error while moving information to frames,exiting\n");
         return 0;
     }
 
-    for(unsigned int i=0;i<nFrames;++i){
+    for (unsigned int i = 0; i < nFrames; ++i)
+    {
         unsigned int toSend = 0;
-        if(i==nFrames-1){
+        if (i == nFrames - 1)
+        {
             toSend = g_ctrl.lastFrameSize;
-        }else{
+        }
+        else
+        {
             toSend = MAX_FRAME_SIZE;
         }
         g_ctrl.frameToSend = frames[i];
-        unsigned int sent = write(fd,frames[i],toSend);
-        if(sent==0){
+        unsigned int sent = write(fd, frames[i], toSend);
+        if (sent == 0)
+        {
             printf("Connection Error Unable To Senda Data\n");
             return 0;
         }
-        unsigned char* buf = getReceptorResponse(fd);
-        if(buf==NULL){
+        unsigned char *buf = getReceptorResponse(fd);
+        if (buf == NULL)
+        {
             return 0;
         }
         unsigned int rez = ReceptorResponseInterpreter(buf);
 
-        if(g_ctrl.currPar==1){
-            while(rez==REJ1){
+        if (g_ctrl.currPar == 1)
+        {
+            while (rez == REJ1)
+            {
                 free(buf);
                 buf = getReceptorResponse(fd);
-                if(buf==NULL){
+                if (buf == NULL)
+                {
                     return 0;
                 }
                 rez = ReceptorResponseInterpreter(buf);
             }
-            if(rez==RR1){
+            if (rez == RR1)
+            {
                 return sent;
             }
-        }else{
-            while(rez==REJ0){
+        }
+        else
+        {
+            while (rez == REJ0)
+            {
                 free(buf);
                 buf = getReceptorResponse(fd);
-                if(buf==NULL){
+                if (buf == NULL)
+                {
                     return 0;
                 }
                 rez = ReceptorResponseInterpreter(buf);
             }
-            if(rez==RR0){
+            if (rez == RR0)
+            {
                 return sent;
             }
         }
 
-        if(rez==UA_R){
+        if (rez == UA_R)
+        {
             printf("Incorrect Response Type Received\n");
             return 0;
         }
 
-        if(rez == ERR){
+        if (rez == ERR)
+        {
             printf("Corrupted Response Received\n");
             return 0;
         }
@@ -560,15 +730,20 @@ unsigned char sendData(unsigned int fd,const unsigned char data[],unsigned int s
     return 0;
 }
 
-void timeoutHandler(int sig){
-    if(g_ctrl.retryCounter>=MAX_TIMEOUT){
+void timeoutHandler(int sig)
+{
+    if (g_ctrl.retryCounter >= MAX_TIMEOUT)
+    {
         printf("Conection Timeout\n");
         g_ctrl.hasTimedOut = TRUE;
         return;
-    }else{
-        printf("Retrying Connection ... Attempt %d\n",g_ctrl.retryCounter+1);
-        unsigned int res = write(g_ctrl.fileDescriptor,g_ctrl.frameToSend,5);
-        if(res==0){
+    }
+    else
+    {
+        printf("Retrying Connection ... Attempt %d\n", g_ctrl.retryCounter + 1);
+        unsigned int res = write(g_ctrl.fileDescriptor, g_ctrl.frameToSend, 5);
+        if (res == 0)
+        {
             printf("Conection Timeout\n");
             g_ctrl.hasTimedOut = TRUE;
             return;
@@ -578,41 +753,53 @@ void timeoutHandler(int sig){
     }
 }
 
-unsigned char* destuffData(unsigned char* data, unsigned int*sizeOf){
+unsigned char *destuffData(unsigned char *data, unsigned int *sizeOf)
+{
     printf("[LOG]@destuffing\tStarting Data Destuffing Proccess\n");
     unsigned int initialSize = *sizeOf;
     unsigned int currSize = *sizeOf;
 
     unsigned int currInd = 0;
 
-    unsigned char* retData = (unsigned char*)malloc(sizeof(unsigned char)*initialSize);
-    if(retData==NULL){
+    unsigned char *retData = (unsigned char *)malloc(sizeof(unsigned char) * initialSize);
+    if (retData == NULL)
+    {
         printf("[ERROR]@destuffing\tFailed to allocated buffer for destuffed data\n");
         return NULL;
     }
 
-    for(unsigned int i=0;i<initialSize;++i){
-        if(data[i]==0x7D){
-            if(data[i+1]==0x5d){
-                retData[currInd]= 0x7D;
+    for (unsigned int i = 0; i < initialSize; ++i)
+    {
+        if (data[i] == 0x7D)
+        {
+            if (data[i + 1] == 0x5d)
+            {
+                retData[currInd] = 0x7D;
                 currSize--;
                 i++;
-            }else if(data[i+1]==0x5E){
-                retData[currInd]= 0x7E;
+            }
+            else if (data[i + 1] == 0x5E)
+            {
+                retData[currInd] = 0x7E;
                 currSize--;
                 i++;
-            }else{
-                retData[currInd]= data[i];
+            }
+            else
+            {
+                retData[currInd] = data[i];
             }
             currInd++;
-        }else{
-            retData[currInd]= data[i];
+        }
+        else
+        {
+            retData[currInd] = data[i];
             currInd++;
         }
     }
 
-    void*chk = realloc(retData,currSize);
-    if(chk==NULL){
+    void *chk = realloc(retData, currSize);
+    if (chk == NULL)
+    {
         printf("[ERROR]@destuffing\tFailed to resize destuffed data buffer\n");
         return NULL;
     }
@@ -623,43 +810,51 @@ unsigned char* destuffData(unsigned char* data, unsigned int*sizeOf){
     return retData;
 }
 
-unsigned char sendRRCommand(unsigned int fd){
+unsigned char sendRRCommand(unsigned int fd)
+{
     printf("[LOG]@cmdRec\tStarting RR commander sending proccess\n");
     unsigned char buff[5];
 
     printf("[LOG]@cmdRec\tpreparing command buffer\n");
     buff[0] = FLAG;
     buff[1] = ADDR2;
-    if(g_ctrl.currPar==0){
+    if (g_ctrl.currPar == 0)
+    {
         buff[2] = RR0;
-        g_ctrl.currPar=1;
-    }else{
-        buff[2] = RR1;
-        g_ctrl.currPar=0;
+        g_ctrl.currPar = 1;
     }
-    buff[3] = buff[1]^buff[2];
+    else
+    {
+        buff[2] = RR1;
+        g_ctrl.currPar = 0;
+    }
+    buff[3] = buff[1] ^ buff[2];
     buff[4] = FLAG;
     printf("[LOG]@cmdRec\tCommand buffer ready\n");
 
     unsigned int retryCounter = 0;
     unsigned int sent = 0;
-    while(sent == 0){
+    while (sent == 0)
+    {
         retryCounter++;
 
         printf("[LOG]@cmdRec\tSending Command Buffer\n");
-        sent = write(fd,buff,sizeof(buff));
+        sent = write(fd, buff, sizeof(buff));
 
-        if(sent!=sizeof(buff)){
+        if (sent != sizeof(buff))
+        {
             sleep(TIMEOUT);
         }
 
-        if(retryCounter>(MAX_TIMEOUT+1)&&sent!=sizeof(buff)){
-            printf("[ERROR]@cmdRec\tFailed to send command to specified file descriptor more than %d times\n",retryCounter);
+        if (retryCounter > (MAX_TIMEOUT + 1) && sent != sizeof(buff))
+        {
+            printf("[ERROR]@cmdRec\tFailed to send command to specified file descriptor more than %d times\n", retryCounter);
             return 0;
         }
     }
 
-    if(sent == 5){
+    if (sent == 5)
+    {
         printf("[SUCCESS]@cmdRec\tSent RR Command Successfully\n");
         return 1;
     }
@@ -667,41 +862,49 @@ unsigned char sendRRCommand(unsigned int fd){
     return 0;
 }
 
-unsigned char sendREJCommand(unsigned int fd){
+unsigned char sendREJCommand(unsigned int fd)
+{
     printf("[LOG]@cmdRec\tStarting REJ commander sending proccess\n");
     unsigned char buff[5];
 
     printf("[LOG]@cmdRec\tpreparing command buffer\n");
     buff[0] = FLAG;
     buff[1] = ADDR2;
-    if(g_ctrl.currPar==0){
+    if (g_ctrl.currPar == 0)
+    {
         buff[2] = REJ0;
-    }else{
+    }
+    else
+    {
         buff[2] = REJ1;
     }
-    buff[3] = buff[1]^buff[2];
+    buff[3] = buff[1] ^ buff[2];
     buff[4] = FLAG;
     printf("[LOG]@cmdRec\tCommand buffer ready\n");
 
     unsigned int retryCounter = 0;
     unsigned int sent = 0;
-    while(sent == 0){
+    while (sent == 0)
+    {
         retryCounter++;
 
         printf("[LOG]@cmdRec\tSending Command Buffer\n");
-        sent = write(fd,buff,sizeof(buff));
+        sent = write(fd, buff, sizeof(buff));
 
-        if(sent!=sizeof(buff)){
+        if (sent != sizeof(buff))
+        {
             sleep(TIMEOUT);
         }
 
-        if(retryCounter>(MAX_TIMEOUT+1)&&sent!=sizeof(buff)){
-            printf("[ERROR]@cmdRec\tFailed to send command to specified file descriptor more than %d times\n",retryCounter);
+        if (retryCounter > (MAX_TIMEOUT + 1) && sent != sizeof(buff))
+        {
+            printf("[ERROR]@cmdRec\tFailed to send command to specified file descriptor more than %d times\n", retryCounter);
             return 0;
         }
     }
 
-    if(sent == 5){
+    if (sent == 5)
+    {
         printf("[SUCCESS]@cmdRec\tSent REJ Command Successfully\n");
         return 1;
     }
@@ -709,7 +912,8 @@ unsigned char sendREJCommand(unsigned int fd){
     return 0;
 }
 
-unsigned char sendUACommand(unsigned int fd){
+unsigned char sendUACommand(unsigned int fd)
+{
     printf("[LOG]@cmdRec\tStarting UA commander sending proccess\n");
     unsigned char buff[5];
 
@@ -717,29 +921,33 @@ unsigned char sendUACommand(unsigned int fd){
     buff[0] = FLAG;
     buff[1] = ADDR2;
     buff[2] = UA;
-    buff[3] = buff[1]^buff[2];
+    buff[3] = buff[1] ^ buff[2];
     buff[4] = FLAG;
     printf("[LOG]@cmdRec\tCommand buffer ready\n");
 
     unsigned int retryCounter = 0;
     unsigned int sent = 0;
-    while(sent == 0){
+    while (sent == 0)
+    {
         retryCounter++;
 
         printf("[LOG]@cmdRec\tSending Command Buffer\n");
-        sent = write(fd,buff,sizeof(buff));
+        sent = write(fd, buff, sizeof(buff));
 
-        if(sent!=sizeof(buff)){
+        if (sent != sizeof(buff))
+        {
             sleep(TIMEOUT);
         }
 
-        if(retryCounter>(MAX_TIMEOUT+1)&&sent!=sizeof(buff)){
-            printf("[ERROR]@cmdRec\tFailed to send command to specified file descriptor more than %d times\n",retryCounter);
+        if (retryCounter > (MAX_TIMEOUT + 1) && sent != sizeof(buff))
+        {
+            printf("[ERROR]@cmdRec\tFailed to send command to specified file descriptor more than %d times\n", retryCounter);
             return 0;
         }
     }
 
-    if(sent == 5){
+    if (sent == 5)
+    {
         printf("[SUCCESS]@cmdRec\tSent UA Command Successfully\n");
         return 1;
     }
@@ -747,40 +955,48 @@ unsigned char sendUACommand(unsigned int fd){
     return 0;
 }
 
-unsigned char* extractDataFromFrame(unsigned char* data,unsigned int* sizeOf){
+unsigned char *extractDataFromFrame(unsigned char *data, unsigned int *sizeOf)
+{
     printf("[LOG]@extract\tStarting Data Extraction proccess\n");
 
-    unsigned int sz = (*sizeOf-6);//size of the data section in the frame
+    unsigned int sz = (*sizeOf - 6); //size of the data section in the frame
 
-    printf("[LOG]@extract\tAtempting to allocate buffer for data of size:%d\n",sz);
-    unsigned char* buff = (unsigned char*)malloc(sizeof(unsigned char)*sz);
+    printf("[LOG]@extract\tAtempting to allocate buffer for data of size:%d\n", sz);
+    unsigned char *buff = (unsigned char *)malloc(sizeof(unsigned char) * sz);
 
-    if(buff==NULL){
+    if (buff == NULL)
+    {
         printf("[ERROR]@extract\tFailed To allocate buffer for data\n");
         return NULL;
-    }else{
+    }
+    else
+    {
         printf("[SUCCESS]@extract\tSuccessfully allocated buffer for data\n");
     }
 
-    memmove(buff,data+4,sz);
+    memmove(buff, data + 4, sz);
     *sizeOf = sz;
     printf("[SUCCESS]@extract\tData Extraction Complete\n");
     return buff;
 }
 
-unsigned char* readSentData(unsigned int fd,unsigned int* sizeOf){
+unsigned char *readSentData(unsigned int fd, unsigned int *sizeOf)
+{
     printf("[LOG]@rcRd\tStarting to read sent data\n");
     unsigned int readFlag1 = 0;
     unsigned int readFlag2 = 0;
-    unsigned int stop=0;
+    unsigned int stop = 0;
 
     printf("[LOG]@rcRd\tAttempting to allocate buffer with max frame size\n");
-    unsigned char* buff = (unsigned char*)malloc(sizeof(unsigned char)*MAX_FRAME_SIZE);
+    unsigned char *buff = (unsigned char *)malloc(sizeof(unsigned char) * MAX_FRAME_SIZE);
 
-    if(buff==NULL){
+    if (buff == NULL)
+    {
         printf("[ERROR]@rcRd\tFailed to allocated buffer\n");
         return NULL;
-    }else{
+    }
+    else
+    {
         printf("[SUCCESS]@rcRd\tSuccessfully allocated buffer\n");
     }
 
@@ -788,28 +1004,34 @@ unsigned char* readSentData(unsigned int fd,unsigned int* sizeOf){
     unsigned int sz = 0;
 
     printf("[LOG]@rcRd\tReading Data\n");
-    while(!stop){
-        unsigned int res = read(fd,&rd,1);
-        if(res==1){
+    while (!stop)
+    {
+        unsigned int res = read(fd, &rd, 1);
+        if (res == 1)
+        {
 
-            if(sz>MAX_FRAME_SIZE && stop == 0){
+            if (sz > MAX_FRAME_SIZE && stop == 0)
+            {
                 printf("[ERROR]@rcRd\tToo much data read without escape Flag\n");
                 return NULL;
             }
 
             printf("[LOG]@rcRd\tRead One Byte\n");
-            if(readFlag1 == 0 && rd == FLAG){
+            if (readFlag1 == 0 && rd == FLAG)
+            {
                 printf("[LOG]@rcRd\tRead Start Frame Flag Byte\n");
                 readFlag1 = 1;
                 buff[sz] = rd;
                 sz++;
             }
-            if(readFlag1 == 1 && readFlag2 == 0){
+            if (readFlag1 == 1 && readFlag2 == 0)
+            {
                 printf("[LOG]@rcRd\tRead Intermediate Byte Byte\n");
                 buff[sz] = rd;
                 sz++;
             }
-            if(readFlag1 == 1 && readFlag2 == 0 && rd == FLAG){
+            if (readFlag1 == 1 && readFlag2 == 0 && rd == FLAG)
+            {
                 printf("[LOG]@rcRd\tRead End Frame Flag Byte\n");
                 readFlag2 = 1;
                 buff[sz] = rd;
@@ -821,12 +1043,15 @@ unsigned char* readSentData(unsigned int fd,unsigned int* sizeOf){
     printf("[LOG]@rcRd\tFinished reading Data\n");
 
     printf("[LOG]@rcRd\tAttempting to resize frame buffer\n");
-    void* ck = realloc(buff,sz);
+    void *ck = realloc(buff, sz);
 
-    if(ck==NULL){
+    if (ck == NULL)
+    {
         printf("[ERROR]@rcRd\tFailed to resize frame buffer\n");
         return NULL;
-    }else{
+    }
+    else
+    {
         printf("[SUCCESS]@rcRd\tSuccessfully resized buffer\n");
     }
 
@@ -834,90 +1059,121 @@ unsigned char* readSentData(unsigned int fd,unsigned int* sizeOf){
     return buff;
 }
 
-unsigned char validateFrame(unsigned char* data,unsigned int sizeOf){
+unsigned char validateFrame(unsigned char *data, unsigned int sizeOf)
+{
     printf("[LOG]@valid\tStarting Frame Validation\n");
 
-    if(sizeOf<5||sizeOf == 6){// impossible for a valid frame to be smaller than 5 or size 6
+    if (sizeOf < 5 || sizeOf == 6)
+    { // impossible for a valid frame to be smaller than 5 or size 6
         printf("[ERROR]@valid\tFrame Is Too Small to be a valid Frame\n");
         return 0;
     }
 
     //Means its a command frame
-    if(sizeOf==5){
+    if (sizeOf == 5)
+    {
         printf("[LOG]@valid\tStarting Frame Validation for command frame\n");
 
         unsigned int currStt = FLAG_STR;
         unsigned int set = 0;
         unsigned int dis = 0;
 
-        for(unsigned int i = 0;i<5;++i){
-            switch(currStt){
-                case(FLAG_STR):{
-                    if(data[i]==FLAG){
-                        printf("[SUCCESS]@valid\tStart Flag field is validated\n");
-                        currStt = ADDR;
-                        break;
-                    }else{
-                        printf("[ERROR]@valid\tStart Byte does not contain Flag\n");
-                        return 0;
-                    }
+        for (unsigned int i = 0; i < 5; ++i)
+        {
+            switch (currStt)
+            {
+            case (FLAG_STR):
+            {
+                if (data[i] == FLAG)
+                {
+                    printf("[SUCCESS]@valid\tStart Flag field is validated\n");
+                    currStt = ADDR;
+                    break;
                 }
-                case(ADDR):{
-                    if(data[i]==ADDRS){
-                        printf("[SUCCESS]@valid\tAddress field is validated\n");
-                        currStt = CTRL;
-                        break;
-                    }else{
-                        printf("[ERROR]@valid\tAddress field is incorrect\n");
-                        return 0;
-                    }
+                else
+                {
+                    printf("[ERROR]@valid\tStart Byte does not contain Flag\n");
+                    return 0;
                 }
-                case(CTRL):{
-                    if(data[i]==SET){
-                        printf("[SUCCESS]@valid\tControll field is validated as set command\n");
-                        currStt = BCC;
-                        set = 1;
-                        break;
-                    }else if(data[i]==DISC){
-                        printf("[SUCCESS]@valid\tControll field is validated as disc command\n");
-                        currStt = BCC;
-                        dis = 1;
-                        break;
-                    }else{
-                        printf("[ERROR]@valid\tControll field is incorrect\n");
-                        return 0;
-                    }
+            }
+            case (ADDR):
+            {
+                if (data[i] == ADDRS)
+                {
+                    printf("[SUCCESS]@valid\tAddress field is validated\n");
+                    currStt = CTRL;
+                    break;
                 }
-                case(BCC):{
-                    if(data[i]==data[i-1]^data[i-2]){
-                        printf("[SUCCESS]@valid\tBCC field is validated\n");
-                        currStt = FLAG_END;
-                        break;
-                    }else{
-                        printf("[ERROR]@valid\tBCC field is incorrect\n");
-                        return 0;
-                    }
+                else
+                {
+                    printf("[ERROR]@valid\tAddress field is incorrect\n");
+                    return 0;
                 }
-                case(FLAG_END):{
-                    if(data[i]==FLAG){
-                        printf("[SUCCESS]@valid\tEnd Flag field is validated\n");
-                        currStt = DONE_PROC;
-                        break;
-                    }else{
-                        printf("[ERROR]@valid\tEnd Flag is incorrect\n");
-                        return 0;
-                    }
+            }
+            case (CTRL):
+            {
+                if (data[i] == SET)
+                {
+                    printf("[SUCCESS]@valid\tControll field is validated as set command\n");
+                    currStt = BCC;
+                    set = 1;
+                    break;
                 }
+                else if (data[i] == DISC)
+                {
+                    printf("[SUCCESS]@valid\tControll field is validated as disc command\n");
+                    currStt = BCC;
+                    dis = 1;
+                    break;
+                }
+                else
+                {
+                    printf("[ERROR]@valid\tControll field is incorrect\n");
+                    return 0;
+                }
+            }
+            case (BCC):
+            {
+                if (data[i] == data[i - 1] ^ data[i - 2])
+                {
+                    printf("[SUCCESS]@valid\tBCC field is validated\n");
+                    currStt = FLAG_END;
+                    break;
+                }
+                else
+                {
+                    printf("[ERROR]@valid\tBCC field is incorrect\n");
+                    return 0;
+                }
+            }
+            case (FLAG_END):
+            {
+                if (data[i] == FLAG)
+                {
+                    printf("[SUCCESS]@valid\tEnd Flag field is validated\n");
+                    currStt = DONE_PROC;
+                    break;
+                }
+                else
+                {
+                    printf("[ERROR]@valid\tEnd Flag is incorrect\n");
+                    return 0;
+                }
+            }
             }
         }
 
         printf("[LOG]@valid\tFinished Frame Validation for command frame\n");
 
-        if(currStt == DONE_PROC){
-            if(set==1){
+        if (currStt == DONE_PROC)
+        {
+            if (set == 1)
+            {
                 setHandler();
                 return 1;
-            }else if(dis == 1){
+            }
+            else if (dis == 1)
+            {
                 discHandler();
                 return 1;
             }
@@ -928,117 +1184,164 @@ unsigned char validateFrame(unsigned char* data,unsigned int sizeOf){
     }
 
     //means its an information frame
-    if(sizeOf>=7){
+    if (sizeOf >= 7)
+    {
         printf("[LOG]@valid\tStarting Frame Validation for information frame\n");
 
         unsigned int currStt = FLAG_STR;
 
-        for(unsigned int i = 0;i<sizeOf;++i){
-            switch(currStt){
-                case(FLAG_STR):{
-                    if(data[i]==FLAG){
-                        printf("[SUCCESS]@valid\tStart Flag field is validated\n");
-                        currStt = ADDR;
-                        break;
-                    }else{
-                        printf("[ERROR]@valid\tStart Byte does not contain Flag\n");
-                        return 0;
-                    }
+        for (unsigned int i = 0; i < sizeOf; ++i)
+        {
+            switch (currStt)
+            {
+            case (FLAG_STR):
+            {
+                if (data[i] == FLAG)
+                {
+                    printf("[SUCCESS]@valid\tStart Flag field is validated\n");
+                    currStt = ADDR;
+                    break;
                 }
-                case(ADDRS):{
-                    if(data[i]==ADDRS){
-                        printf("[SUCCESS]@valid\tAddress field is validated\n");
-                        currStt = CTRL;
-                        break;
-                    }else{
-                        printf("[ERROR]@valid\tAddress field is not validated\n");
-                        return 0;
-                    }
-                }
-                case(CTRL):{
-                    if(g_ctrl.currPar==0){
-                        if(data[i]==CTR_PAR0){
-                            printf("[SUCCESS]@valid\tControll field is validated\n");
-                            currStt = BCC;
-                            break;
-                        }else if(data[i]==CTR_PAR1){
-                            printf("[ERROR]@valid\tAddress field is not validated, has incorrect parity\n");
-                            return 0;
-                        }else{
-                            printf("[ERROR]@valid\tAddress field is not validated, unrecognized value\n");
-                            return 0;
-                        }
-                    }else if(g_ctrl.currPar==1){
-                        if(data[i]==CTR_PAR0){
-                            printf("[ERROR]@valid\tAddress field is not validated, has incorrect parity\n");
-                            return 0;
-                        }else if(data[i]==CTR_PAR1){
-                            printf("[SUCCESS]@valid\tControll field is validated\n");
-                            currStt = BCC;
-                            break;
-                        }else{
-                            printf("[ERROR]@valid\tAddress field is not validated, unrecognized value\n");
-                            return 0;
-                        }
-                    }else{
-                        printf("[ERROR]@valid\tInternal Receiver Parity Issue\n");
-                        return 0;
-                    }
-                }
-                case(BCC):{
-                    if(data[i]==data[i-1]^data[i-2]){
-                        printf("[SUCCESS]@valid\tBCC field is validated\n");
-                        currStt = BCC2;
-                        break;
-                    }else{
-                        printf("[ERROR]@valid\tBCC field is not validated\n");
-                        return 0;
-                    }
-                }
-                case(BCC2):{
-                    unsigned int sz = sizeOf;
-
-                    unsigned char* buff = extractDataFromFrame(data,&sz);
-                    if(buff==NULL){
-                        //error
-                        return 0;
-                    }
-                    unsigned char* bf = destuffData(buff,&sz);
-                    if(bf==NULL){
-                        //error
-                        return 0;
-                    }
-
-                    unsigned char b2 = calculateBCC2(bf,sz);
-
-                    if(data[sizeOf-2]==b2){
-                        printf("[SUCCESS]@valid\tBCC2 field is validated\n");
-                        currStt = FLAG_END;
-                        break;
-                    }else{
-                        printf("[ERROR]@valid\tBCC2 field is not validated\n");
-                        return 0;
-                    }
-                }
-                case(FLAG_END):{
-                    if(data[sizeOf-1]==FLAG){
-                        printf("[SUCCESS]@valid\tEnd Flag field is validated\n");
-                        currStt = DONE_PROC;
-                        break;
-                    }else{
-                        printf("[ERROR]@valid\tEnd Flag is not validated\n");
-                        return 0;
-                    }
+                else
+                {
+                    printf("[ERROR]@valid\tStart Byte does not contain Flag\n");
+                    return 0;
                 }
             }
-            if(currStt==DONE_PROC){
-                if(g_ctrl.currPar==0){
+            case (ADDRS):
+            {
+                if (data[i] == ADDRS)
+                {
+                    printf("[SUCCESS]@valid\tAddress field is validated\n");
+                    currStt = CTRL;
+                    break;
+                }
+                else
+                {
+                    printf("[ERROR]@valid\tAddress field is not validated\n");
+                    return 0;
+                }
+            }
+            case (CTRL):
+            {
+                if (g_ctrl.currPar == 0)
+                {
+                    if (data[i] == CTR_PAR0)
+                    {
+                        printf("[SUCCESS]@valid\tControll field is validated\n");
+                        currStt = BCC;
+                        break;
+                    }
+                    else if (data[i] == CTR_PAR1)
+                    {
+                        printf("[ERROR]@valid\tAddress field is not validated, has incorrect parity\n");
+                        return 0;
+                    }
+                    else
+                    {
+                        printf("[ERROR]@valid\tAddress field is not validated, unrecognized value\n");
+                        return 0;
+                    }
+                }
+                else if (g_ctrl.currPar == 1)
+                {
+                    if (data[i] == CTR_PAR0)
+                    {
+                        printf("[ERROR]@valid\tAddress field is not validated, has incorrect parity\n");
+                        return 0;
+                    }
+                    else if (data[i] == CTR_PAR1)
+                    {
+                        printf("[SUCCESS]@valid\tControll field is validated\n");
+                        currStt = BCC;
+                        break;
+                    }
+                    else
+                    {
+                        printf("[ERROR]@valid\tAddress field is not validated, unrecognized value\n");
+                        return 0;
+                    }
+                }
+                else
+                {
+                    printf("[ERROR]@valid\tInternal Receiver Parity Issue\n");
+                    return 0;
+                }
+            }
+            case (BCC):
+            {
+                if (data[i] == data[i - 1] ^ data[i - 2])
+                {
+                    printf("[SUCCESS]@valid\tBCC field is validated\n");
+                    currStt = BCC2;
+                    break;
+                }
+                else
+                {
+                    printf("[ERROR]@valid\tBCC field is not validated\n");
+                    return 0;
+                }
+            }
+            case (BCC2):
+            {
+                unsigned int sz = sizeOf;
+
+                unsigned char *buff = extractDataFromFrame(data, &sz);
+                if (buff == NULL)
+                {
+                    //error
+                    return 0;
+                }
+                unsigned char *bf = destuffData(buff, &sz);
+                if (bf == NULL)
+                {
+                    //error
+                    return 0;
+                }
+
+                unsigned char b2 = calculateBCC2(bf, sz);
+
+                if (data[sizeOf - 2] == b2)
+                {
+                    printf("[SUCCESS]@valid\tBCC2 field is validated\n");
+                    currStt = FLAG_END;
+                    break;
+                }
+                else
+                {
+                    printf("[ERROR]@valid\tBCC2 field is not validated\n");
+                    return 0;
+                }
+            }
+            case (FLAG_END):
+            {
+                if (data[sizeOf - 1] == FLAG)
+                {
+                    printf("[SUCCESS]@valid\tEnd Flag field is validated\n");
+                    currStt = DONE_PROC;
+                    break;
+                }
+                else
+                {
+                    printf("[ERROR]@valid\tEnd Flag is not validated\n");
+                    return 0;
+                }
+            }
+            }
+            if (currStt == DONE_PROC)
+            {
+                if (g_ctrl.currPar == 0)
+                {
                     printf("[LOG]@valid\tFinished Frame Validation for information frame\n");
                     return 2;
-                }else if(g_ctrl.currPar==1){
+                }
+                else if (g_ctrl.currPar == 1)
+                {
                     printf("[LOG]@valid\tFinished Frame Validation for information frame\n");
                     return 2;
-                }else{
+                }
+                else
+                {
                     printf("[ERROR]@valid\tInternal Receiver Parity Issue\n");
                     return 0;
                 }
@@ -1050,13 +1353,15 @@ unsigned char validateFrame(unsigned char* data,unsigned int sizeOf){
     }
 }
 
-void setHandler(){
-    g_ctrl.currPar=0;
-    g_ctrl.retryCounter=0;
-    g_ctrl.hasTimedOut=FALSE;
-    g_ctrl.shouldDC=FALSE;
+void setHandler()
+{
+    g_ctrl.currPar = 0;
+    g_ctrl.retryCounter = 0;
+    g_ctrl.hasTimedOut = FALSE;
+    g_ctrl.shouldDC = FALSE;
 }
 
-void discHandler(){
-    g_ctrl.shouldDC=TRUE;
+void discHandler()
+{
+    g_ctrl.shouldDC = TRUE;
 }

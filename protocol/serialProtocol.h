@@ -126,7 +126,7 @@ void moveInformationToFrame(unsigned char* frame,const unsigned char data[],unsi
 	@param size - the size in bytes of the data supplied
 	@parm numberOfFrames - the number of frames in the frame buffer
 */
-void moveDataToFrames(unsigned char** frames,const unsigned char data[],unsigned int size,unsigned int numberOfFrames);
+unsigned char moveDataToFrames(unsigned char** frames,const unsigned char data[],unsigned int size,unsigned int numberOfFrames);
 
 /*
 	Level:Sender
