@@ -354,25 +354,38 @@ void closeConnection(unsigned int fd)
 //NEED TO DOCUMENT - MISSING ERROR CHECKING
 unsigned char *byteStuffingOnData(const unsigned char data[], unsigned int *sizeOfData)
 {
+    printf("[LOG]@stuff\tStarting byte stuffing proccess\n");
     unsigned int originalSize = *sizeOfData;
     unsigned int postSize = originalSize;
 
+    printf("[LOG]@stuff\tAttempting to allocated buffers\n");
     unsigned char **buffer = allocateCharBuffers(1, originalSize * 2); // we really should not use this but as a barebones implementation it can pass
+
+    if(buffer==NULL){
+        printf("[ERROR]@stuff\tFailed to allocated buffer\n");
+        return NULL;
+    }else{
+        printf("[SUCCESS]@stuff\tBuffers allocated\n");
+    }
 
     unsigned int currIndice = 0;
     for (unsigned int i = 0; i < originalSize; ++i)
     {
         if (data[i] == 0x7D)
         {
+            printf("[LOG]@stuff\t0x7D detected to stuff\n");
             buffer[0][currIndice] = 0x7D;
             buffer[0][++currIndice] = 0x5D;
             postSize++;
+            printf("[LOG]@stuff\tStuffed\n");
         }
         else if (data[i] == 0x7E)
         {
+            printf("[LOG]@stuff\t0x7E detected to stuff\n");
             buffer[0][currIndice] = 0x7D;
             buffer[0][++currIndice] = 0x5E;
             postSize++;
+            printf("[LOG]@stuff\tStuffed\n");
         }
         else
         {
@@ -381,18 +394,25 @@ unsigned char *byteStuffingOnData(const unsigned char data[], unsigned int *size
         currIndice++;
     }
 
+    printf("[LOG]@stuff\tAttempting to resize buffer\n");
     void *ret = realloc(buffer[0], postSize);
     if (ret == NULL)
     {
+        printf("[ERROR]@stuff\tFailed to resize buffer\n");
         return NULL;
+    }else{
+        printf("[SUCCESS]@stuff\tResized the buffer\n");
     }
     *sizeOfData = postSize;
+
+    printf("[LOG]@stuff\tFinished stuffing\n");
     return buffer[0];
 }
 
 //NEEDS TO BE DOCUMENTED
 char ReceptorResponseInterpreter(const unsigned char *receptorResponse)
 {
+    printf("[LOG]@interpret\tStarting response interpreter\n");
     unsigned int currntState = FLAG_STR;
     unsigned int responseType;
 
@@ -409,6 +429,7 @@ char ReceptorResponseInterpreter(const unsigned char *receptorResponse)
             }
             else
             {
+                printf("[LOG]@interpret\tInvalid Frame!\n");
                 return ERR;
             }
             break;
@@ -422,6 +443,7 @@ char ReceptorResponseInterpreter(const unsigned char *receptorResponse)
             }
             else
             {
+                printf("[LOG]@interpret\tInvalid Frame!\n");
                 return ERR;
             }
             break;
@@ -451,6 +473,7 @@ char ReceptorResponseInterpreter(const unsigned char *receptorResponse)
                 }
                 else
                 {
+                    printf("[LOG]@interpret\tInvalid Frame!\n");
                     return ERR;
                 }
             }
@@ -476,6 +499,7 @@ char ReceptorResponseInterpreter(const unsigned char *receptorResponse)
                 }
                 else
                 {
+                    printf("[LOG]@interpret\tInvalid Frame!\n");
                     return ERR;
                 }
             }
@@ -491,6 +515,7 @@ char ReceptorResponseInterpreter(const unsigned char *receptorResponse)
             }
             else
             {
+                printf("[LOG]@interpret\tInvalid Frame!\n");
                 return ERR;
             }
         }
@@ -504,6 +529,7 @@ char ReceptorResponseInterpreter(const unsigned char *receptorResponse)
             }
             else
             {
+                printf("[LOG]@interpret\tInvalid Frame!\n");
                 return ERR;
             }
         }
@@ -515,9 +541,10 @@ char ReceptorResponseInterpreter(const unsigned char *receptorResponse)
 
     if (currntState == DONE_PROC)
     {
+        printf("[LOG]@interpret\tFinished response interpreting\n");
         return responseType;
     }
-
+    printf("[LOG]@interpret\tInvalid Frame!\n");
     return ERR; //error code
 }
 
