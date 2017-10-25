@@ -294,7 +294,9 @@ unsigned int openConnection(char *serialPort, unsigned int flags)
         printf("[ERROR]@openc\tFile descriptor failed to open\n");
         perror(serialPort);
         exit(-1);
-    }else{
+    }
+    else
+    {
         printf("[SUCCESS]@openc\tFile descriptor obatained\n");
     }
 
@@ -304,7 +306,9 @@ unsigned int openConnection(char *serialPort, unsigned int flags)
         printf("[ERROR]@openc\tFailed to obtain file descriptor current attributes\n");
         perror("tcgetattr");
         exit(-1);
-    }else{
+    }
+    else
+    {
         printf("[SUCCESS]@openc\tObtained file descriptor attributes\n");
     }
 
@@ -327,12 +331,14 @@ unsigned int openConnection(char *serialPort, unsigned int flags)
         printf("[ERROR]@openc\tFailed to set file descriptor current attributes\n");
         perror("tcsetattr");
         return -1;
-    }else{
+    }
+    else
+    {
         printf("[SUCCESS]@openc\tSet file descriptor current attributes\n");
     }
 
     printf("New termios structure set\n");
-    printf("[LOG]@openc\tFinished estableshing serial porto conenction to:%s\n",serialPort);
+    printf("[LOG]@openc\tFinished estableshing serial porto conenction to:%s\n", serialPort);
     return fd;
 }
 
@@ -344,7 +350,9 @@ void closeConnection(unsigned int fd)
         printf("[ERROR]@closec\tFailed to close serial port file descriptor\n");
         perror("tcsetattr");
         exit(-1);
-    }else{
+    }
+    else
+    {
         printf("[SUCCESS]@closec\tClosed serial port file descriptor\n");
     }
 
@@ -361,10 +369,13 @@ unsigned char *byteStuffingOnData(const unsigned char data[], unsigned int *size
     printf("[LOG]@stuff\tAttempting to allocated buffers\n");
     unsigned char **buffer = allocateCharBuffers(1, originalSize * 2); // we really should not use this but as a barebones implementation it can pass
 
-    if(buffer==NULL){
+    if (buffer == NULL)
+    {
         printf("[ERROR]@stuff\tFailed to allocated buffer\n");
         return NULL;
-    }else{
+    }
+    else
+    {
         printf("[SUCCESS]@stuff\tBuffers allocated\n");
     }
 
@@ -400,7 +411,9 @@ unsigned char *byteStuffingOnData(const unsigned char data[], unsigned int *size
     {
         printf("[ERROR]@stuff\tFailed to resize buffer\n");
         return NULL;
-    }else{
+    }
+    else
+    {
         printf("[SUCCESS]@stuff\tResized the buffer\n");
     }
     *sizeOfData = postSize;
@@ -551,28 +564,43 @@ char ReceptorResponseInterpreter(const unsigned char *receptorResponse)
 //NEEDS TO BE COMMENTED
 unsigned char *getReceptorResponse(unsigned int fd)
 {
+    printf("[LOG]@rdR\tStarting Receptor Response Read Cycle\n");
     unsigned int res = 0;
+
+    printf("[LOG]@rdR\tAttempting to allocate buffer\n");
     unsigned char *buffer = (unsigned char *)malloc(sizeof(unsigned char) * 5);
     if (buffer == NULL)
     {
+        printf("[ERROR]@rdR\tFailed to allocate buffer\n");
         return NULL;
     }
+    else
+    {
+        printf("[SUCCESS]@rdR\tBuffer was allocated\n");
+    }
+
+    printf("[LOG]@rdR\tTimeout alarm engaged\n");
     alarm(TIMEOUT); //sets an alarm with the timeout value , to manage connection timeouts
     while (res == 0)
     {
+        printf("[LOG]@rdR\tAttempting to read response\n");
         res = read(fd, buffer, 5);
         if (res == 5)
         { // if it reads it disables the alarms and marks the connection as successful and returns 1
+            printf("[LOG]@rdR\tResponse Detected\n");
             alarm(0);
             g_ctrl.hasTimedOut = FALSE;
             g_ctrl.retryCounter = 0;
+            printf("[LOG]@rdR\tDone attempting to read response\n");
             return buffer;
         }
         if (g_ctrl.hasTimedOut)
         { // if the connection is marked as timed out 0 is returned
+            printf("[ERROR]@rdR\tFailed to read receptor response\n");
             return NULL;
         }
     }
+    printf("[ERROR]@rdR\tFailed to read receptor response\n");
     return NULL;
 }
 
