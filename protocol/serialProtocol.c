@@ -1214,7 +1214,7 @@ unsigned char validateFrame(unsigned char *data, unsigned int sizeOf)
             }
             case (BCC):
             {
-                if (data[i] == data[i - 1] ^ data[i - 2])
+                if (data[i] == (data[i - 1] ^ data[i - 2]))
                 {
                     printf("[SUCCESS]@valid\tBCC field is validated\n");
                     currStt = FLAG_END;
@@ -1350,7 +1350,7 @@ unsigned char validateFrame(unsigned char *data, unsigned int sizeOf)
             }
             case (BCC):
             {
-                if (data[i] == data[i - 1] ^ data[i - 2])
+                if (data[i] == (data[i - 1] ^ data[i - 2]))
                 {
                     printf("[SUCCESS]@valid\tBCC field is validated\n");
                     currStt = BCC2;
@@ -1429,8 +1429,11 @@ unsigned char validateFrame(unsigned char *data, unsigned int sizeOf)
             }
         }
 
-        printf("[LOG]@valid\tFinished Frame Validation for information frame\n");
+        printf("[LOG]@valid\tFinished Frame Validation for information frame, should not have reacher here\n");
+        return 0;
     }
+    printf("[LOG]@valid\tFinished Frame Validation for information frame, should not have reacher here\n");
+    return 0;
 }
 
 void setHandler()
