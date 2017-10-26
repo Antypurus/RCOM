@@ -626,9 +626,9 @@ unsigned char sendSetCommand(unsigned int fd)
     printf("[LOG]@stSend\tAttempting to send frame\n");
     unsigned int res = write(fd, buffer, 5); //writes to pipe the set command in the buffer
 
-jump:unsigned char *buff;
+    unsigned char *buff;
 
-    if (res == 5)
+jump:if (res == 5)
     {   
         printf("[LOG]@stSend\tFrame sent , attempting to read response\n");
         g_ctrl.retryCounter=0;//if it wrote the whole buffer it will now atemp to read the confirmation for the receptor
