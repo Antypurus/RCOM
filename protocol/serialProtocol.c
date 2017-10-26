@@ -607,6 +607,7 @@ unsigned char *getReceptorResponse(unsigned int fd)
 //NEEDS TO BE COMMENTED
 unsigned char sendSetCommand(unsigned int fd)
 {
+    printf("[LOG]@stSend\tStarting send command transmission proccess\n");
     signal(SIGALRM, timeoutHandler);
     g_ctrl.currPar = 0;
     g_ctrl.retryCounter = 0;
@@ -622,31 +623,47 @@ unsigned char sendSetCommand(unsigned int fd)
 
     g_ctrl.frameToSend = buffer;
 
+    printf("[LOG]@stSend\tAttempting to send frame\n");
     unsigned int res = write(fd, buffer, 5); //writes to pipe the set command in the buffer
 
-    unsigned char *buff;
+jump:unsigned char *buff;
 
     if (res == 5)
-    {                                   //if it wrote the whole buffer it will now atemp to read the confirmation for the receptor
+    {   
+        printf("[LOG]@stSend\tFrame sent , attempting to read response\n");
+        g_ctrl.retryCounter=0;//if it wrote the whole buffer it will now atemp to read the confirmation for the receptor
         buff = getReceptorResponse(fd); //get the response with the possibility of timeout
         if (buff == NULL)
         {
+            printf("[ERROR]@stSend\tResponse timeout\n");
             return 0;
         }
         unsigned int rez = ReceptorResponseInterpreter(buff); //check response type
         if (rez == UA_R)
         { //if correct response type return 1
+            printf("[LOG]@stSend\tValid response received\n");
             free(buff);
             return 1;
         }
         else
-        {
+        {//invalid reponse
+            printf("[ERROR]@stSend\tInvalid Response received\n");
             free(buff);
             return 0;
         }
     }
     else
     {
+        while(res==0 && g_ctrl.retryCounter<=MAX_TIMEOUT){
+            printf("[ERROR]@stSend\tFrame was not sent , attempting retransmission...\n");
+            sleep(TIMEOUT);
+            res = write(fd, buffer, 5);
+            g_ctrl.retryCounter++;
+        }
+        if(res==5){
+            printf("[SUCCESS]@stSend\tRetransmission successfull\n");
+            goto jump;
+        }
         return 0;
     }
     return 0;
