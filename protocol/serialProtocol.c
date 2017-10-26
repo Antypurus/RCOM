@@ -628,7 +628,7 @@ unsigned char sendSetCommand(unsigned int fd)
 
     unsigned char *buff;
 
-jump:if (res == 5)
+    jump:if (res == 5)
     {   
         printf("[LOG]@stSend\tFrame sent , attempting to read response\n");
         g_ctrl.retryCounter=0;//if it wrote the whole buffer it will now atemp to read the confirmation for the receptor
@@ -1288,7 +1288,7 @@ unsigned char validateFrame(unsigned char *data, unsigned int sizeOf)
                     return 0;
                 }
             }
-            case (ADDRS):
+            case (ADDR):
             {
                 if (data[i] == ADDRS)
                 {
