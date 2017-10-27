@@ -737,19 +737,27 @@ jump:
 //NEEDS COMMENTING
 unsigned char sendData(unsigned int fd, const unsigned char data[], unsigned int size)
 {
+    printf("[LOG]@dataSend\tStarting data sending proccess\n");
     signal(SIGALRM, timeoutHandler);
     g_ctrl.retryCounter = 0;
     g_ctrl.fileDescriptor = fd;
 
+    printf("[LOG]@dataSend\tAttempting to allocated frame buffers\n");
     unsigned char **frames = NULL;
     unsigned int nFrames = allocateInformationFrames(frames, data, size);
-    if (nFrames == 0)
+    if (nFrames == 0 || frames==NULL)
     {
         printf("[ERROR]@allocation:There has been an allocation error on the inforation frames\n");
         return 0;
     }
+    printf("[LOG]@dataSend\tAttempting to preprare information frames\n");
     prepareInformationFrames(frames, nFrames);
+    //TODO check for error
+
+    printf("[LOG]@dataSend\tAttempting to move data to frames\n");
     moveDataToFrames(frames, data, size, nFrames);
+    //TODO check for error
+
     //the frames are now ready to be sent
 
     if (g_ctrl.allocError)
