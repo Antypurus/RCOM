@@ -628,10 +628,11 @@ unsigned char sendSetCommand(unsigned int fd)
 
     unsigned char *buff;
 
-    jump:if (res == 5)
-    {   
+jump:
+    if (res == 5)
+    {
         printf("[LOG]@stSend\tFrame sent , attempting to read response\n");
-        g_ctrl.retryCounter=0;//if it wrote the whole buffer it will now atemp to read the confirmation for the receptor
+        g_ctrl.retryCounter = 0;        //if it wrote the whole buffer it will now atemp to read the confirmation for the receptor
         buff = getReceptorResponse(fd); //get the response with the possibility of timeout
         if (buff == NULL)
         {
@@ -646,7 +647,7 @@ unsigned char sendSetCommand(unsigned int fd)
             return 1;
         }
         else
-        {//invalid reponse
+        { //invalid reponse
             printf("[ERROR]@stSend\tInvalid Response received\n");
             free(buff);
             return 0;
@@ -654,13 +655,15 @@ unsigned char sendSetCommand(unsigned int fd)
     }
     else
     {
-        while(res==0 && g_ctrl.retryCounter<=MAX_TIMEOUT){
+        while (res == 0 && g_ctrl.retryCounter <= MAX_TIMEOUT)
+        {
             printf("[ERROR]@stSend\tFrame was not sent , attempting retransmission...\n");
             sleep(TIMEOUT);
             res = write(fd, buffer, 5);
             g_ctrl.retryCounter++;
         }
-        if(res==5){
+        if (res == 5)
+        {
             printf("[SUCCESS]@stSend\tRetransmission successfull\n");
             goto jump;
         }
@@ -671,6 +674,7 @@ unsigned char sendSetCommand(unsigned int fd)
 
 unsigned char sendDisconnectCommand(unsigned int fd)
 {
+    printf("[LOG]@dcSend\tStarting diconnect command sending proccess\n");
     signal(SIGALRM, timeoutHandler);
     g_ctrl.retryCounter = 0;
     g_ctrl.fileDescriptor = fd;
@@ -684,28 +688,47 @@ unsigned char sendDisconnectCommand(unsigned int fd)
 
     g_ctrl.frameToSend = buffer;
 
+    printf("[LOG]@dcSend\tAttemprting to send frame\n");
     unsigned int res = write(fd, buffer, 5);
+jump:
     if (res == 5)
     {
+        printf("[LOG]@dcSend\tFrame sent ,a ttempting to read response\n");
+        g_ctrl.retryCounter = 0;
         unsigned char *buff = getReceptorResponse(fd); //get the response with the possibility of timeout
         if (buff == NULL)
         {
+            printf("[ERROR]@dcSend\tFailed to read response\n");
             return 0;
         }
         unsigned int rez = ReceptorResponseInterpreter(buff); //check response type
         if (rez == UA_R)
         { //if correct response type return 1
+            printf("[LOG]@dcSend\tValid response received\n");
             free(buff);
             return 1;
         }
-        else
+        else //incorrect response
         {
+            printf("[ERROR]@dcSend\tInvalid response received\n");
             free(buff);
             return 0;
         }
     }
     else
     {
+        while (res == 0 && g_ctrl.retryCounter <= MAX_TIMEOUT)
+        {
+            printf("[ERROR]@stSend\tFrame was not sent , attempting retransmission...\n");
+            sleep(TIMEOUT);
+            res = write(fd, buffer, 5);
+            g_ctrl.retryCounter++;
+        }
+        if (res == 5)
+        {
+            printf("[SUCCESS]@stSend\tRetransmission successfull\n");
+            goto jump;
+        }
         return 0;
     }
     return 0;
