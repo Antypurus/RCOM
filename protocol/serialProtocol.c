@@ -629,7 +629,7 @@ unsigned char sendSetCommand(unsigned int fd)
     //configures a buffer with the information for the set command
     unsigned char buffer[5];
     buffer[0] = FLAG;
-    buffer[1] = ADDR;
+    buffer[1] = ADDRS;
     buffer[2] = SET;
     buffer[3] = buffer[1] ^ buffer[2];
     buffer[4] = FLAG;
@@ -694,7 +694,7 @@ unsigned char sendDisconnectCommand(unsigned int fd)
 
     unsigned char buffer[5];
     buffer[0] = FLAG;
-    buffer[1] = ADDR;
+    buffer[1] = ADDRS;
     buffer[2] = DISC;
     buffer[3] = buffer[1] ^ buffer[2];
     buffer[4] = FLAG;
@@ -1182,12 +1182,14 @@ unsigned char *readSentData(unsigned int fd, unsigned int *sizeOf)
                 readFlag1 = 1;
                 buff[sz] = rd;
                 sz++;
+                continue;
             }
-            if (readFlag1 == 1 && readFlag2 == 0)
+            if (readFlag1 == 1 && readFlag2 == 0 && rd!=FLAG)
             {
                 printf("[LOG]@rcRd\tRead Intermediate Byte Byte\n");
                 buff[sz] = rd;
                 sz++;
+                continue;
             }
             if (readFlag1 == 1 && readFlag2 == 0 && rd == FLAG)
             {
