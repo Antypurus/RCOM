@@ -11,11 +11,11 @@ int llopen(int porta, int side)
     char port[20];
     if (porta == 0)
     {
-        memcpy(port,"dev/ttyS0",10);
+        memcpy(port,"/dev/ttyS0",11);
     }
     else
     {
-        memcpy(port,"dev/ttyS0",10);
+        memcpy(port,"/dev/ttyS0",11);
     }
 
     unsigned int fd = openConnection(port, 0);
