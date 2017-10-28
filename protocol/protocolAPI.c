@@ -78,7 +78,7 @@ int llopen(int porta, int side)
     return -1;
 }
 
-int llread(int fd, char *buffer)
+int llread(int fd, char **buffer)
 {
     unsigned int size = 0;
     unsigned char *data = readSentData(fd, &size);
@@ -96,13 +96,13 @@ int llread(int fd, char *buffer)
             {
                 printf("failed to send UA command\n");
             }
-            buffer = (char *)malloc(3); //allocated space for the string DC
+            *buffer = (char *)malloc(3); //allocated space for the string DC
             if (buffer == NULL)
             {
                 printf("failed to allocated buffer\n");
                 return -1;
             }
-            buffer = "DC";
+            *buffer = "DC";
             return 3; //received a disconnect command
         }
         else

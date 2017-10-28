@@ -79,7 +79,7 @@ struct SEND_CONTROLL g_ctrl;//global controll structure for the protocol to use
 
 	@return - the number of frames allocated
 */
-unsigned int allocateInformationFrames(unsigned char** buff,const unsigned char data[],unsigned int sizeOf);
+unsigned int allocateInformationFrames(unsigned char*** buff,const unsigned char data[],unsigned int sizeOf);
 
 /*
     Level:Sender
@@ -90,7 +90,7 @@ unsigned int allocateInformationFrames(unsigned char** buff,const unsigned char 
     
     @Param numberOfFrames - the number of frames inside the frame buffer , this value is returned by the prepareData function
 */
-void deallocateInformationFrames(unsigned char** frames,unsigned int numberOfFrames);
+void deallocateInformationFrames(unsigned char*** frames,unsigned int numberOfFrames);
 
 /*
 	Level:Sender

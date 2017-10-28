@@ -11,16 +11,16 @@
 #include <unistd.h>
 #include <signal.h>
 
-unsigned int allocateInformationFrames(unsigned char **buff, const unsigned char data[], unsigned int sizeOf)
+unsigned int allocateInformationFrames(unsigned char ***buff, const unsigned char data[], unsigned int sizeOf)
 {
     printf("[LOG]@memory\tStarting Allocation of information frames process\n");
     //This bit of code determine how many frames will be necessary to send the data
     unsigned int size = (unsigned int)floor(sizeOf / MAX_DATA_PER_FRAME);
 
     //this allocates the buffer with the ammount of frames necessary to send the data
-    buff = (unsigned char **)malloc(sizeof(unsigned char *) * size);
+    *buff = (unsigned char **)malloc(sizeof(unsigned char *) * size);
 
-    if (buff == NULL)
+    if (*buff == NULL)
     {
         printf("[ERROR]@memory\tAllocation of the information frame failed\n");
         deallocateInformationFrames(buff, 0); //since the was an error everything must be dealocated
@@ -38,22 +38,22 @@ unsigned int allocateInformationFrames(unsigned char **buff, const unsigned char
             {
                 double fraction = size - (sizeOf / MAX_DATA_PER_FRAME);                               //determines fraction of the max data per frame for the last frame
                 g_ctrl.lastFrameSize = sizeof(unsigned char) * MAX_FRAME_SIZE * fraction;             //saves the size of the last frame for easy acess
-                buff[i] = (unsigned char *)malloc(sizeof(unsigned char) * MAX_FRAME_SIZE * fraction); //allocates the frame with only the needed size
+                *buff[i] = (unsigned char *)malloc(sizeof(unsigned char) * MAX_FRAME_SIZE * fraction); //allocates the frame with only the needed size
                 printf("[LOG]@memory\tAttempting to allocate an information frame of %f bytes", MAX_FRAME_SIZE * fraction);
             }
             else
             {
-                buff[i] = (unsigned char *)malloc(sizeof(unsigned char) * MAX_FRAME_SIZE);
+                *buff[i] = (unsigned char *)malloc(sizeof(unsigned char) * MAX_FRAME_SIZE);
                 printf("[LOG]@memory\tAttempting to allocate an information frame of %d bytes", MAX_FRAME_SIZE);
             }
         }
         else
         {
-            buff[i] = (unsigned char *)malloc(sizeof(unsigned char) * (sizeOf + 6));
+            *buff[i] = (unsigned char *)malloc(sizeof(unsigned char) * (sizeOf + 6));
             printf("[LOG]@memory\tAttempting to allocate an information frame of %d bytes", (sizeOf + 6));
         }
 
-        if (buff[i] == NULL)
+        if (*buff[i] == NULL)
         {
             printf("[ERROR]@memory\tInformation Frame Failed to Allocate\n");
             deallocateInformationFrames(buff, i); //since the was an error everything must be dealocated
@@ -66,16 +66,16 @@ unsigned int allocateInformationFrames(unsigned char **buff, const unsigned char
     return size; //returns the ammount of frames allocated
 }
 
-void deallocateInformationFrames(unsigned char **frames, unsigned int numberOfFrames)
+void deallocateInformationFrames(unsigned char ***frames, unsigned int numberOfFrames)
 {
     printf("[LOG]@memory\tStarting deallocation of information frames\n");
     //dealocates the memory space of each individual frame
     for (unsigned int i = 0; i < numberOfFrames; ++i)
     {
-        free(frames[i]);
+        free(*frames[i]);
     }
     //dealocates the frame buffer
-    free(frames);
+    free(*frames);
     printf("[LOG]@memory\tFinished deallocating Information frames\n");
     return;
 }
@@ -757,7 +757,7 @@ unsigned char sendData(unsigned int fd, const unsigned char data[], unsigned int
 
     printf("[LOG]@dataSend\tAttempting to allocated frame buffers\n");
     unsigned char **frames = NULL;
-    unsigned int nFrames = allocateInformationFrames(frames, data, size);
+    unsigned int nFrames = allocateInformationFrames(&frames, data, size);
     if (nFrames == 0 || frames == NULL)
     {
         printf("[ERROR]@allocation:There has been an allocation error on the inforation frames\n");

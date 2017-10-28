@@ -9,7 +9,7 @@ int main()
 {
 	char *buf = NULL;
 	int fd = llopen(0, RECEIVER);
-	int rd = llread(fd, buf);
+	int rd = llread(fd, &buf);
 	if (rd == 0)
 	{
 		printf("unable to read\n");

@@ -13,7 +13,7 @@ struct sideControll g_side;
 int llopen(int porta,int side);//llopen
 
 //NEEDS DOCUMENTATION
-int llread(int fd,char* buffer);//llread
+int llread(int fd,char** buffer);//llread
 
 //NEEDS DOCUMENTATION
 int llwrite(int fd,char*buffer,int lenght);//llwrite
