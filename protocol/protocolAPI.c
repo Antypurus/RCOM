@@ -105,7 +105,8 @@ int llread(int fd, char *buffer)
             if (ret == 2)
             { //received a data frame
                 ret = sendRRCommand(fd);
-                if(ret==0){
+                if (ret == 0)
+                {
                     printf("failed to send RR command\n");
                     return -1;
                 }
@@ -118,17 +119,23 @@ int llread(int fd, char *buffer)
                 else
                 {
                     destuffData(data, &size);
-                    if (data == NULL){
+                    if (data == NULL)
+                    {
                         printf("unable to destuff data\n");
                         return -1;
-                    }else{
+                    }
+                    else
+                    {
                         buffer = data;
                         return size;
                     }
                 }
-            }else{
+            }
+            else
+            {
                 ret = sendREJCommand(fd);
-                if(ret==0){
+                if (ret == 0)
+                {
                     printf("failed to send rej command, CRITICAL ERROR!\n ");
                     llclose(fd);
                     exit(-1);
@@ -142,11 +149,14 @@ int llread(int fd, char *buffer)
 
 int llwrite(int fd, char *buffer, int lenght)
 {
-    unsigned int ret = sendData(fd,buffer,lenght);
-    if(ret!=lenght){
+    unsigned int ret = sendData(fd, buffer, lenght);
+    if (ret != lenght)
+    {
         printf("failed to send data or validate response\n");
         return -1;
-    }else{
+    }
+    else
+    {
         return ret;
     }
     return -1;
@@ -154,12 +164,16 @@ int llwrite(int fd, char *buffer, int lenght)
 
 int llclose(int fd)
 {
-    if(g_side.side==RECEIVER){
+    if (g_side.side == RECEIVER)
+    {
         closeConnection(fd);
         return 1;
-    }else{
+    }
+    else
+    {
         unsigned int ret = sendDisconnectCommand(fd);
-        if(ret==0){
+        if (ret == 0)
+        {
             printf("failed to send disconnect command\n");
             return -1;
         }
