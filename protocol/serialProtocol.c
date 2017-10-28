@@ -576,6 +576,7 @@ char ReceptorResponseInterpreter(const unsigned char *receptorResponse)
 //NEEDS TO BE COMMENTED
 unsigned char *getReceptorResponse(unsigned int fd)
 {
+    signal(SIGALRM,timeoutHandler);
     printf("[LOG]@rdR\tStarting Receptor Response Read Cycle\n");
     unsigned int res = 0;
 
