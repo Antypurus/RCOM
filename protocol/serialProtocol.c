@@ -313,7 +313,7 @@ unsigned int openConnection(char *serialPort, unsigned int flags)
     }
 
     printf("[LOG]@openc\tAttempting to  obtain file descriptor current attributes\n");
-    if (tcgetattr(fd, &oldtio) == -1)
+    if (tcgetattr(fdz, &oldtio) == -1)
     { /* save current port settings */
         printf("[ERROR]@openc\tFailed to obtain file descriptor current attributes\n");
         perror("tcgetattr");
@@ -335,10 +335,10 @@ unsigned int openConnection(char *serialPort, unsigned int flags)
     newtio.c_cc[VTIME] = 0; /* inter-character timer unused */
     newtio.c_cc[VMIN] = 5;  /* blocking read until 5 chars received */
 
-    tcflush(fd, TCIOFLUSH);
+    tcflush(fdz, TCIOFLUSH);
 
     printf("[LOG]@openc\tAttempting to set file descriptor current attributes\n");
-    if (tcsetattr(fd, TCSANOW, &newtio) == -1)
+    if (tcsetattr(fdz, TCSANOW, &newtio) == -1)
     {
         printf("[ERROR]@openc\tFailed to set file descriptor current attributes\n");
         perror("tcsetattr");
@@ -351,7 +351,7 @@ unsigned int openConnection(char *serialPort, unsigned int flags)
 
     printf("New termios structure set\n");
     printf("[LOG]@openc\tFinished estableshing serial porto conenction to:%s\n", serialPort);
-    return fd;
+    return fdz;
 }
 
 void closeConnection(unsigned int fd)
