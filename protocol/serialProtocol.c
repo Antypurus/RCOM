@@ -655,7 +655,7 @@ jump:
     }
     else
     {
-        while (res == 0 && g_ctrl.retryCounter <= MAX_TIMEOUT)
+        while (res != 5 && g_ctrl.retryCounter <= MAX_TIMEOUT)
         {
             printf("[ERROR]@stSend\tFrame was not sent , attempting retransmission...\n");
             sleep(TIMEOUT);
@@ -717,7 +717,7 @@ jump:
     }
     else
     {
-        while (res == 0 && g_ctrl.retryCounter <= MAX_TIMEOUT)
+        while (res != 5 && g_ctrl.retryCounter <= MAX_TIMEOUT)
         {
             printf("[ERROR]@stSend\tFrame was not sent , attempting retransmission...\n");
             sleep(TIMEOUT);
@@ -745,24 +745,31 @@ unsigned char sendData(unsigned int fd, const unsigned char data[], unsigned int
     printf("[LOG]@dataSend\tAttempting to allocated frame buffers\n");
     unsigned char **frames = NULL;
     unsigned int nFrames = allocateInformationFrames(frames, data, size);
-    if (nFrames == 0 || frames==NULL)
+    if (nFrames == 0 || frames == NULL)
     {
         printf("[ERROR]@allocation:There has been an allocation error on the inforation frames\n");
         return 0;
     }
     printf("[LOG]@dataSend\tAttempting to preprare information frames\n");
-    prepareInformationFrames(frames, nFrames);
-    //TODO check for error
+    prepareInformationFrames(frames, nFrames); //this function does not error in normal situations
 
     printf("[LOG]@dataSend\tAttempting to move data to frames\n");
-    moveDataToFrames(frames, data, size, nFrames);
-    //TODO check for error
+    unsigned char ret = moveDataToFrames(frames, data, size, nFrames);
+    if (ret == 0)
+    {
+        printf("[ERROR]@dataSend\tMoving data to frames failed\n");
+        return 0;
+    }
+    else
+    {
+        printf("[LOG]@dataSend\tData moved to frames\n");
+    }
 
     //the frames are now ready to be sent
 
     if (g_ctrl.allocError)
     {
-        printf("[ERROR]@allocation:There has been an allocation error while moving information to frames,exiting\n");
+        printf("[ERROR]@dataSend\tThere has been an allocation error while moving information to frames,exiting\n");
         return 0;
     }
 
@@ -778,17 +785,40 @@ unsigned char sendData(unsigned int fd, const unsigned char data[], unsigned int
             toSend = MAX_FRAME_SIZE;
         }
         g_ctrl.frameToSend = frames[i];
+
+    resend:
+        printf("[LOG]@dataSend\tAttempting to send data\n");
         unsigned int sent = write(fd, frames[i], toSend);
-        if (sent == 0)
+
+        if (g_ctrl.retryCounter > MAX_TIMEOUT + 1)
         {
-            printf("Connection Error Unable To Senda Data\n");
+            printf("[ERROR]@dataSend\tMaximum permited retransmission executed, connection timeout\n");
             return 0;
         }
+
+        while (sent != toSend && g_ctrl.retryCounter <= MAX_TIMEOUT)
+        {
+            sleep(TIMEOUT);
+            printf("[ERROR]@dataSend\tFailed to send data, attempting retansmission\n");
+            g_ctrl.retryCounter++;
+            goto resend;
+        }
+
+        g_ctrl.retryCounter = 0;
+
+        printf("[LOG]@dataSend\tAttempting to obtain receptor response\n");
         unsigned char *buf = getReceptorResponse(fd);
         if (buf == NULL)
         {
+            printf("[ERROR]@dataSend\tFailed to get response from receiver , connection timeout\n");
             return 0;
         }
+        else
+        {
+            printf("[LOG]@dataSend\tObtained receptor response\n");
+        }
+
+        printf("[LOG]@dataSend\tAttempting interpret receptor response\n");
         unsigned int rez = ReceptorResponseInterpreter(buf);
 
         if (g_ctrl.currPar == 1)
@@ -796,15 +826,13 @@ unsigned char sendData(unsigned int fd, const unsigned char data[], unsigned int
             while (rez == REJ1)
             {
                 free(buf);
-                buf = getReceptorResponse(fd);
-                if (buf == NULL)
-                {
-                    return 0;
-                }
-                rez = ReceptorResponseInterpreter(buf);
+                printf("[ERROR]@dataSend\tReceived response of corrupted frame\n");
+                goto resend;
             }
             if (rez == RR1)
             {
+                printf("[LOG]@dataSend\tReceived response of valid frame\n");
+                free(buf);
                 return sent;
             }
         }
@@ -813,28 +841,26 @@ unsigned char sendData(unsigned int fd, const unsigned char data[], unsigned int
             while (rez == REJ0)
             {
                 free(buf);
-                buf = getReceptorResponse(fd);
-                if (buf == NULL)
-                {
-                    return 0;
-                }
-                rez = ReceptorResponseInterpreter(buf);
+                printf("[ERROR]@dataSend\tReceived response of corrupted frame\n");
+                goto resend;
             }
             if (rez == RR0)
             {
+                printf("[LOG]@dataSend\tReceived response of valid frame\n");
+                free(buf);
                 return sent;
             }
         }
 
         if (rez == UA_R)
         {
-            printf("Incorrect Response Type Received\n");
+            printf("[ERROR]@dataSend\tIncorrect response type received\n");
             return 0;
         }
 
         if (rez == ERR)
         {
-            printf("Corrupted Response Received\n");
+            printf("[ERROR]@dataSend\tCorrupted response received\n");
             return 0;
         }
     }
@@ -843,21 +869,28 @@ unsigned char sendData(unsigned int fd, const unsigned char data[], unsigned int
 
 void timeoutHandler(int sig)
 {
-    if (g_ctrl.retryCounter >= MAX_TIMEOUT)
+    printf("[LOG]@timeoutHandle\tTimeout signal occurred\n") if (g_ctrl.retryCounter >= MAX_TIMEOUT)
     {
-        printf("Conection Timeout\n");
-        g_ctrl.hasTimedOut = TRUE;
+        printf("[ERROR]@timeoutHandle\tConnection timeout\n")
+            g_ctrl.hasTimedOut = TRUE;
         return;
     }
     else
     {
-        printf("Retrying Connection ... Attempt %d\n", g_ctrl.retryCounter + 1);
+        unsigned int resend = 0l printf("[LOG]@timeoutHandle\tRetrying Connection ... Attempt %d\n", g_ctrl.retryCounter + 1);
         unsigned int res = write(g_ctrl.fileDescriptor, g_ctrl.frameToSend, 5);
-        if (res == 0)
+        while (res != 5)
         {
-            printf("Conection Timeout\n");
-            g_ctrl.hasTimedOut = TRUE;
-            return;
+            sleep(TIMEOUT);
+            printf("[ERROR]@timeoutHandle\tFailed to resend, retrying retransmission\n");
+            res = write(g_ctrl.fileDescriptor, g_ctrl.frameToSend, 5);
+            resend++;
+            if (resend > MAX_TIMEOUT + 1)
+            {
+                printf("[ERROR]@timeoutHandle\tAll retransmission failed , aborting\n");
+                g_ctrl.hasTimedOut = TRUE;
+                return;
+            }
         }
         g_ctrl.retryCounter++;
         alarm(TIMEOUT);
@@ -1469,13 +1502,17 @@ unsigned char validateFrame(unsigned char *data, unsigned int sizeOf)
 
 void setHandler()
 {
+    printf("[LOG]@setHandler\tSetting controll structure value\n");
     g_ctrl.currPar = 0;
     g_ctrl.retryCounter = 0;
     g_ctrl.hasTimedOut = FALSE;
     g_ctrl.shouldDC = FALSE;
+    printf("[LOG]@setHandler\tDone Setting controll structure value\n");
 }
 
 void discHandler()
 {
+    printf("[LOG]@discHandler\tSetting controll value for disconnedtion\n");
     g_ctrl.shouldDC = TRUE;
+    printf("[LOG]@discHandler\tDone Setting controll value for disconnedtion\n");
 }
