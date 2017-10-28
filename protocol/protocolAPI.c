@@ -180,6 +180,7 @@ int llclose(int fd)
         if (ret == 0)
         {
             printf("failed to send disconnect command\n");
+            closeConnection(fd);
             return -1;
         }
         closeConnection(fd);
