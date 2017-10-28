@@ -66,7 +66,7 @@ int llopen(int porta, int side)
         if (ret == 0)
         {
             printf("failed to send set command\n");
-            return -1;
+            return (int)fd;
         }
         else
         {
