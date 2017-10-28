@@ -309,7 +309,7 @@ unsigned int openConnection(char *serialPort, unsigned int flags)
     else
     {
         printf("[SUCCESS]@openc\tFile descriptor obatained\n");
-        fd = fdz;
+        fdz = fd;
     }
 
     printf("[LOG]@openc\tAttempting to  obtain file descriptor current attributes\n");
