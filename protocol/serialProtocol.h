@@ -166,8 +166,6 @@ unsigned int openConnection(char* serialPort,unsigned int flags);
 	Level:Both
 
 	This function closes the connection to the specified file descriptor
-
-	@param fd - file descriptor of the serial port you want to disconect from
 */
 void closeConnection(unsigned int fd);
 
