@@ -1,3 +1,5 @@
+#define _USE_MATH_DEFINES
+
 #include "serialProtocol.h"
 #include <math.h>
 #include <strings.h>
@@ -462,7 +464,7 @@ char ReceptorResponseInterpreter(const unsigned char *receptorResponse)
         {
             if (receptorResponse[i] == ADDR2)
             {
-                currntState = CTRL;
+                currntState = CTRLL;
             }
             else
             {
@@ -472,7 +474,7 @@ char ReceptorResponseInterpreter(const unsigned char *receptorResponse)
             break;
         }
 
-        case (CTRL):
+        case (CTRLL):
         {
             if (g_ctrl.currPar == 0)
             {
@@ -1257,7 +1259,7 @@ unsigned char validateFrame(unsigned char *data, unsigned int sizeOf)
                 if (data[i] == ADDRS)
                 {
                     printf("[SUCCESS]@valid\tAddress field is validated\n");
-                    currStt = CTRL;
+                    currStt = CTRLL;
                     break;
                 }
                 else
@@ -1266,7 +1268,7 @@ unsigned char validateFrame(unsigned char *data, unsigned int sizeOf)
                     return 0;
                 }
             }
-            case (CTRL):
+            case (CTRLL):
             {
                 if (data[i] == SET)
                 {
@@ -1369,7 +1371,7 @@ unsigned char validateFrame(unsigned char *data, unsigned int sizeOf)
                 if (data[i] == ADDRS)
                 {
                     printf("[SUCCESS]@valid\tAddress field is validated\n");
-                    currStt = CTRL;
+                    currStt = CTRLL;
                     break;
                 }
                 else
@@ -1378,7 +1380,7 @@ unsigned char validateFrame(unsigned char *data, unsigned int sizeOf)
                     return 0;
                 }
             }
-            case (CTRL):
+            case (CTRLL):
             {
                 if (g_ctrl.currPar == 0)
                 {

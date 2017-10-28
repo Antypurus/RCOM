@@ -21,7 +21,7 @@
 
 #define FLAG_STR 0
 #define ADDR 1
-#define CTRL 2
+#define CTRLL 2
 #define BCC 3
 #define FLAG_END 4
 #define DONE_PROC 5
@@ -257,7 +257,7 @@ void deallocatedCharBuffers(unsigned char** buffers,unsigned int numberOfBuffers
 	Level:Sender
 
 	This function is a handler for the SIGALRM signal , it is used when sending a frame over the network
-	it has inbued retransmission to a specified ammount, marks in the g_ctrl structure that there has 
+	it has inbued retransmission to a specified ammount, marks in the g_CTRLL structure that there has 
 	been a timeout if such occurs
 
 	@param sig - as per specified for this handler the ammount of time of the alarm.
