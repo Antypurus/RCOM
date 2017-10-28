@@ -286,10 +286,10 @@ unsigned int openConnection(char *serialPort, unsigned int flags)
     }
 
     printf("[LOG]@openc\tAttempting to open file descriptor\n");
-    int fdz;
-    unsigned int fd;
+    int fdz=-1;
+    unsigned int fd=-1;
     
-    if (fd == 0)
+    if (flags == 0)
     {
         fd = open(serialPort, O_RDWR | O_NOCTTY | O_NONBLOCK);
     }
@@ -879,15 +879,17 @@ unsigned char sendData(unsigned int fd, const unsigned char data[], unsigned int
 
 void timeoutHandler(int sig)
 {
-    printf("[LOG]@timeoutHandle\tTimeout signal occurred\n") if (g_ctrl.retryCounter >= MAX_TIMEOUT)
+    printf("[LOG]@timeoutHandle\tTimeout signal occurred\n");
+    if (g_ctrl.retryCounter >= MAX_TIMEOUT)
     {
-        printf("[ERROR]@timeoutHandle\tConnection timeout\n")
-            g_ctrl.hasTimedOut = TRUE;
+        printf("[ERROR]@timeoutHandle\tConnection timeout\n");
+        g_ctrl.hasTimedOut = TRUE;
         return;
     }
     else
     {
-        unsigned int resend = 0l printf("[LOG]@timeoutHandle\tRetrying Connection ... Attempt %d\n", g_ctrl.retryCounter + 1);
+        unsigned int resend = 0;
+        printf("[LOG]@timeoutHandle\tRetrying Connection ... Attempt %d\n", g_ctrl.retryCounter + 1);
         unsigned int res = write(g_ctrl.fileDescriptor, g_ctrl.frameToSend, 5);
         while (res != 5)
         {
