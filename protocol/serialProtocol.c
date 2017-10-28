@@ -286,8 +286,8 @@ unsigned int openConnection(char *serialPort, unsigned int flags)
     }
 
     printf("[LOG]@openc\tAttempting to open file descriptor\n");
-    int fdz=-1;
-    unsigned int fd=-1;
+    int fd=-1;
+    unsigned int fdz=-1;
     
     if (flags == 0)
     {

@@ -1,16 +1,21 @@
 #include "serialProtocol.h"
 #include "protocolAPI.h"
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <termios.h>
+#include <unistd.h>
 
 int llopen(int porta, int side)
 {
-    unsigned char port[20];
+    char port[20];
     if (porta == 0)
     {
-        port = "dev/ttyS0";
+        memcpy(port,"dev/ttyS0",10);
     }
     else
     {
-        port = "dev/ttyS1";
+        memcpy(port,"dev/ttyS0",10);
     }
 
     unsigned int fd = openConnection(port, 0);
@@ -91,7 +96,7 @@ int llread(int fd, char *buffer)
             {
                 printf("failed to send UA command\n");
             }
-            buffer = (unsigned char *)malloc(3); //allocated space for the string DC
+            buffer = (char *)malloc(3); //allocated space for the string DC
             if (buffer == NULL)
             {
                 printf("failed to allocated buffer\n");
