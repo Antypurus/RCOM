@@ -135,8 +135,8 @@ void deallocatedCharBuffers(unsigned char **buffers, unsigned int numberOfBuffer
 
 unsigned char **divideData(const unsigned char data[], unsigned int *sizeOf)
 {
-    printf("[LOG]@divData\tStarting data division process\n");
-    unsigned int size = (unsigned int)ceil(*sizeOf / MAX_DATA_PER_FRAME);  //determine the size of the data
+    printf("[LOG]@divData\tStarting data division process for data of size %d\n",*sizeOf);
+    unsigned int size = (unsigned int)ceil(*sizeOf / (float)MAX_DATA_PER_FRAME);  //determine the size of the data
     unsigned char **buffer = allocateCharBuffers(size, MAX_DATA_PER_FRAME); //allocates the required space for the data holders
 
     if (buffer == NULL)
