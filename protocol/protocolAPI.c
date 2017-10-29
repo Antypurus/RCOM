@@ -81,8 +81,9 @@ int llopen(int porta, int side)
 int llread(int fd, char **buffer)
 {
     unsigned int size = 0;
+    unsigned char *data;
 jmp:
-    unsigned char *data = readSentData(fd, &size);
+    data = readSentData(fd, &size);
     if (data == NULL)
     {
         printf("failed to read data\n");
