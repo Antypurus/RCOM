@@ -615,7 +615,7 @@ unsigned char *getReceptorResponse(unsigned int fd)
         else
         {
             printf("[LOG]@rdR\tDidnt read 5 bytes, read:\n",res);
-            res = write(g_ctrl.fileDescriptor, g_ctrl.frameToSend, g_ctrl.sendSize);
+            write(g_ctrl.fileDescriptor, g_ctrl.frameToSend, g_ctrl.sendSize);
             sleep(TIMEOUT);
         }
         if (g_ctrl.hasTimedOut)
