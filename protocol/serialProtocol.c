@@ -1143,9 +1143,10 @@ unsigned char *extractDataFromFrame(unsigned char *data, unsigned int *sizeOf)
 unsigned char *readSentData(unsigned int fd, unsigned int *sizeOf)
 {
     printf("[LOG]@rcRd\tStarting to read sent data\n");
-    unsigned int readFlag1 = 0;
-    unsigned int readFlag2 = 0;
-    unsigned int stop = 0;
+    
+    //unsigned int readFlag1 = 0;
+    //unsigned int readFlag2 = 0;
+    //unsigned int stop = 0;
 
     printf("[LOG]@rcRd\tAttempting to allocate buffer with max frame size\n");
     unsigned char *buff = (unsigned char *)malloc(sizeof(unsigned char) * MAX_FRAME_SIZE);
@@ -1211,7 +1212,7 @@ unsigned char *readSentData(unsigned int fd, unsigned int *sizeOf)
             }
             case (CTRLL):
             {
-                if (rd == SET || rd == DISC || rd == CTR_PAR0 || rs == CTR_PAR1)
+                if (rd == SET || rd == DISC || rd == CTR_PAR0 || rd == CTR_PAR1)
                 {
                     printf("[LOG]@rcRd\tControll byte read\n");
                     currSts = BCC;
@@ -1227,20 +1228,20 @@ unsigned char *readSentData(unsigned int fd, unsigned int *sizeOf)
             }
             case (BCC):
             {
-                if (rd == (buff[sz - 1] ^ buff[sz - 2])))
+                if (rd == (buff[sz - 1] ^ buff[sz - 2]))
+                {
+                    if (buff[sz - 1] == CTR_PAR0 || buff[sz - 1] == CTR_PAR1)
                     {
-                        if (buf[sz - 1] == CTR_PAR0 || buf[sz - 1] == CTR_PAR1)
-                        {
-                            printf("[LOG]@rcRd\tBCC byte read,reading information\n");
-                            currSts = INFO_STT;
-                        }
-                        else
-                        {
-                            printf("[LOG]@rcRd\tBCC byte read,reading end byte\n");
-                            currSts = FLAG_END;
-                        }
-                        sz++;
+                        printf("[LOG]@rcRd\tBCC byte read,reading information\n");
+                        currSts = INFO_STT;
                     }
+                    else
+                    {
+                        printf("[LOG]@rcRd\tBCC byte read,reading end byte\n");
+                        currSts = FLAG_END;
+                    }
+                    sz++;
+                }
                 else
                 {
                     printf("[ERROR]@rcRd\tBCC byte not validated\n");
@@ -1269,7 +1270,7 @@ unsigned char *readSentData(unsigned int fd, unsigned int *sizeOf)
                 if (rd == FLAG)
                 {
                     printf("[LOG]@rcRd\tRead End Flag\n");
-                    currSts = FLAG_DONE_PROCEND;
+                    currSts = DONE_PROC;
                     sz++;
                 }
                 else
@@ -1328,25 +1329,25 @@ unsigned char *readSentData(unsigned int fd, unsigned int *sizeOf)
                 sz++;
                 stop = 1;
             }
-        }*/
-}
-printf("[LOG]@rcRd\tFinished reading Data\n");
+        }
+}*/
+    printf("[LOG]@rcRd\tFinished reading Data\n");
 
-printf("[LOG]@rcRd\tAttempting to resize frame buffer\n");
-void *ck = realloc(buff, sz);
+    printf("[LOG]@rcRd\tAttempting to resize frame buffer\n");
+    void *ck = realloc(buff, sz);
 
-if (ck == NULL)
-{
-    printf("[ERROR]@rcRd\tFailed to resize frame buffer\n");
-    return NULL;
-}
-else
-{
-    printf("[SUCCESS]@rcRd\tSuccessfully resized buffer\n");
-}
+    if (ck == NULL)
+    {
+        printf("[ERROR]@rcRd\tFailed to resize frame buffer\n");
+        return NULL;
+    }
+    else
+    {
+        printf("[SUCCESS]@rcRd\tSuccessfully resized buffer\n");
+    }
 
-*sizeOf = sz;
-return buff;
+    *sizeOf = sz;
+    return buff;
 }
 
 unsigned char validateFrame(unsigned char *data, unsigned int sizeOf)
