@@ -1157,8 +1157,25 @@ unsigned char *extractDataFromFrame(unsigned char *data, unsigned int *sizeOf)
     return buff;
 }
 
+void readtimeoutHandler(int sig){
+    if(hasReceived==FALSE){
+        g_ctrl.retryCounter++;
+        if(g_ctrl.retryCounter>MAX_TIMEOUT+1){
+            printf("[ERROR]@rdTimehourHandler\tTimeout the read\n");
+            g_ctrl.hasTimedOut=TRUE;
+            return;
+        }else{
+            printf("[LOG]@rdTimehourHandler\tTimeout period reached , retrying attempt %d\n",g_ctrl.retryCounter);
+            alarm(TIMEOUT);
+        }
+    }
+    return;
+}
+
 unsigned char *readSentData(unsigned int fd, unsigned int *sizeOf)
 {
+    signal(SIGALRM,readtimeoutHandler);
+    hasReceived=FALSE;
     printf("[LOG]@rcRd\tStarting to read sent data\n");
 
     //unsigned int readFlag1 = 0;
@@ -1187,10 +1204,17 @@ unsigned char *readSentData(unsigned int fd, unsigned int *sizeOf)
     unsigned int currSts = FLAG_STR;
     while (currSts != DONE_PROC && retry <= MAX_TIMEOUT + 1)
     {
+        hasReceived=FALSE;
         alarm(TIMEOUT);
+        if(g_ctrl.hasTimedOut==TRUE){
+            printf("[ERROR]@rcRd\tRead timeout\n");
+            return NULL;
+        }
         unsigned int res = read(fd, &rd, 1);
         if (res == 1)
         {
+            hasReceived=TRUE;
+            g_ctrl.retryCounter=0;
             alarm(0);
             retry = 0;
             printf("[LOG]@rcRd\tRead a byte of data\n");
