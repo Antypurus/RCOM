@@ -185,12 +185,17 @@ void prepareInformationFrames(unsigned char **frames, unsigned int numberFrames)
     for (unsigned int i = 0; i < numberFrames; ++i)
     {
         printf("[LOG]@frameSet\tsetting up frame %d\n", i);
+
+        unsigned char ctr_byte;
+
         if (g_ctrl.currPar == 0)
         {
+            ctr_byte=CTR_PAR0;
             g_ctrl.currPar = 1;
         }
         else
         {
+            ctr_byte=CTR_PAR1;
             g_ctrl.currPar = 0;
         }
 
