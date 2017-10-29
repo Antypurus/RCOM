@@ -295,7 +295,7 @@ unsigned int openConnection(char *serialPort, unsigned int flags)
 
     if (flags == 0)
     {
-        fd = open(serialPort, O_RDWR | O_NOCTTY | O_NONBLOCK);
+        fd = open(serialPort, O_RDWR | O_NOCTTY);
     }
     else
     {
