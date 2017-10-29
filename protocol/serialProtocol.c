@@ -1683,7 +1683,7 @@ unsigned char validateFrame(unsigned char *data, unsigned int sizeOf)
                 }
                 else
                 {
-                    printf("[ERROR]@valid\tEnd Flag is not validated\n");
+                    printf("[ERROR]@valid\tEnd Flag is not validated, value was %d\n",data[sizeOf - 1]);
                     return 0;
                 }
             }
