@@ -124,6 +124,8 @@ jmp:
                 {
                     printf("failed to send RR command\n");
                     return -1;
+                }else{
+                    printf("rr command sent\n");
                 }
                 extractDataFromFrame(data, &size);
                 if (data == NULL)
@@ -133,6 +135,7 @@ jmp:
                 }
                 else
                 {
+                    printf("data extracted with size %d, destuffing",size);
                     destuffData(data, &size);
                     if (data == NULL)
                     {
@@ -141,6 +144,7 @@ jmp:
                     }
                     else
                     {
+                        printf("data destuffed with size %d , read the string %s\n",size,data);
                         *buffer = data;
                         return size;
                     }
