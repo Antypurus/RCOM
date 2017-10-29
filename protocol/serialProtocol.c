@@ -406,6 +406,7 @@ unsigned char *byteStuffingOnData(const unsigned char data[], unsigned int *size
     unsigned int currIndice = 0;
     for (unsigned int i = 0; i < originalSize; ++i)
     {
+        printf("[LOG]@stuff\tAt indice %d\n",i);
         if (data[i] == 0x7D)
         {
             printf("[LOG]@stuff\t0x7D detected to stuff\n");
