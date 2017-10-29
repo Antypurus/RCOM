@@ -896,7 +896,7 @@ unsigned char sendData(unsigned int fd, const unsigned char data[], unsigned int
 
 void timeoutHandler(int sig)
 {
-    if (hasReceived = FALSE)
+    if (hasReceived == FALSE)
     {
         printf("[LOG]@timeoutHandle\tTimeout signal occurred\n");
         if (g_ctrl.retryCounter >= MAX_TIMEOUT)
