@@ -1166,12 +1166,12 @@ unsigned char *readSentData(unsigned int fd, unsigned int *sizeOf)
     printf("[LOG]@rcRd\tReading Data\n");
 
     unsigned int currSts = FLAG_STR;
-    while (currSts != FLAG_END)
+    while (currSts != DONE_PROC)
     {
         unsigned int res = read(fd, &rd, 1);
         if (res == 1)
         {
-            buff[sz]=rd;
+            buff[sz] = rd;
             switch (currSts)
             {
             case (FLAG_STR):
@@ -1218,11 +1218,18 @@ unsigned char *readSentData(unsigned int fd, unsigned int *sizeOf)
             }
             case (BCC):
             {
-                if (rd == (buff[sz-1]^buff[sz-2])))
-                {
-                    currSts = INFO_STT;
-                    sz++;
-                }
+                if (rd == (buff[sz - 1] ^ buff[sz - 2])))
+                    {
+                        if (buf[sz - 1] == CTR_PAR0 || buf[sz - 1] == CTR_PAR1)
+                        {
+                            currSts = INFO_STT;
+                        }
+                        else
+                        {
+                            currSts = FLAG_END;
+                        }
+                        sz++;
+                    }
                 else
                 {
                     currSts = FLAG_STR;
@@ -1234,12 +1241,26 @@ unsigned char *readSentData(unsigned int fd, unsigned int *sizeOf)
             {
                 if (rd == FLAG)
                 {
-                    currSts = FLAG_END;
+                    currSts = DONE_PROC;
                     sz++;
                 }
                 else
                 {
                     sz++;
+                }
+                break;
+            }
+            case (FLAG_END):
+            {
+                if (rd == FLAG)
+                {
+                    currSts = FLAG_DONE_PROCEND;
+                    sz++;
+                }
+                else
+                {
+                    currSts = FLAG_STR;
+                    sz = 0;
                 }
                 break;
             }
