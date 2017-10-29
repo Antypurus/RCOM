@@ -424,8 +424,10 @@ unsigned char *byteStuffingOnData(const unsigned char data[], unsigned int *size
         }
         else
         {
+            printf("[LOG]@stuff\tdata section does not need stuff\n");
             buffer[0][currIndice] = data[i];
         }
+        printf("[LOG]@stuff\tcurrentIndice %d\n",currIndice);
         currIndice++;
     }
 
