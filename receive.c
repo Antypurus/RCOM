@@ -21,7 +21,7 @@ int main()
 			}
 			return -1;
 		}else{
-			printf("read %s , size %d",buf,rd);
+			printf("read %s , size %d\n",buf,rd);
 		}
 	}
 	if (!strcmp("DC", buf))
