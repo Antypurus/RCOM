@@ -204,10 +204,15 @@ void prepareInformationFrames(unsigned char **frames, unsigned int numberFrames)
         }
 
         frames[i][0] = FLAG;                        //FLAG
+        printf("[LOG]@frameSet\tFlag set\n");
         frames[i][1] = ADDRS;                       //ADDRS
+        printf("[LOG]@frameSet\taddress set\n");
         frames[i][2] = g_ctrl.currPar;              //CTRL
+        printf("[LOG]@frameSet\tcontroll set\n");
         frames[i][3] = frames[i][1] ^ frames[i][2]; //BCC1
+        printf("[LOG]@frameSet\tbcc set\n");
         frames[i][lastByte - 1] = FLAG;             //FLAG
+        printf("[LOG]@frameSet\tend flag set\n");
         printf("[LOG]@frameSet\tfinished setting up frame %d\n", i);
     }
     printf("[LOG]@frameSet\tFrame Set Up finished\n");
