@@ -615,6 +615,7 @@ unsigned char *getReceptorResponse(unsigned int fd)
         else
         {
             printf("[LOG]@rdR\tDidnt read 5 bytes, read:\n",res);
+            res = write(g_ctrl.fileDescriptor, g_ctrl.frameToSend, g_ctrl.sendSize);
             sleep(TIMEOUT);
         }
         if (g_ctrl.hasTimedOut)
@@ -645,6 +646,7 @@ unsigned char sendSetCommand(unsigned int fd)
     buffer[4] = FLAG;
 
     g_ctrl.frameToSend = buffer;
+    g_ctrl.sendSize = 5;
 
     printf("[LOG]@stSend\tAttempting to send frame\n");
     unsigned int res = write(fd, buffer, 5); //writes to pipe the set command in the buffer
@@ -710,6 +712,7 @@ unsigned char sendDisconnectCommand(unsigned int fd)
     buffer[4] = FLAG;
 
     g_ctrl.frameToSend = buffer;
+    g_ctrl.sendSize = 5;
 
     printf("[LOG]@dcSend\tAttemprting to send frame\n");
     unsigned int res = write(fd, buffer, 5);
@@ -808,6 +811,7 @@ unsigned char sendData(unsigned int fd, const unsigned char data[], unsigned int
             toSend = MAX_FRAME_SIZE;
         }
         g_ctrl.frameToSend = frames[i];
+        g_ctrl.sendSize = toSend;
 
     resend:
         printf("[LOG]@dataSend\tAttempting to send data\n");
@@ -905,7 +909,7 @@ void timeoutHandler(int sig)
         {
             unsigned int resend = 0;
             printf("[LOG]@timeoutHandle\tRetrying Connection ... Attempt %d\n", g_ctrl.retryCounter + 1);
-            unsigned int res = write(g_ctrl.fileDescriptor, g_ctrl.frameToSend, 5);
+            unsigned int res = write(g_ctrl.fileDescriptor, g_ctrl.frameToSend, g_ctrl.sendSize);
             while (res != 5)
             {
                 sleep(TIMEOUT);

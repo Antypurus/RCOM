@@ -57,6 +57,7 @@ struct termios oldtio,newtio; //structures with the information about the serial
 struct SEND_CONTROLL{
 	unsigned char* frameToSend;
 	unsigned char currPar;
+	unsigned int sendSize;
 	unsigned char retryCounter;
 	unsigned char hasTimedOut;
 	unsigned int fileDescriptor;
