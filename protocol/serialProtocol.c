@@ -614,7 +614,8 @@ unsigned char *getReceptorResponse(unsigned int fd)
         }
         else
         {
-            printf("didnt read 5 bytes\n");
+            printf("[LOG]@rdR\tDidnt read 5 bytes, read:\n",res);
+            sleep(TIMEOUT);
         }
         if (g_ctrl.hasTimedOut)
         { // if the connection is marked as timed out 0 is returned
