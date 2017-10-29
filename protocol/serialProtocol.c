@@ -1675,7 +1675,7 @@ unsigned char validateFrame(unsigned char *data, unsigned int sizeOf)
             }
             case (FLAG_END):
             {
-                if (data[sizeOf - 1] == FLAG)
+                if (data[sizeOf] == FLAG)
                 {
                     printf("[SUCCESS]@valid\tEnd Flag field is validated\n");
                     currStt = DONE_PROC;
