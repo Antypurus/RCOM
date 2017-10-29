@@ -595,7 +595,7 @@ unsigned char *getReceptorResponse(unsigned int fd)
 
     printf("[LOG]@rdR\tTimeout alarm engaged\n");
     alarm(TIMEOUT); //sets an alarm with the timeout value , to manage connection timeouts
-    while (res == 0)
+    while (res != 5)
     {
         printf("[LOG]@rdR\tAttempting to read response\n");
         res = read(fd, buffer, 5);
@@ -607,6 +607,8 @@ unsigned char *getReceptorResponse(unsigned int fd)
             g_ctrl.retryCounter = 0;
             printf("[LOG]@rdR\tDone attempting to read response\n");
             return buffer;
+        }else{
+            printf("didnt read 5 bytes\n");
         }
         if (g_ctrl.hasTimedOut)
         { // if the connection is marked as timed out 0 is returned
