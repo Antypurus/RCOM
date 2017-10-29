@@ -214,7 +214,7 @@ void prepareInformationFrames(unsigned char **frames, unsigned int numberFrames)
         printf("[LOG]@frameSet\tFlag set\n");
         frames[i][1] = ADDRS;                       //ADDRS
         printf("[LOG]@frameSet\taddress set\n");
-        frames[i][2] = g_ctrl.currPar;              //CTRL
+        frames[i][2] = ctr_byte;              //CTRL
         printf("[LOG]@frameSet\tcontroll set\n");
         frames[i][3] = frames[i][1] ^ frames[i][2]; //BCC1
         printf("[LOG]@frameSet\tbcc set\n");
