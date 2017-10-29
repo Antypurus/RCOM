@@ -11,6 +11,8 @@
 #include <unistd.h>
 #include <signal.h>
 
+unsigned int hasReceived = FALSE;
+
 unsigned int allocateInformationFrames(unsigned char ***buff, const unsigned char data[], unsigned int sizeOf)
 {
     printf("[LOG]@memory\tStarting Allocation of information frames process\n");
@@ -576,6 +578,7 @@ char ReceptorResponseInterpreter(const unsigned char *receptorResponse)
 //NEEDS TO BE COMMENTED
 unsigned char *getReceptorResponse(unsigned int fd)
 {
+    hasReceived = FALSE;
     g_ctrl.retryCounter = 0;
     signal(SIGALRM, timeoutHandler);
     printf("[LOG]@rdR\tStarting Receptor Response Read Cycle\n");
@@ -601,13 +604,16 @@ unsigned char *getReceptorResponse(unsigned int fd)
         res = read(fd, buffer, 5);
         if (res == 5)
         { // if it reads it disables the alarms and marks the connection as successful and returns 1
+            hasReceived = TRUE;
             printf("[LOG]@rdR\tResponse Detected\n");
             alarm(0);
             g_ctrl.hasTimedOut = FALSE;
             g_ctrl.retryCounter = 0;
             printf("[LOG]@rdR\tDone attempting to read response\n");
             return buffer;
-        }else{
+        }
+        else
+        {
             printf("didnt read 5 bytes\n");
         }
         if (g_ctrl.hasTimedOut)
@@ -885,33 +891,36 @@ unsigned char sendData(unsigned int fd, const unsigned char data[], unsigned int
 
 void timeoutHandler(int sig)
 {
-    printf("[LOG]@timeoutHandle\tTimeout signal occurred\n");
-    if (g_ctrl.retryCounter >= MAX_TIMEOUT)
+    if (hasReceived = FALSE)
     {
-        printf("[ERROR]@timeoutHandle\tConnection timeout\n");
-        g_ctrl.hasTimedOut = TRUE;
-        return;
-    }
-    else
-    {
-        unsigned int resend = 0;
-        printf("[LOG]@timeoutHandle\tRetrying Connection ... Attempt %d\n", g_ctrl.retryCounter + 1);
-        unsigned int res = write(g_ctrl.fileDescriptor, g_ctrl.frameToSend, 5);
-        while (res != 5)
+        printf("[LOG]@timeoutHandle\tTimeout signal occurred\n");
+        if (g_ctrl.retryCounter >= MAX_TIMEOUT)
         {
-            sleep(TIMEOUT);
-            printf("[ERROR]@timeoutHandle\tFailed to resend, retrying retransmission\n");
-            res = write(g_ctrl.fileDescriptor, g_ctrl.frameToSend, 5);
-            resend++;
-            if (resend > MAX_TIMEOUT + 1)
-            {
-                printf("[ERROR]@timeoutHandle\tAll retransmission failed , aborting\n");
-                g_ctrl.hasTimedOut = TRUE;
-                return;
-            }
+            printf("[ERROR]@timeoutHandle\tConnection timeout\n");
+            g_ctrl.hasTimedOut = TRUE;
+            return;
         }
-        g_ctrl.retryCounter++;
-        alarm(TIMEOUT);
+        else
+        {
+            unsigned int resend = 0;
+            printf("[LOG]@timeoutHandle\tRetrying Connection ... Attempt %d\n", g_ctrl.retryCounter + 1);
+            unsigned int res = write(g_ctrl.fileDescriptor, g_ctrl.frameToSend, 5);
+            while (res != 5)
+            {
+                sleep(TIMEOUT);
+                printf("[ERROR]@timeoutHandle\tFailed to resend, retrying retransmission\n");
+                res = write(g_ctrl.fileDescriptor, g_ctrl.frameToSend, 5);
+                resend++;
+                if (resend > MAX_TIMEOUT + 1)
+                {
+                    printf("[ERROR]@timeoutHandle\tAll retransmission failed , aborting\n");
+                    g_ctrl.hasTimedOut = TRUE;
+                    return;
+                }
+            }
+            g_ctrl.retryCounter++;
+            alarm(TIMEOUT);
+        }
     }
 }
 
@@ -1145,7 +1154,7 @@ unsigned char *extractDataFromFrame(unsigned char *data, unsigned int *sizeOf)
 unsigned char *readSentData(unsigned int fd, unsigned int *sizeOf)
 {
     printf("[LOG]@rcRd\tStarting to read sent data\n");
-    
+
     //unsigned int readFlag1 = 0;
     //unsigned int readFlag2 = 0;
     //unsigned int stop = 0;
