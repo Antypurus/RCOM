@@ -1164,7 +1164,25 @@ unsigned char *readSentData(unsigned int fd, unsigned int *sizeOf)
     unsigned int sz = 0;
 
     printf("[LOG]@rcRd\tReading Data\n");
-    while (!stop)
+
+    unsigned int currSts = FLAG_STR;
+    while(currSts!=FLAG_END){
+        unsigned int res = read(fd,&rd,1);
+        switch(currSts){
+            case(FLAG_STR):{
+                if(rd==ADDRS){
+                    currSts = ADDR;
+                    sz++;
+                }else{
+                    currSts = FLAG_STR;
+                    sz=0;
+                }
+            }
+            default:break;
+        }
+    }
+
+    /*while (!stop)
     {
         unsigned int res = read(fd, &rd, 1);
         if (res == 1)
@@ -1200,7 +1218,7 @@ unsigned char *readSentData(unsigned int fd, unsigned int *sizeOf)
                 sz++;
                 stop = 1;
             }
-        }
+        }*/
     }
     printf("[LOG]@rcRd\tFinished reading Data\n");
 
