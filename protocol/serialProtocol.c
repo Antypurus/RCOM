@@ -15,7 +15,7 @@ unsigned int hasReceived = FALSE;
 
 unsigned int allocateInformationFrames(unsigned char ***buff, const unsigned char data[], unsigned int sizeOf)
 {
-    printf("[LOG]@memory\tStarting Allocation of information frames process\n");
+    printf("[LOG]@memory\tStarting Allocation of information frames process for data of size:%d\n",sizeof);
     //This bit of code determine how many frames will be necessary to send the data
     unsigned int size = (unsigned int)ceil((float)sizeOf / MAX_DATA_PER_FRAME);
 
@@ -43,18 +43,18 @@ unsigned int allocateInformationFrames(unsigned char ***buff, const unsigned cha
                 double fraction = size - (sizeOf / MAX_DATA_PER_FRAME);                                //determines fraction of the max data per frame for the last frame
                 g_ctrl.lastFrameSize = sizeof(unsigned char) * MAX_FRAME_SIZE * fraction;              //saves the size of the last frame for easy acess
                 *buff[i] = (unsigned char *)malloc(sizeof(unsigned char) * MAX_FRAME_SIZE * fraction); //allocates the frame with only the needed size
-                printf("[LOG]@memory\tAttempting to allocate an information frame of %f bytes", MAX_FRAME_SIZE * fraction);
+                printf("[LOG]@memory\tAttempting to allocate an information frame of %f bytes\n", MAX_FRAME_SIZE * fraction);
             }
             else
             {
                 *buff[i] = (unsigned char *)malloc(sizeof(unsigned char) * MAX_FRAME_SIZE);
-                printf("[LOG]@memory\tAttempting to allocate an information frame of %d bytes", MAX_FRAME_SIZE);
+                printf("[LOG]@memory\tAttempting to allocate an information frame of %d bytes\n", MAX_FRAME_SIZE);
             }
         }
         else
         {
             *buff[i] = (unsigned char *)malloc(sizeof(unsigned char) * (sizeOf + 6));
-            printf("[LOG]@memory\tAttempting to allocate an information frame of %d bytes", (sizeOf + 6));
+            printf("[LOG]@memory\tAttempting to allocate an information frame of %d bytes\n", (sizeOf + 6));
         }
 
         if (*buff[i] == NULL)
