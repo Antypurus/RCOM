@@ -1480,11 +1480,13 @@ unsigned char validateFrame(unsigned char *data, unsigned int sizeOf)
         {
             if (set == 1)
             {
+                printf("[LOG]@valid\tValidated a SET Command\n");
                 setHandler();
                 return 1;
             }
             else if (dis == 1)
             {
+                printf("[LOG]@valid\tValidated a DISC Command\n");
                 discHandler();
                 return 1;
             }
