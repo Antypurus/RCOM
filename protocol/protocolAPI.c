@@ -11,11 +11,11 @@ int llopen(int porta, int side)
     char port[20];
     if (porta == 0)
     {
-        memcpy(port,"/dev/ttyS0",11);
+        memcpy(port, "/dev/ttyS0", 11);
     }
     else
     {
-        memcpy(port,"/dev/ttyS0",11);
+        memcpy(port, "/dev/ttyS0", 11);
     }
 
     unsigned int fd = openConnection(port, 0);
@@ -89,21 +89,24 @@ int llread(int fd, char **buffer)
     else
     {
         unsigned char ret = validateFrame(data, size);
-        if (ret == 1 && g_ctrl.shouldDC == TRUE)
+        if (ret == 1)
         {
-            ret = sendUACommand(fd);
-            if (ret == 0)
+            if (g_ctrl.shouldDC)
             {
-                printf("failed to send UA command\n");
+                ret = sendUACommand(fd);
+                if (ret == 0)
+                {
+                    printf("failed to send UA command\n");
+                }
+                *buffer = (char *)malloc(3); //allocated space for the string DC
+                if (buffer == NULL)
+                {
+                    printf("failed to allocated buffer\n");
+                    return -1;
+                }
+                *buffer = "DC";
+                return 3; //received a disconnect
             }
-            *buffer = (char *)malloc(3); //allocated space for the string DC
-            if (buffer == NULL)
-            {
-                printf("failed to allocated buffer\n");
-                return -1;
-            }
-            *buffer = "DC";
-            return 3; //received a disconnect command
         }
         else
         {
