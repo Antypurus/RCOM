@@ -15,7 +15,7 @@ unsigned int hasReceived = FALSE;
 
 unsigned int allocateInformationFrames(unsigned char ***buff, const unsigned char data[], unsigned int sizeOf)
 {
-    printf("[LOG]@memory\tStarting Allocation of information frames process for data of size:%d\n",sizeof);
+    printf("[LOG]@memory\tStarting Allocation of information frames process for data of size:%d\n",sizeOf);
     //This bit of code determine how many frames will be necessary to send the data
     unsigned int size = (unsigned int)ceil((float)sizeOf / MAX_DATA_PER_FRAME);
 
