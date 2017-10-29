@@ -252,7 +252,8 @@ unsigned char moveDataToFrames(unsigned char **frames, const unsigned char data[
         }
 
         printf("[LOG]@dataMv\tAttempting to bytte stuff data\n");
-        unsigned char *stuffed = byteStuffingOnData(info[i], &s_size);
+        unsigned char *stuffed = byteStuffingOnData(info[i], &sizeOf);
+        s_size = sizeOf;
         if (stuffed == NULL)
         {
             printf("[ERROR]@dataMv\tByte stuffing failed\n");
