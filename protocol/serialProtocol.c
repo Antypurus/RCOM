@@ -256,7 +256,7 @@ unsigned char moveDataToFrames(unsigned char **frames, const unsigned char data[
             sizeOf = MAX_FRAME_SIZE;
         }
 
-        printf("[LOG]@dataMv\tAttempting to bytte stuff data\n");
+        printf("[LOG]@dataMv\tAttempting to bytte stuff data %s\n",info[i]);
         unsigned char *stuffed = byteStuffingOnData(info[i], &sizeOf);
         s_size = sizeOf;
         if (stuffed == NULL)
