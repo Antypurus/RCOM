@@ -1152,7 +1152,7 @@ unsigned char sendUACommand(unsigned int fd)
 
 unsigned char *extractDataFromFrame(unsigned char *data, unsigned int *sizeOf)
 {
-    printf("[LOG]@extract\tStarting Data Extraction proccess\n");
+    printf("[LOG]@extract\tStarting Data Extraction proccess on data of size %d\n",*sizeOf);
 
     unsigned int sz = (*sizeOf - 6); //size of the data section in the frame
 
@@ -1318,7 +1318,7 @@ unsigned char *readSentData(unsigned int fd, unsigned int *sizeOf)
                 {
                     printf("[LOG]@rcRd\tRead end flag\n");
                     currSts = DONE_PROC;
-                    sz++;
+                    //sz++;
                 }
                 else
                 {
