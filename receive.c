@@ -10,7 +10,7 @@ int main()
 	char *buf = NULL;
 	int fd = llopen(0, RECEIVER);
 	int rd;
-	while(buf==NULL || strcmp(bud,"DC")){
+	while(buf==NULL || strcmp(buf,"DC")){
 		rd = llread(fd, &buf);
 		if(rd==0){
 			printf("unable to read\n");
