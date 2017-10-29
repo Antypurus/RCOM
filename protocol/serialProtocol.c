@@ -1158,6 +1158,7 @@ unsigned char *extractDataFromFrame(unsigned char *data, unsigned int *sizeOf)
 }
 
 void readtimeoutHandler(int sig){
+    signal(SIGALRM,readtimeoutHandler);
     if(hasReceived==FALSE){
         g_ctrl.retryCounter++;
         if(g_ctrl.retryCounter>MAX_TIMEOUT+1){
