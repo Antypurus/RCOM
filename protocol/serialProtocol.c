@@ -1232,11 +1232,12 @@ unsigned char *readSentData(unsigned int fd, unsigned int *sizeOf)
         unsigned int res = read(fd, &rd, 1);
         if (res == 1)
         {
+
             hasReceived=TRUE;
             g_ctrl.retryCounter=0;
             alarm(0);
             retry = 0;
-            printf("[LOG]@rcRd\tRead a byte of data\n");
+            printf("[LOG]@rcRd\tRead a byte of data with value %d\n",rd);
             buff[sz] = rd;
             switch (currSts)
             {
