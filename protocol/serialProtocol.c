@@ -1191,6 +1191,7 @@ unsigned char *readSentData(unsigned int fd, unsigned int *sizeOf)
         unsigned int res = read(fd, &rd, 1);
         if (res == 1)
         {
+            alarm(0);
             retry = 0;
             printf("[LOG]@rcRd\tRead a byte of data\n");
             buff[sz] = rd;
