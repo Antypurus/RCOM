@@ -1661,7 +1661,7 @@ unsigned char validateFrame(unsigned char *data, unsigned int sizeOf)
 
                 unsigned char b2 = calculateBCC2(bf, sz);
 
-                if (data[sizeOf - 2] == b2)
+                if (data[sizeOf - 1] == b2)
                 {
                     printf("[SUCCESS]@valid\tBCC2 field is validated\n");
                     currStt = FLAG_END;
