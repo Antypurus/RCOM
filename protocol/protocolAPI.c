@@ -131,7 +131,7 @@ int llread(int fd, char **buffer)
                     }
                     else
                     {
-                        buffer = data;
+                        *buffer = data;
                         return size;
                     }
                 }
