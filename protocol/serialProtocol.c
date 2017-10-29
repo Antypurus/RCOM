@@ -17,7 +17,7 @@ unsigned int allocateInformationFrames(unsigned char ***buff, const unsigned cha
 {
     printf("[LOG]@memory\tStarting Allocation of information frames process\n");
     //This bit of code determine how many frames will be necessary to send the data
-    unsigned int size = (unsigned int)floor(sizeOf / MAX_DATA_PER_FRAME);
+    unsigned int size = (unsigned int)floor((float)sizeOf / MAX_DATA_PER_FRAME);
 
     //this allocates the buffer with the ammount of frames necessary to send the data
     *buff = (unsigned char **)malloc(sizeof(unsigned char *) * size);
