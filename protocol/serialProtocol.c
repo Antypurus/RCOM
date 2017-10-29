@@ -1165,12 +1165,15 @@ unsigned char *readSentData(unsigned int fd, unsigned int *sizeOf)
 
     printf("[LOG]@rcRd\tReading Data\n");
 
+    unsigned int retry = 0;
     unsigned int currSts = FLAG_STR;
-    while (currSts != DONE_PROC)
+    while (currSts != DONE_PROC && retry <= MAX_TIMEOUT + 1)
     {
         unsigned int res = read(fd, &rd, 1);
         if (res == 1)
         {
+            retry = 0;
+            printf("[LOG]@rcRd\tRead a byte of data\n");
             buff[sz] = rd;
             switch (currSts)
             {
@@ -1178,11 +1181,13 @@ unsigned char *readSentData(unsigned int fd, unsigned int *sizeOf)
             {
                 if (rd == FLAG)
                 {
+                    printf("[LOG]@rcRd\tStart Flag read\n");
                     currSts = ADDR;
                     sz++;
                 }
                 else
                 {
+                    printf("[ERROR]@rcRd\tStart Flag not read\n");
                     currSts = FLAG_STR;
                     sz = 0;
                 }
@@ -1192,11 +1197,13 @@ unsigned char *readSentData(unsigned int fd, unsigned int *sizeOf)
             {
                 if (rd == ADDRS)
                 {
+                    printf("[LOG]@rcRd\tAddress byte read\n");
                     currSts = CTRLL;
                     sz++;
                 }
                 else
                 {
+                    printf("[ERROR]@rcRd\tAddress byte not read\n");
                     currSts = FLAG_STR;
                     sz = 0;
                 }
@@ -1206,11 +1213,13 @@ unsigned char *readSentData(unsigned int fd, unsigned int *sizeOf)
             {
                 if (rd == SET || rd == DISC || rd == CTR_PAR0 || rs == CTR_PAR1)
                 {
+                    printf("[LOG]@rcRd\tControll byte read\n");
                     currSts = BCC;
                     sz++;
                 }
                 else
                 {
+                    printf("[LOG]@rcRd\tControll byte noy read\n");
                     currSts = FLAG_STR;
                     sz = 0;
                 }
@@ -1222,16 +1231,19 @@ unsigned char *readSentData(unsigned int fd, unsigned int *sizeOf)
                     {
                         if (buf[sz - 1] == CTR_PAR0 || buf[sz - 1] == CTR_PAR1)
                         {
+                            printf("[LOG]@rcRd\tBCC byte read,reading information\n");
                             currSts = INFO_STT;
                         }
                         else
                         {
+                            printf("[LOG]@rcRd\tBCC byte read,reading end byte\n");
                             currSts = FLAG_END;
                         }
                         sz++;
                     }
                 else
                 {
+                    printf("[ERROR]@rcRd\tBCC byte not validated\n");
                     currSts = FLAG_STR;
                     sz = 0;
                 }
@@ -1241,11 +1253,13 @@ unsigned char *readSentData(unsigned int fd, unsigned int *sizeOf)
             {
                 if (rd == FLAG)
                 {
+                    printf("[LOG]@rcRd\tRead end flag\n");
                     currSts = DONE_PROC;
                     sz++;
                 }
                 else
                 {
+                    printf("[LOG]@rcRd\tRead information byte\n");
                     sz++;
                 }
                 break;
@@ -1254,11 +1268,13 @@ unsigned char *readSentData(unsigned int fd, unsigned int *sizeOf)
             {
                 if (rd == FLAG)
                 {
+                    printf("[LOG]@rcRd\tRead End Flag\n");
                     currSts = FLAG_DONE_PROCEND;
                     sz++;
                 }
                 else
                 {
+                    printf("[ERROR]@rcRd\tFailed to read end flag\n");
                     currSts = FLAG_STR;
                     sz = 0;
                 }
@@ -1270,6 +1286,8 @@ unsigned char *readSentData(unsigned int fd, unsigned int *sizeOf)
         }
         else
         {
+            retry++;
+            sleep(TIMEOUT);
             //timeout system
         }
     }
