@@ -1187,6 +1187,7 @@ unsigned char *readSentData(unsigned int fd, unsigned int *sizeOf)
     unsigned int currSts = FLAG_STR;
     while (currSts != DONE_PROC && retry <= MAX_TIMEOUT + 1)
     {
+        alarm(TIMEOUT);
         unsigned int res = read(fd, &rd, 1);
         if (res == 1)
         {
