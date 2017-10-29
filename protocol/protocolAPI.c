@@ -81,6 +81,7 @@ int llopen(int porta, int side)
 int llread(int fd, char **buffer)
 {
     unsigned int size = 0;
+jmp:
     unsigned char *data = readSentData(fd, &size);
     if (data == NULL)
     {
@@ -106,6 +107,11 @@ int llread(int fd, char **buffer)
                 }
                 *buffer = "DC";
                 return 3; //received a disconnect
+            }
+            else
+            {
+                printf("read out if place SET command , ignoring\n");
+                goto jmp;
             }
         }
         else
