@@ -36,8 +36,8 @@ unsigned int allocateInformationFrames(unsigned char ***buff, const unsigned cha
         {
             if (i == (size - 1))
             {
-                double fraction = size - (sizeOf / MAX_DATA_PER_FRAME);                               //determines fraction of the max data per frame for the last frame
-                g_ctrl.lastFrameSize = sizeof(unsigned char) * MAX_FRAME_SIZE * fraction;             //saves the size of the last frame for easy acess
+                double fraction = size - (sizeOf / MAX_DATA_PER_FRAME);                                //determines fraction of the max data per frame for the last frame
+                g_ctrl.lastFrameSize = sizeof(unsigned char) * MAX_FRAME_SIZE * fraction;              //saves the size of the last frame for easy acess
                 *buff[i] = (unsigned char *)malloc(sizeof(unsigned char) * MAX_FRAME_SIZE * fraction); //allocates the frame with only the needed size
                 printf("[LOG]@memory\tAttempting to allocate an information frame of %f bytes", MAX_FRAME_SIZE * fraction);
             }
@@ -288,9 +288,9 @@ unsigned int openConnection(char *serialPort, unsigned int flags)
     }
 
     printf("[LOG]@openc\tAttempting to open file descriptor\n");
-    int fd=-1;
-    unsigned int fdz=-1;
-    
+    int fd = -1;
+    unsigned int fdz = -1;
+
     if (flags == 0)
     {
         fd = open(serialPort, O_RDWR | O_NOCTTY | O_NONBLOCK);
@@ -576,8 +576,8 @@ char ReceptorResponseInterpreter(const unsigned char *receptorResponse)
 //NEEDS TO BE COMMENTED
 unsigned char *getReceptorResponse(unsigned int fd)
 {
-    g_ctrl.retryCounter=0;
-    signal(SIGALRM,timeoutHandler);
+    g_ctrl.retryCounter = 0;
+    signal(SIGALRM, timeoutHandler);
     printf("[LOG]@rdR\tStarting Receptor Response Read Cycle\n");
     unsigned int res = 0;
 
@@ -1166,19 +1166,90 @@ unsigned char *readSentData(unsigned int fd, unsigned int *sizeOf)
     printf("[LOG]@rcRd\tReading Data\n");
 
     unsigned int currSts = FLAG_STR;
-    while(currSts!=FLAG_END){
-        unsigned int res = read(fd,&rd,1);
-        switch(currSts){
-            case(FLAG_STR):{
-                if(rd==ADDRS){
+    while (currSts != FLAG_END)
+    {
+        unsigned int res = read(fd, &rd, 1);
+        if (res == 1)
+        {
+            buff[sz]=rd;
+            switch (currSts)
+            {
+            case (FLAG_STR):
+            {
+                if (rd == FLAG)
+                {
                     currSts = ADDR;
                     sz++;
-                }else{
-                    currSts = FLAG_STR;
-                    sz=0;
                 }
+                else
+                {
+                    currSts = FLAG_STR;
+                    sz = 0;
+                }
+                break;
             }
-            default:break;
+            case (ADDR):
+            {
+                if (rd == ADDRS)
+                {
+                    currSts = CTRLL;
+                    sz++;
+                }
+                else
+                {
+                    currSts = FLAG_STR;
+                    sz = 0;
+                }
+                break;
+            }
+            case (CTRLL):
+            {
+                if (rd == SET || rd == DISC || rd == CTR_PAR0 || rs == CTR_PAR1)
+                {
+                    currSts = BCC;
+                    sz++;
+                }
+                else
+                {
+                    currSts = FLAG_STR;
+                    sz = 0;
+                }
+                break;
+            }
+            case (BCC):
+            {
+                if (rd == (buff[sz-1]^buff[sz-2])))
+                {
+                    currSts = INFO_STT;
+                    sz++;
+                }
+                else
+                {
+                    currSts = FLAG_STR;
+                    sz = 0;
+                }
+                break;
+            }
+            case (INFO_STT):
+            {
+                if (rd == FLAG)
+                {
+                    currSts = FLAG_END;
+                    sz++;
+                }
+                else
+                {
+                    sz++;
+                }
+                break;
+            }
+            default:
+                break;
+            }
+        }
+        else
+        {
+            //timeout system
         }
     }
 
@@ -1219,24 +1290,24 @@ unsigned char *readSentData(unsigned int fd, unsigned int *sizeOf)
                 stop = 1;
             }
         }*/
-    }
-    printf("[LOG]@rcRd\tFinished reading Data\n");
+}
+printf("[LOG]@rcRd\tFinished reading Data\n");
 
-    printf("[LOG]@rcRd\tAttempting to resize frame buffer\n");
-    void *ck = realloc(buff, sz);
+printf("[LOG]@rcRd\tAttempting to resize frame buffer\n");
+void *ck = realloc(buff, sz);
 
-    if (ck == NULL)
-    {
-        printf("[ERROR]@rcRd\tFailed to resize frame buffer\n");
-        return NULL;
-    }
-    else
-    {
-        printf("[SUCCESS]@rcRd\tSuccessfully resized buffer\n");
-    }
+if (ck == NULL)
+{
+    printf("[ERROR]@rcRd\tFailed to resize frame buffer\n");
+    return NULL;
+}
+else
+{
+    printf("[SUCCESS]@rcRd\tSuccessfully resized buffer\n");
+}
 
-    *sizeOf = sz;
-    return buff;
+*sizeOf = sz;
+return buff;
 }
 
 unsigned char validateFrame(unsigned char *data, unsigned int sizeOf)

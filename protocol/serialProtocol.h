@@ -26,6 +26,7 @@
 #define FLAG_END 4
 #define DONE_PROC 5
 #define BCC2 6
+#define INFO_STT 7
 
 /*
 	Response types calculated for each of the 2 possible frame parities, 0 or 1
