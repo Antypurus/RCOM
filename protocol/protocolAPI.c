@@ -128,6 +128,9 @@ jmp:
                     printf("rr command sent\n");
                 }
                 extractDataFromFrame(data, &size);
+                for(unsigned int i =0;i<size;++i){
+                    printf("byte %d:%d\n",size,data[i]);
+                }
                 if (data == NULL)
                 {
                     printf("unable to extract data from frame\n");
@@ -135,7 +138,10 @@ jmp:
                 }
                 else
                 {
-                    printf("data extracted with size %d, destuffing",size);
+                    printf("data extracted with size %d, destuffing\n",size);
+                    for(unsigned int i =0;i<size;++i){
+                        printf("byte %d:%d\n",size,data[i]);
+                    }
                     destuffData(data, &size);
                     if (data == NULL)
                     {
@@ -145,6 +151,9 @@ jmp:
                     else
                     {
                         printf("data destuffed with size %d , read the string %s\n",size,data);
+                        for(unsigned int i =0;i<size;++i){
+                            printf("byte %d:%d\n",size,data[i]);
+                        }
                         *buffer = data;
                         return size;
                     }
