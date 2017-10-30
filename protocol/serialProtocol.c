@@ -1177,7 +1177,7 @@ unsigned char *extractDataFromFrame(unsigned char *data, unsigned int *sizeOf)
         printf("[SUCCESS]@extract\tSuccessfully allocated buffer for data\n");
     }
 
-    memmove(buff, data + 4, sz);
+    memmcpy(buff, data + 4, sz);
     *sizeOf = sz;
     printf("[SUCCESS]@extract\tData Extraction Complete\n");
     return buff;
