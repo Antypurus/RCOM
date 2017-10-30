@@ -99,14 +99,12 @@ int main()
 		llclose(fd);
 		return -1;
 	}
-	printf("here\n");
 	unsigned int res = llwrite(fd, buffer, sz);
-	if (res != sz)
+	if (res == -1)
 	{
 		llclose(fd);
 		return -1;
 	}
-	printf("here\n");
 	free(buffer);
 	res = 255;
 	while (res != 0)
