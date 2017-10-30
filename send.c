@@ -53,7 +53,7 @@ unsigned char *createControllPacket(unsigned char startEnd, char *filename, unsi
 	}
 	else
 	{
-		unsigned char *buffer = (unsigned char)malloc(*sizeOfPacket);
+		unsigned char *buffer = (unsigned char*)malloc(*sizeOfPacket);
 		printf("\n%d\n",*sizeOfPacket);
 		if (buffer == NULL)
 		{
