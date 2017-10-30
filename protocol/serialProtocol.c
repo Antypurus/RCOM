@@ -875,13 +875,13 @@ unsigned char sendData(unsigned int fd, const unsigned char data[], unsigned int
 
         if (g_ctrl.currPar == 1)
         {
-            while (rez == REJ1)
+            while (rez == REJ)
             {
                 free(buf);
                 printf("[ERROR]@dataSend\tReceived response of corrupted frame\n");
                 goto resend;
             }
-            if (rez == RR1)
+            if (rez == ACPT)
             {
                 printf("[LOG]@dataSend\tReceived response of valid frame\n");
                 free(buf);
@@ -890,13 +890,13 @@ unsigned char sendData(unsigned int fd, const unsigned char data[], unsigned int
         }
         else
         {
-            while (rez == REJ0)
+            while (rez == REJ)
             {
                 free(buf);
                 printf("[ERROR]@dataSend\tReceived response of corrupted frame\n");
                 goto resend;
             }
-            if (rez == RR0)
+            if (rez == ACPT)
             {
                 printf("[LOG]@dataSend\tReceived response of valid frame\n");
                 free(buf);
