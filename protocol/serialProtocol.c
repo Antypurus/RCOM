@@ -174,7 +174,7 @@ void moveInformationToFrame(unsigned char *frame, const unsigned char data[], un
         return; //The data is too big for this frame;
     }
 
-    memmove(frame + 4, data, size); //moves the data to the data section of the frame
+    memmove(frame + 4, data, size-1); //moves the data to the data section of the frame
     printf("[LOG]@movData\tData moved to frame\n");
     return;
 }
