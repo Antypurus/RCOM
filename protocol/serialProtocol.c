@@ -1422,6 +1422,9 @@ unsigned char *readSentData(unsigned int fd, unsigned int *sizeOf)
     }
 
     *sizeOf = sz;
+    for(unsigned int i=0;i<sz;++i){
+        printf("[LOG]@rcRd\tByte %d:%d\n",i,buff[i]);
+    }
     return buff;
 }
 
