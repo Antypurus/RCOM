@@ -509,13 +509,13 @@ char ReceptorResponseInterpreter(const unsigned char *receptorResponse)
                     currntState = BCC;
                     break;
                 }
-                else if (receptorResponse[i] == RR0)
+                else if (receptorResponse[i] == RR1)
                 {
                     responseType = ACPT;
                     currntState = BCC;
                     break;
                 }
-                else if (receptorResponse[i] == REJ0)
+                else if (receptorResponse[i] == REJ1)
                 {
                     responseType = REJ;
                     currntState = BCC;
@@ -535,13 +535,13 @@ char ReceptorResponseInterpreter(const unsigned char *receptorResponse)
                     currntState = BCC;
                     break;
                 }
-                else if (receptorResponse[i] == RR1)
+                else if (receptorResponse[i] == RR0)
                 {
                     responseType = ACPT;
                     currntState = BCC;
                     break;
                 }
-                else if (receptorResponse[i] == REJ1)
+                else if (receptorResponse[i] == REJ0)
                 {
                     responseType = REJ;
                     currntState = BCC;
