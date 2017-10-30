@@ -142,7 +142,7 @@ jmp:
                     for(unsigned int i =0;i<size;++i){
                         printf("byte %d:%d\n",size,retBuf[i]);
                     }
-                    retBuf = destuffData(retBuf, &size);
+                    unsigned char *destuffed = destuffData(retBuf, &size);
                     if (retBuf == NULL)
                     {
                         printf("unable to destuff data\n");
@@ -152,9 +152,9 @@ jmp:
                     {
                         printf("data destuffed with size %d , read the string %s\n",size,data);
                         for(unsigned int i =0;i<size;++i){
-                            printf("byte %d:%d\n",size,data[i]);
+                            printf("byte %d:%d\n",size,destuffed[i]);
                         }
-                        *buffer = retBuf;
+                        *buffer = destuffed;
                         return size;
                     }
                 }
