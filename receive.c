@@ -13,7 +13,7 @@
 
 int openFile(char *filename)
 {
-	return open(filename, O_WRONLY);
+	return open(filename, O_WRONLY | O_CREAT);
 }
 
 unsigned char *extractDataFromPacket(unsigned char *data, unsigned int *sizeOfData)
