@@ -63,6 +63,10 @@ unsigned char *createControllPacket(unsigned char startEnd, char *filename, unsi
 	}
 }
 
+int openFile(char* filename){
+	return open(filename,O_RDONLY | O_NONBLOCK );
+}
+
 int main()
 {
 	char noStuff[] = "Hello My Good Friend";
