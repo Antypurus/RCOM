@@ -53,7 +53,7 @@ unsigned int allocateInformationFrames(unsigned char ***buff, const unsigned cha
         }
         else
         {
-            g_ctrl.lastFrameSize = (sizeOf + 6)*2;
+            g_ctrl.lastFrameSize = (sizeOf + 6);
             *buff[i] = (unsigned char *)malloc(sizeof(unsigned char) * (sizeOf + 6));
             printf("[LOG]@memory\tAttempting to allocate an information frame of %d bytes\n", (sizeOf + 6));
         }
