@@ -167,14 +167,14 @@ unsigned char **divideData(const unsigned char data[], unsigned int *sizeOf)
 
 void moveInformationToFrame(unsigned char *frame, const unsigned char data[], unsigned int size)
 {
-    printf("[LOG]@movData\tStarting data move to frame\n");
+    printf("[LOG]@movData\tStarting data move to frame with size %d\n",size);
     if (size > MAX_DATA_PER_FRAME * 2)
     {
         printf("[ERROR]@movData\tData to large for a single frame\n");
         return; //The data is too big for this frame;
     }
 
-    memmove(frame + 4, data, size-1); //moves the data to the data section of the frame
+    memmove(frame + 4, data, size); //moves the data to the data section of the frame
     printf("[LOG]@movData\tData moved to frame\n");
     return;
 }
@@ -276,6 +276,7 @@ unsigned char moveDataToFrames(unsigned char **frames, const unsigned char data[
         printf("flag byte %d",frames[i][sizeOf-1]);
         frames[i][sizeOf - 2] = calculateBCC2(info[i], s_size); //sets the BCC for the data chunk that was moved
         printf("flag byte %d",frames[i][sizeOf-1]);
+        frames[i][sizeOf - 1] = FLAG; 
     }
     printf("[SUCCESS]@dataMv\tInformation and BCC2 have been set for the frames\n");
     return 1;
