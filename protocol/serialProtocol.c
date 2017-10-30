@@ -180,7 +180,12 @@ void moveInformationToFrame(unsigned char *frame, const unsigned char data[], un
 
     }
     printf("data size %d \n",size);
-    memcpy(&frame[4], data, size); //moves the data to the data section of the frame
+    //memcpy(&frame[4], data, size); //moves the data to the data section of the frame
+    unsigned int ind = 4;
+    for(unsigned int i=0;i<size;++i){
+        frame[ind]=data[i];
+        ind++;
+    }
     printf("[LOG]@movData\tData moved to frame\n");
     return;
 }
