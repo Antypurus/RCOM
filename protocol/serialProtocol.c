@@ -210,6 +210,7 @@ void prepareInformationFrames(unsigned char **frames, unsigned int numberFrames)
             lastByte = MAX_FRAME_SIZE;
         }
 
+        printf("[LOG]@frameSet\tFrame size:%d\n",lastByte);
         frames[i][0] = FLAG;                        //FLAG
         printf("[LOG]@frameSet\tFlag set\n");
         frames[i][1] = ADDRS;                       //ADDRS
@@ -218,7 +219,7 @@ void prepareInformationFrames(unsigned char **frames, unsigned int numberFrames)
         printf("[LOG]@frameSet\tcontroll set\n");
         frames[i][3] = frames[i][1] ^ frames[i][2]; //BCC1
         printf("[LOG]@frameSet\tbcc set\n");
-        frames[i][lastByte] = FLAG;             //FLAG
+        frames[i][lastByte-1] = FLAG;             //FLAG
         printf("[LOG]@frameSet\tend flag set\n");
         printf("[LOG]@frameSet\tfinished setting up frame %d\n", i);
     }
