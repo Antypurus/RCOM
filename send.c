@@ -83,6 +83,8 @@ int openFile(char *filename)
 int main()
 {
 	char filename[] = "protocol/pinguim.gif";
+	char filename2[] = "pinguim.gif";
+	
 	char buff[255];
 	int file = openFile(&filename);
 	if (file < 0)
@@ -91,7 +93,7 @@ int main()
 	}
 	int fd = llopen(0, TRANSMITER);
 	unsigned int sz = 0;
-	unsigned char *buffer = createControllPacket(2, filename, strlen(filename) + 1, 0, &sz);
+	unsigned char *buffer = createControllPacket(2, filename2, strlen(filename) + 1, 0, &sz);
 	printf("finished creating controll packet\n");
 	if (buffer == NULL)
 	{
