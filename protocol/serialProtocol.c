@@ -1178,6 +1178,7 @@ unsigned char *extractDataFromFrame(unsigned char *data, unsigned int *sizeOf)
     }
     unsigned int orInd = 4;
     for(unsigned int i=0;i<sz;++i){
+        printf("copying %d\n",data[orInd]);
         buff[i]=data[orInd];
         orInd++;
     }
