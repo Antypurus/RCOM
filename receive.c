@@ -57,7 +57,7 @@ int main()
 			if(buf[0]==2){
 				//start packet
 				strcpy(filename,&buf[3]);
-				file = openConnection(filename);
+				file = openConnection(&filename);
 				if(file<1){
 					strcpy(buf,"DC");
 				}
