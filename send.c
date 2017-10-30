@@ -62,7 +62,7 @@ unsigned char *createControllPacket(unsigned char startEnd, char *filename, unsi
 			buffer[0] = startEnd;
 			buffer[1] = 1;
 			buffer[2] = filenameSize;
-			memcpy(&buffer[3], filename, filenameSize);
+			memcpy(&buffer[3], filename, filenameSize-1);
 			return buffer;
 		}
 	}
@@ -83,7 +83,7 @@ int main()
 	int fd = llopen(0, TRANSMITER);
 	unsigned int sz = 0;
 	unsigned char* buffer = createControllPacket(2,filename,strlen(filename)+1,0,&sz);
-	printf("here\n");
+	printf("finished creating controll packet\n");
 	if(buffer==NULL){
 		printf("here\n");
 		llclose(fd);
