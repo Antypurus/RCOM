@@ -85,6 +85,7 @@ int main()
 	unsigned char* buffer = createControllPacket(2,filename,strlen(filename)+1,0,&sz);
 	printf("here\n");
 	if(buffer==NULL){
+		printf("here\n");
 		llclose(fd);
 		return -1;
 	}
