@@ -74,7 +74,7 @@ int openFile(char* filename){
 
 int main()
 {
-	char filename[255] = "protocol/pinguim.gif";
+	char filename[] = "protocol/pinguim.gif";
 	char buff[255];
 	int file = openFile(&filename);
 	if(file<0){
