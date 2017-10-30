@@ -113,7 +113,7 @@ int main()
 		llclose(fd);
 		return -1;
 	}
-	unsigned int res = llwrite(file,buffer,sz);
+	res = llwrite(file,buffer,sz);
 	if(res!=sz){
 		llclose(fd);
 		return -1;
