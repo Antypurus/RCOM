@@ -1327,7 +1327,7 @@ unsigned char *readSentData(unsigned int fd, unsigned int *sizeOf)
                 {
                     printf("[LOG]@rcRd\tRead end flag\n");
                     currSts = DONE_PROC;
-                    //sz++;
+                    sz++;
                 }
                 else
                 {
