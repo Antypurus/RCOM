@@ -840,7 +840,7 @@ unsigned char sendData(unsigned int fd, const unsigned char data[], unsigned int
 
     resend:
         printf("[LOG]@dataSend\tAttempting to send data,listing each byte now\n");
-        unsigned int sent = write(fd, frames[i], toSend);
+        unsigned int sent = write(fd, frames[i], g_ctrl.lastFrameSize);
 
         if (g_ctrl.retryCounter > MAX_TIMEOUT + 1)
         {
