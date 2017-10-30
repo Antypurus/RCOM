@@ -100,7 +100,7 @@ int main()
 		return -1;
 	}
 	printf("here\n");
-	unsigned int res = llwrite(file, buffer, sz);
+	unsigned int res = llwrite(fd, buffer, sz);
 	if (res != sz)
 	{
 		llclose(fd);
@@ -112,7 +112,7 @@ int main()
 	while (res != 0)
 	{
 		printf("here\n");
-		res = read(fd, &buff, maxBytes - 4);
+		res = read(file, &buff, maxBytes - 4);
 		buffer = createDataPacket(buff, res, &sz);
 		if (buffer == NULL)
 		{
@@ -132,7 +132,7 @@ int main()
 		llclose(fd);
 		return -1;
 	}
-	res = llwrite(file, buffer, sz);
+	res = llwrite(fd, buffer, sz);
 	if (res != sz)
 	{
 		llclose(fd);
