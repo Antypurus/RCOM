@@ -276,7 +276,9 @@ unsigned char moveDataToFrames(unsigned char **frames, const unsigned char data[
             printf("[SUCCESS]@dataMv\tByte stuffing complete,obtained data %s\n",stuffed);
         }
         g_ctrl.allocError = 0;
+        printf("f:%d\n",frames[i][0]);
         moveInformationToFrame(frames[i], stuffed, s_size);     //moves the chunk of data into the frame
+        printf("f:%d\n",frames[i][0]);
         frames[i][sizeOf - 2] = calculateBCC2(info[i], s_size); //sets the BCC for the data chunk that was moved
         frames[i][sizeOf - 1] = FLAG; 
     }
