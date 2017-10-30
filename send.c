@@ -25,7 +25,7 @@ unsigned char **createDataPacket(unsigned char *data, unsigned int sizeOfData, u
 		unsigned int needed = 4 + sizeOfData;
 		*sizeOfPacket = needed;
 		unsigned char *buffer = (unsigned char)malloc(needed);
-		fi(buffer == NULL){
+		if(buffer == NULL){
 			printf("[ERROR]\tallocation error\n");
 			return NULL;
 		}else{
@@ -74,12 +74,11 @@ int main()
 {
 	char filename[255] = "protocol/pinguim.gif";
 	char buff[255];
-	int file = openConnection(filename);
+	int file = openConnection(&filename);
 	if(file<0){
 		return -1;
 	}
 	int fd = llopen(0, TRANSMITER);
-	printf("Sending %s\n", noStuff);
 	unsigned int sz = 0;
 	unsigned char* buffer = createControllPacket(2,filename,strlen(filename)+1,0,&sz);
 	if(buffer==NULL){
