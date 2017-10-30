@@ -267,7 +267,7 @@ unsigned char moveDataToFrames(unsigned char **frames, const unsigned char data[
         }
         else
         {
-            printf("[SUCCESS]@dataMv\tByte stuffing complete\n");
+            printf("[SUCCESS]@dataMv\tByte stuffing complete,obtained data %s\n",stuffed);
         }
         g_ctrl.allocError = 0;
         moveInformationToFrame(frames[i], stuffed, s_size);     //moves the chunk of data into the frame
