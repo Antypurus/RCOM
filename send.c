@@ -94,7 +94,7 @@ int main()
 	int fd = llopen(0, TRANSMITER);
 	unsigned int sz = 0;
 	unsigned char *buffer = createControllPacket(2, filename2, strlen(filename2) + 1, 0, &sz);
-	printf("finished creating controll packet\n");
+	printf("finished creating controll packet %d\n",sz);
 	if (buffer == NULL)
 	{
 		printf("here\n");
