@@ -69,21 +69,53 @@ int openFile(char* filename){
 
 int main()
 {
-	char noStuff[] = "Hello My Good Friend";
-	char stuff[4];
-	stuff[0] = 0x65;
-	stuff[1] = 0x7E;
-	stuff[2] = 0x7D;
-	stuff[3] = 0x65;
-
+	char filename[255] = "";
+	char buff[255];
+	int file = openConnection(filename);
+	if(file<0){
+		return -1;
+	}
 	int fd = llopen(0, TRANSMITER);
 	printf("Sending %s\n", noStuff);
-	int read = llwrite(fd, noStuff, sizeof(noStuff));
-	printf("Wrote %d\n", read);
+	unsigned int sz = 0;
+	unsigned char* buffer = createControllPacket(2,filename,strlen(filename)+1,0,&sz);
+	if(buffer==NULL){
+		llclose(fd);
+		return -1;
+	}
+	unsigned int res = llwrite(file,buffer,sz);
+	if(res!=sz){
+		llclose(fd);
+		return -1;
+	}
+	free(buffer);
+	res=255;
+	while(res!=0){
 
-	printf("Sending %s\n", stuff);
-	read = llwrite(fd, stuff, sizeof(stuff));
-	printf("Wrote %d\n", read);
+		res = read(fd,&buff,maxBytes-4);
+		buffer = createDataPacket(buff,res,&sz);
+		if(buffer==NULL){
+			llclose(fd);
+			return -1;
+		}
+		sz = llwrite(fd,buff,sz);
+		if(sz==0){
+			llclose(fd);
+			return -1;
+		}
+
+	}
+	buffer = createControllPacket(3,filename,strlen(filename)+1,0,&sz);
+	if(buffer==NULL){
+		llclose(fd);
+		return -1;
+	}
+	unsigned int res = llwrite(file,buffer,sz);
+	if(res!=sz){
+		llclose(fd);
+		return -1;
+	}
+	free(buffer);
 
 	llclose(fd);
 	return 0;
