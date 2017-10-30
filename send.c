@@ -77,7 +77,7 @@ unsigned char *createControllPacket(unsigned char startEnd, char *filename, unsi
 
 int openFile(char *filename)
 {
-	return open(filename, O_RDONLY | O_NONBLOCK);
+	return open(filename, O_RDONLY);
 }
 
 int main()
@@ -113,6 +113,7 @@ int main()
 	{
 		printf("here\n");
 		res = read(file, &buff, maxBytes - 4);
+		printf("read %d bytes from file\n",res);
 		buffer = createDataPacket(buff, res, &sz);
 		if (buffer == NULL)
 		{
