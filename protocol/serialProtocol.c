@@ -218,7 +218,7 @@ void prepareInformationFrames(unsigned char **frames, unsigned int numberFrames)
         printf("[LOG]@frameSet\tcontroll set\n");
         frames[i][3] = frames[i][1] ^ frames[i][2]; //BCC1
         printf("[LOG]@frameSet\tbcc set\n");
-        frames[i][lastByte - 1] = FLAG;             //FLAG
+        frames[i][lastByte] = FLAG;             //FLAG
         printf("[LOG]@frameSet\tend flag set\n");
         printf("[LOG]@frameSet\tfinished setting up frame %d\n", i);
     }
