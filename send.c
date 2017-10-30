@@ -54,7 +54,6 @@ unsigned char *createControllPacket(unsigned char startEnd, char *filename, unsi
 	else
 	{
 		unsigned char *buffer = (unsigned char)malloc(*sizeOfPacket);
-		printf("\n\nhere\n");
 		if (buffer == NULL)
 		{
 			printf("[ERROR]\tallocation error\n");
@@ -62,11 +61,14 @@ unsigned char *createControllPacket(unsigned char startEnd, char *filename, unsi
 		}
 		else
 		{
-			printf("here\n");
 			buffer[0] = startEnd;
+			printf("\n0\n");
 			buffer[1] = 1;
+			printf("\n1\n");
 			buffer[2] = filenameSize;
+			printf("\n2\n");
 			memcpy(&buffer[3], filename, filenameSize - 1);
+			printf("\ndata\n");
 			return buffer;
 		}
 	}
