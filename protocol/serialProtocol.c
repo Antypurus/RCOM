@@ -54,7 +54,7 @@ unsigned int allocateInformationFrames(unsigned char ***buff, const unsigned cha
         else
         {
             g_ctrl.lastFrameSize = (sizeOf + 6)*2;
-            *buff[i] = (unsigned char *)malloc(sizeof(unsigned char) * (sizeOf + 6) *2);
+            *buff[i] = (unsigned char *)malloc(sizeof(unsigned char) * (sizeOf + 6));
             printf("[LOG]@memory\tAttempting to allocate an information frame of %d bytes\n", (sizeOf + 6));
         }
 
@@ -173,7 +173,10 @@ void moveInformationToFrame(unsigned char *frame, const unsigned char data[], un
         printf("[ERROR]@movData\tData to large for a single frame\n");
         return; //The data is too big for this frame;
     }
-
+    if((size+6)>g_ctrl.lastFrameSize){
+        void* ret = realloc(frame,size+6);
+        g_ctrl.lastFrameSize=size+6;
+    }
     memmove(frame + 4, data, size); //moves the data to the data section of the frame
     printf("[LOG]@movData\tData moved to frame\n");
     return;
@@ -451,7 +454,6 @@ unsigned char *byteStuffingOnData(const unsigned char data[], unsigned int *size
         printf("[SUCCESS]@stuff\tResized the buffer\n");
     }
     *sizeOfData = postSize;
-    g_ctrl.lastFrameSize = postSize;
 
     printf("[LOG]@stuff\tFinished stuffing\n");
     return buffer[0];
