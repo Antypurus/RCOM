@@ -68,7 +68,7 @@ int main()
 			}
 			if (buf[0] == 2)
 			{
-				printf("\nhere\n")
+				printf("\nhere\n");
 				//start packet
 				strcpy(filename, &buf[3]);
 				printf("filename:%s",filename);
