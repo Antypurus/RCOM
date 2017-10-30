@@ -119,7 +119,7 @@ int main()
 			llclose(fd);
 			return -1;
 		}
-		sz = llwrite(fd, buff, sz);
+		sz = llwrite(fd, buffer, sz);
 		free(buff);
 	}
 	buffer = createControllPacket(3, filename2, strlen(filename2) + 1, 0, &sz);
