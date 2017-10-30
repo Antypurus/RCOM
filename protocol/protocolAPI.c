@@ -127,11 +127,11 @@ jmp:
                 }else{
                     printf("rr command sent\n");
                 }
-                extractDataFromFrame(data, &size);
+                unsigned char* retBuf = extractDataFromFrame(data, &size);
                 for(unsigned int i =0;i<size;++i){
-                    printf("byte %d:%d\n",size,data[i]);
+                    printf("byte %d:%d\n",size,retBuf[i]);
                 }
-                if (data == NULL)
+                if (retBuf == NULL)
                 {
                     printf("unable to extract data from frame\n");
                     return -1;
@@ -140,10 +140,10 @@ jmp:
                 {
                     printf("data extracted with size %d, destuffing\n",size);
                     for(unsigned int i =0;i<size;++i){
-                        printf("byte %d:%d\n",size,data[i]);
+                        printf("byte %d:%d\n",size,retBuf[i]);
                     }
-                    destuffData(data, &size);
-                    if (data == NULL)
+                    retBuf = destuffData(retBuf, &size);
+                    if (retBuf == NULL)
                     {
                         printf("unable to destuff data\n");
                         return -1;
@@ -154,7 +154,7 @@ jmp:
                         for(unsigned int i =0;i<size;++i){
                             printf("byte %d:%d\n",size,data[i]);
                         }
-                        *buffer = data;
+                        *buffer = retBuf;
                         return size;
                     }
                 }
