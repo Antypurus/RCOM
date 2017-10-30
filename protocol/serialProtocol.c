@@ -1176,13 +1176,14 @@ unsigned char *extractDataFromFrame(unsigned char *data, unsigned int *sizeOf)
     {
         printf("[SUCCESS]@extract\tSuccessfully allocated buffer for data\n");
     }
+    /*
     unsigned int orInd = 4;
     for(unsigned int i=0;i<sz;++i){
         printf("copying %d\n",data[orInd]);
         buff[i]=data[orInd];
         orInd++;
-    }
-    //memcpy(&buff[0],&(data[4]), sz);
+    }*/
+    memcpy(&buff[0],&(data[4]), sz);
     *sizeOf = sz;
     printf("[SUCCESS]@extract\tData Extraction Complete\n");
     return buff;
