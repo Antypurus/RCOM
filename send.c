@@ -69,7 +69,7 @@ int openFile(char* filename){
 
 int main()
 {
-	char filename[255] = "";
+	char filename[255] = "protocol/pinguim.gif";
 	char buff[255];
 	int file = openConnection(filename);
 	if(file<0){
