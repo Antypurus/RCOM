@@ -25,7 +25,7 @@ unsigned char **createDataPacket(unsigned char *data, unsigned int sizeOfData, u
 	{
 		unsigned int needed = 4 + sizeOfData;
 		*sizeOfPacket = needed;
-		unsigned char *buffer = (unsigned char)malloc(needed);
+		unsigned char *buffer = (unsigned char*)malloc(needed);
 		if (buffer == NULL)
 		{
 			printf("[ERROR]\tallocation error\n");
