@@ -9,7 +9,7 @@
 #include <fcntl.h>
 #include <string.h>
 
-#define maxBytes 99
+#define maxBytes 20
 
 unsigned int g_seq = 0;
 
