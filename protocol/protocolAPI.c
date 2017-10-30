@@ -178,7 +178,7 @@ jmp:
 int llwrite(int fd, char *buffer, int lenght)
 {
     unsigned int ret = sendData(fd, buffer, lenght);
-    if (ret != lenght)
+    if (ret < lenght)
     {
         printf("failed to send data or validate response\n");
         return -1;

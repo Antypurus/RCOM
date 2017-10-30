@@ -274,7 +274,7 @@ unsigned char moveDataToFrames(unsigned char **frames, const unsigned char data[
         printf("flag byte %d",frames[i][sizeOf-1]);
         moveInformationToFrame(frames[i], stuffed, s_size);     //moves the chunk of data into the frame
         printf("flag byte %d",frames[i][sizeOf-1]);
-        frames[i][sizeOf - 2] = calculateBCC2(info[i], s_size); //sets the BCC for the data chunk that was moved
+        frames[i][sizeOf - 2] = calculateBCC2(stuffed, s_size); //sets the BCC for the data chunk that was moved
         printf("flag byte %d",frames[i][sizeOf-1]);
         frames[i][sizeOf - 1] = FLAG; 
     }
