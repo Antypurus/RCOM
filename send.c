@@ -81,19 +81,22 @@ int main()
 	int fd = llopen(0, TRANSMITER);
 	unsigned int sz = 0;
 	unsigned char* buffer = createControllPacket(2,filename,strlen(filename)+1,0,&sz);
+	printf("here\n");
 	if(buffer==NULL){
 		llclose(fd);
 		return -1;
 	}
+	printf("here\n");
 	unsigned int res = llwrite(file,buffer,sz);
 	if(res!=sz){
 		llclose(fd);
 		return -1;
 	}
+	printf("here\n");
 	free(buffer);
 	res=255;
 	while(res!=0){
-
+		printf("here\n");
 		res = read(fd,&buff,maxBytes-4);
 		buffer = createDataPacket(buff,res,&sz);
 		if(buffer==NULL){
