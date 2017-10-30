@@ -6,6 +6,9 @@
 #include <string.h>
 #include <unistd.h>
 #include "protocol/serialProtocol.h"
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 int openFile(char*filename){
 	return open(filename,O_WRONLY);

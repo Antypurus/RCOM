@@ -4,6 +4,9 @@
 #include <termios.h>
 #include <unistd.h>
 #include "protocol/serialProtocol.h"
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 #define maxBytes 99
 
