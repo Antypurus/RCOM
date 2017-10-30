@@ -176,6 +176,8 @@ void moveInformationToFrame(unsigned char *frame, const unsigned char data[], un
     if((size+6)>g_ctrl.lastFrameSize){
         void* ret = realloc(frame,size+6);
         g_ctrl.lastFrameSize=size+6;
+    }else{
+
     }
     memmove(frame + 4, data, size); //moves the data to the data section of the frame
     printf("[LOG]@movData\tData moved to frame\n");
@@ -838,9 +840,6 @@ unsigned char sendData(unsigned int fd, const unsigned char data[], unsigned int
 
     resend:
         printf("[LOG]@dataSend\tAttempting to send data,listing each byte now\n");
-        for(unsigned int a=0;a<toSend;++a){
-            printf("[LOG]@dataSend\tByte %d:%d\n",a,frames[i][a]);
-        }
         unsigned int sent = write(fd, frames[i], toSend);
 
         if (g_ctrl.retryCounter > MAX_TIMEOUT + 1)
@@ -1428,9 +1427,6 @@ unsigned char *readSentData(unsigned int fd, unsigned int *sizeOf)
     }
 
     *sizeOf = sz;
-    for(unsigned int i=0;i<sz;++i){
-        printf("[LOG]@rcRd\tByte %d:%d\n",i,buff[i]);
-    }
     return buff;
 }
 
