@@ -53,8 +53,8 @@ unsigned int allocateInformationFrames(unsigned char ***buff, const unsigned cha
         }
         else
         {
-            g_ctrl.lastFrameSize = (sizeOf + 6); 
-            *buff[i] = (unsigned char *)malloc(sizeof(unsigned char) * (sizeOf + 6));
+            g_ctrl.lastFrameSize = (sizeOf + 6)*2;
+            *buff[i] = (unsigned char *)malloc(sizeof(unsigned char) * (sizeOf + 6) *2);
             printf("[LOG]@memory\tAttempting to allocate an information frame of %d bytes\n", (sizeOf + 6));
         }
 
@@ -271,11 +271,8 @@ unsigned char moveDataToFrames(unsigned char **frames, const unsigned char data[
             printf("[SUCCESS]@dataMv\tByte stuffing complete,obtained data %s\n",stuffed);
         }
         g_ctrl.allocError = 0;
-        printf("flag byte %d",frames[i][sizeOf-1]);
         moveInformationToFrame(frames[i], stuffed, s_size);     //moves the chunk of data into the frame
-        printf("flag byte %d",frames[i][sizeOf-1]);
-        frames[i][sizeOf - 2] = calculateBCC2(stuffed, s_size); //sets the BCC for the data chunk that was moved
-        printf("flag byte %d",frames[i][sizeOf-1]);
+        frames[i][sizeOf - 2] = calculateBCC2(info[i], s_size); //sets the BCC for the data chunk that was moved
         frames[i][sizeOf - 1] = FLAG; 
     }
     printf("[SUCCESS]@dataMv\tInformation and BCC2 have been set for the frames\n");
@@ -454,6 +451,7 @@ unsigned char *byteStuffingOnData(const unsigned char data[], unsigned int *size
         printf("[SUCCESS]@stuff\tResized the buffer\n");
     }
     *sizeOfData = postSize;
+    g_ctrl.lastFrameSize = postSize;
 
     printf("[LOG]@stuff\tFinished stuffing\n");
     return buffer[0];
