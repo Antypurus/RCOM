@@ -174,7 +174,7 @@ void moveInformationToFrame(unsigned char *frame, const unsigned char data[], un
         return; //The data is too big for this frame;
     }
     if((size+6)>g_ctrl.lastFrameSize){
-        void* ret = realloc(frame,size+6);
+        //void* ret = realloc(frame,size+6);
         g_ctrl.lastFrameSize=size+6;
     }else{
 
