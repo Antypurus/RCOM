@@ -1006,13 +1006,13 @@ unsigned char *destuffData(unsigned char *data, unsigned int *sizeOf)
             currInd++;
         }
     }
-
+    /*
     void *chk = realloc(retData, currSize);
     if (chk == NULL)
     {
         printf("[ERROR]@destuffing\tFailed to resize destuffed data buffer\n");
         return NULL;
-    }
+    }*/
 
     *sizeOf = currSize;
 
