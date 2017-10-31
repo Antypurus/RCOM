@@ -276,7 +276,7 @@ unsigned char moveDataToFrames(unsigned char **frames, const unsigned char data[
         }
         printf("[LOG]@dataMv\tMoving data:\n");
         for(unsigned int a =0;a<sizeOf;++a){
-            printf("[LOG]@dataMv\tByte %d:%d",a,info[i][a]);
+            printf("[LOG]@dataMv\tByte %d:%d\n",a,info[i][a]);
         }
 
         printf("[LOG]@dataMv\tAttempting to bytte stuff data %s\n",info[i]);
