@@ -292,7 +292,7 @@ unsigned char moveDataToFrames(unsigned char **frames, const unsigned char data[
         {
             printf("[LOG]@dataMv\tObtained Stuffed data:\n");
             for(unsigned int a =0;a<sizeOf;++a){
-                printf("[LOG]@dataMv\tByte %d:%d",a,stuffed[a]);
+                printf("[LOG]@dataMv\tByte %d:%d\n",a,stuffed[a]);
             }
             printf("[SUCCESS]@dataMv\tByte stuffing complete,obtained data %s\n",stuffed);
         }
@@ -301,11 +301,11 @@ unsigned char moveDataToFrames(unsigned char **frames, const unsigned char data[
         moveInformationToFrame(frames[i], stuffed, s_size);     //moves the chunk of data into the frame
         printf("f:%d\n",frames[i][0]);
         frames[i][sizeOf - 2] = calculateBCC2(info[i], s_size); //sets the BCC for the data chunk that was moved
-        printf("[LOG]@dataMv\tBCC2 calculated with value:%d",calculateBCC2(info[i], s_size));
+        printf("[LOG]@dataMv\tBCC2 calculated with value:%d\n",calculateBCC2(info[i], s_size));
         frames[i][sizeOf - 1] = FLAG; 
         printf("[LOG]@dataMv\tFrame to send now contains:\n");
         for(unsigned int a =0;a<sizeOf;++a){
-            printf("[LOG]@dataMv\tByte %d:%d",a,frames[i][a]);
+            printf("[LOG]@dataMv\tByte %d:%d\n",a,frames[i][a]);
         }
     }
     printf("[SUCCESS]@dataMv\tInformation and BCC2 have been set for the frames\n");
