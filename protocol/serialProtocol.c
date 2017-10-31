@@ -304,6 +304,7 @@ unsigned char moveDataToFrames(unsigned char **frames, const unsigned char data[
             }
             printf("[SUCCESS]@dataMv\tByte stuffing complete,obtained datasize %d\n",s_size);
         }
+        g_ctrl.lastFrameSize = s_size+6;
         g_ctrl.allocError = 0;
         printf("f:%d\n",frames[i][0]);
         moveInformationToFrame(frames[i], stuffed, s_size);     //moves the chunk of data into the frame
