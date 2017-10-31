@@ -304,7 +304,7 @@ unsigned char moveDataToFrames(unsigned char **frames, const unsigned char data[
             }
             printf("[SUCCESS]@dataMv\tByte stuffing complete,obtained datasize %d\n",s_size);
         }
-        g_ctrl.lastFrameSize = s_size+6;
+        g_ctrl.lastFrameSize = s_size + 6;
         g_ctrl.allocError = 0;
         printf("f:%d\n",frames[i][0]);
         moveInformationToFrame(frames[i], stuffed, s_size);     //moves the chunk of data into the frame
@@ -1367,21 +1367,9 @@ unsigned char *readSentData(unsigned int fd, unsigned int *sizeOf)
             {
                 if (rd == FLAG)
                 {
-                    sz++;
-                    res = read(fd,&rd,1);
-                    currSts = DONE_PROC;
-                    if(res==1){
-                        buff[sz] = rd;
-                        if(rd!=FLAG){
-                            printf("[ERROR]@rcRd\tFailed to read end flag\n");
-                            currSts = FLAG_STR;
-                            sz = 0;
-                            break;
-                        }else{
-                            sz++;
-                        }
-                    }
                     printf("[LOG]@rcRd\tRead end flag\n");
+                    currSts = DONE_PROC;
+                    sz++;
                 }
                 else
                 {
