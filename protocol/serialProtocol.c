@@ -186,6 +186,14 @@ void moveInformationToFrame(unsigned char *frame, const unsigned char data[], un
     }else{
 
     }
+
+    printf("[LOG]@movData\tResizing buffer to match data size\n");
+    void *check = realloc(frame,size+6);
+    if(check==NULL){
+        printf("[ERROR]@movData\tFailed to resize\n");
+        return;
+    }
+
     printf("data size %d \n",size);
     //memcpy(&frame[4], data, size); //moves the data to the data section of the frame
     unsigned int ind = 4;
