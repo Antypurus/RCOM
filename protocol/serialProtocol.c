@@ -261,6 +261,7 @@ unsigned char moveDataToFrames(unsigned char **frames, const unsigned char data[
     printf("[LOG]@dataMv\tAttempting to divide data\n");
     unsigned char **info = divideData(data, &s_size); //obtain the data divided into chunks
     printf("[LOG]@dataMv\tSmallest Data chunk is %d\n",s_size);
+    
     if (info == NULL)
     {
         printf("[ERROR]@dataMv\tFailed to split data into chunks\n");
