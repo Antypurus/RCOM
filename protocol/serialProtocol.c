@@ -1718,7 +1718,7 @@ unsigned char validateFrame(unsigned char *data, unsigned int sizeOf)
                 }
                 else
                 {
-                    printf("[ERROR]@valid\tBCC2 field is not validated\n");
+                    printf("[ERROR]@valid\tBCC2 field is not validated , Expected:%d , got:%d\n",b2,data[sizeOf - 2]);
                     return 0;
                 }
             }
