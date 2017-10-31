@@ -12,6 +12,7 @@
 #include <signal.h>
 
 unsigned int hasReceived = FALSE;
+unsigned int numberOfDivs=0;
 
 unsigned int allocateInformationFrames(unsigned char ***buff, const unsigned char data[], unsigned int sizeOf)
 {
@@ -41,7 +42,7 @@ unsigned int allocateInformationFrames(unsigned char ***buff, const unsigned cha
             if (i == (size - 1))
             {
                 double fraction = size - (sizeOf / MAX_DATA_PER_FRAME);                                //determines fraction of the max data per frame for the last frame
-                g_ctrl.lastFrameSize = sizeof(unsigned char) * MAX_FRAME_SIZE * fraction;              //saves the size of the last frame for easy acess
+                g_ctrl.lastFrameSize = sizeof(unsigned char) * MAX_DATA_PER_FRAME * fraction + 6;              //saves the size of the last frame for easy acess
                 *buff[i] = (unsigned char *)malloc(sizeof(unsigned char) * MAX_FRAME_SIZE * fraction); //allocates the frame with only the needed size
                 printf("[LOG]@memory\tAttempting to allocate an information frame of %f bytes\n", MAX_FRAME_SIZE * fraction);
             }
@@ -154,6 +155,11 @@ unsigned char **divideData(const unsigned char data[], unsigned int *sizeOf)
             memmove(buffer[i], data + str, end);
             printf("[LOG]@divData\tMoved data from range[%d,%d] to buffer\n", str, end);
             *sizeOf = *sizeOf - i * MAX_DATA_PER_FRAME;
+            void* check = realloc(buffer[i],*sizeOf);
+            fi(check==NULL){
+                printf("[ERROR]@divData\tReallocation Error\n");
+                return NULL;
+            }
         }
         else
         {
@@ -161,6 +167,7 @@ unsigned char **divideData(const unsigned char data[], unsigned int *sizeOf)
             printf("[LOG]@divData\tMoved data from range[%d,%d] to buffer\n", i * MAX_DATA_PER_FRAME, MAX_DATA_PER_FRAME);
         }
     }
+    numberOfDivs = size;
     printf("[LOG]@divData\tFinished data division process\n");
     return buffer;
 }
@@ -267,6 +274,10 @@ unsigned char moveDataToFrames(unsigned char **frames, const unsigned char data[
         {
             sizeOf = MAX_FRAME_SIZE;
         }
+        printf("[LOG]@dataMv\tMoving data:\n");
+        for(unsigned int a =0;a<sizeOf;++a){
+            printf("[LOG]@dataMv\tByte %d:%d",a,info[i][a]);
+        }
 
         printf("[LOG]@dataMv\tAttempting to bytte stuff data %s\n",info[i]);
         unsigned char *stuffed = byteStuffingOnData(info[i], &sizeOf);
@@ -279,6 +290,10 @@ unsigned char moveDataToFrames(unsigned char **frames, const unsigned char data[
         }
         else
         {
+            printf("[LOG]@dataMv\tObtained Stuffed data:\n");
+            for(unsigned int a =0;a<sizeOf;++a){
+                printf("[LOG]@dataMv\tByte %d:%d",a,stuffed[a]);
+            }
             printf("[SUCCESS]@dataMv\tByte stuffing complete,obtained data %s\n",stuffed);
         }
         g_ctrl.allocError = 0;
@@ -286,7 +301,12 @@ unsigned char moveDataToFrames(unsigned char **frames, const unsigned char data[
         moveInformationToFrame(frames[i], stuffed, s_size);     //moves the chunk of data into the frame
         printf("f:%d\n",frames[i][0]);
         frames[i][sizeOf - 2] = calculateBCC2(info[i], s_size); //sets the BCC for the data chunk that was moved
+        fprintf("[LOG]@dataMv\tBCC2 calculated with value:%d",calculateBCC2(info[i], s_size));
         frames[i][sizeOf - 1] = FLAG; 
+        printf("[LOG]@dataMv\tFrame to send now contains:\n");
+        for(unsigned int a =0;a<sizeOf;++a){
+            printf("[LOG]@dataMv\tByte %d:%d",a,frames[i][a]);
+        }
     }
     printf("[SUCCESS]@dataMv\tInformation and BCC2 have been set for the frames\n");
     return 1;
