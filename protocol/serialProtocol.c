@@ -302,7 +302,7 @@ unsigned char moveDataToFrames(unsigned char **frames, const unsigned char data[
             for(unsigned int a =0;a<sizeOf;++a){
                 printf("[LOG]@dataMv\tByte %d:%d\n",a,stuffed[a]);
             }
-            printf("[SUCCESS]@dataMv\tByte stuffing complete,obtained data %s\n",stuffed);
+            printf("[SUCCESS]@dataMv\tByte stuffing complete,obtained datasize %d\n",s_size);
         }
         g_ctrl.allocError = 0;
         printf("f:%d\n",frames[i][0]);
