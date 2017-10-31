@@ -156,7 +156,7 @@ unsigned char **divideData(const unsigned char data[], unsigned int *sizeOf)
             printf("[LOG]@divData\tMoved data from range[%d,%d] to buffer\n", str, end);
             *sizeOf = *sizeOf - i * MAX_DATA_PER_FRAME;
             void* check = realloc(buffer[i],*sizeOf);
-            fi(check==NULL){
+            if(check==NULL){
                 printf("[ERROR]@divData\tReallocation Error\n");
                 return NULL;
             }
