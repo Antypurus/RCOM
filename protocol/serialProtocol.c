@@ -261,7 +261,7 @@ unsigned char moveDataToFrames(unsigned char **frames, const unsigned char data[
     printf("[LOG]@dataMv\tAttempting to divide data\n");
     unsigned char **info = divideData(data, &s_size); //obtain the data divided into chunks
     printf("[LOG]@dataMv\tSmallest Data chunk is %d\n",s_size);
-    
+
     if (info == NULL)
     {
         printf("[ERROR]@dataMv\tFailed to split data into chunks\n");
@@ -284,13 +284,12 @@ unsigned char moveDataToFrames(unsigned char **frames, const unsigned char data[
             sizeOf = MAX_FRAME_SIZE;
         }
         printf("[LOG]@dataMv\tMoving data:\n");
-        for(unsigned int a =0;a<sizeOf;++a){
+        for(unsigned int a =0;a<s_size;++a){
             printf("[LOG]@dataMv\tByte %d:%d\n",a,info[i][a]);
         }
 
         printf("[LOG]@dataMv\tAttempting to bytte stuff data %s\n",info[i]);
-        unsigned char *stuffed = byteStuffingOnData(info[i], &sizeOf);
-        s_size = sizeOf;
+        unsigned char *stuffed = byteStuffingOnData(info[i], &s_size);
         if (stuffed == NULL)
         {
             printf("[ERROR]@dataMv\tByte stuffing failed\n");
