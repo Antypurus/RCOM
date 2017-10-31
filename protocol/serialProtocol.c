@@ -1371,7 +1371,7 @@ unsigned char *readSentData(unsigned int fd, unsigned int *sizeOf)
                     printf("[LOG]@rcRd\tRead end flag\n");
                     currSts = DONE_PROC;
                     sz++;
-                    for(unsigned int a = 4;a<sz;++a){
+                    for(unsigned int a = 4;a<sz-1;++a){
                         bcc2 = bcc2^buff[a]; 
                     }
                     if(bcc2 == FLAG){
