@@ -1367,9 +1367,16 @@ unsigned char *readSentData(unsigned int fd, unsigned int *sizeOf)
             {
                 if (rd == FLAG)
                 {
+                    unsigned char bcc2 = 0;
                     printf("[LOG]@rcRd\tRead end flag\n");
                     currSts = DONE_PROC;
                     sz++;
+                    for(unsigned int a = 4;a<sz;++a){
+                        bcc2 = bcc2^buff[a]; 
+                    }
+                    if(bcc2 == FLAG){
+                        currSts = INFO_STT;
+                    }
                 }
                 else
                 {
