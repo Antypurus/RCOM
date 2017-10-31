@@ -301,7 +301,7 @@ unsigned char moveDataToFrames(unsigned char **frames, const unsigned char data[
         moveInformationToFrame(frames[i], stuffed, s_size);     //moves the chunk of data into the frame
         printf("f:%d\n",frames[i][0]);
         frames[i][sizeOf - 2] = calculateBCC2(info[i], s_size); //sets the BCC for the data chunk that was moved
-        fprintf("[LOG]@dataMv\tBCC2 calculated with value:%d",calculateBCC2(info[i], s_size));
+        printf("[LOG]@dataMv\tBCC2 calculated with value:%d",calculateBCC2(info[i], s_size));
         frames[i][sizeOf - 1] = FLAG; 
         printf("[LOG]@dataMv\tFrame to send now contains:\n");
         for(unsigned int a =0;a<sizeOf;++a){
