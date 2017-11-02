@@ -674,6 +674,30 @@ unsigned char *getReceptorResponse(unsigned int fd)
     alarm(TIMEOUT); //sets an alarm with the timeout value , to manage connection timeouts
     while (res != 5)
     {
+		unsigned char gt;
+		alarm(TIMEOUT);
+		unsigned int ck = read(fd,&gt,1);
+		if(ck==1){
+			alarm(0);
+			printf("[LOG]@rdR\tResponse byte detected, read %d\n",gt);
+			buffer[res] = gt;
+			if(res==0 || res== 4){
+				if(gt!=FLAG){
+					res=0;
+				}
+			}
+			res++;
+			if(res==5){
+				return buffer;
+			}
+		}
+			 else
+        {
+            printf("[LOG]@rdR\tDidnt read 5 bytes, read:%d\n", res);
+            write(g_ctrl.fileDescriptor, g_ctrl.frameToSend, g_ctrl.sendSize);
+            sleep(TIMEOUT);
+        }
+		/*
         printf("[LOG]@rdR\tAttempting to read response\n");
         res = read(fd, buffer, 5);
         if (res == 5)
@@ -696,7 +720,7 @@ unsigned char *getReceptorResponse(unsigned int fd)
         { // if the connection is marked as timed out 0 is returned
             printf("[ERROR]@rdR\tFailed to read receptor response\n");
             return NULL;
-        }
+        }*/
     }
     printf("[ERROR]@rdR\tFailed to read receptor response\n");
     return NULL;
@@ -918,6 +942,11 @@ unsigned char sendData(unsigned int fd, const unsigned char data[], unsigned int
         {
             printf("[LOG]@dataSend\tObtained receptor response\n");
         }
+
+		for(unsigned int a = 0;a<5;a++){
+			printf("response byte %d:%d",a,buf[a]);		
+		}
+
 
         printf("[LOG]@dataSend\tAttempting interpret receptor response\n");
         unsigned int rez = ReceptorResponseInterpreter(buf);
