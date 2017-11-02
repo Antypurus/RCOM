@@ -688,7 +688,7 @@ unsigned char *getReceptorResponse(unsigned int fd)
         }
         else
         {
-            printf("[LOG]@rdR\tDidnt read 5 bytes, read:\n", res);
+            printf("[LOG]@rdR\tDidnt read 5 bytes, read:%d\n", res);
             write(g_ctrl.fileDescriptor, g_ctrl.frameToSend, g_ctrl.sendSize);
             sleep(TIMEOUT);
         }
