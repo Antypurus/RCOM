@@ -187,11 +187,23 @@ void moveInformationToFrame(unsigned char *frame, const unsigned char data[], un
 
     }
 
+    char keep[4];
+    keep[0] = frame[0];
+    keep[1] = frame[1];
+    keep[2] = frame[2];
+    keep[3] = frame[3];
     printf("[LOG]@movData\tResizing buffer to match data size\n");
     void *check = realloc(frame,size+6);
     if(check==NULL){
         printf("[ERROR]@movData\tFailed to resize\n");
         return;
+    }
+
+    if(frame[0]==0 || frame[1] == 0 || frame[2] == 0 || frame[3]==0){
+        frame[0] = keep[0];
+        frame[1] = keep[1];
+        frame[2] = keep[2];
+        frame[3] = keep[3];
     }
 
     printf("data size %d \n",size);
