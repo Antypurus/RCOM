@@ -167,6 +167,8 @@ jmp:
                     printf("failed to send rej command, CRITICAL ERROR!\n ");
                     llclose(fd);
                     exit(-1);
+                }else{
+                    goto jmp;
                 }
                 return -1;
             }
