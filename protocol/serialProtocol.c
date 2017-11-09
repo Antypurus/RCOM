@@ -947,7 +947,6 @@ unsigned char sendData(unsigned int fd, const unsigned char data[], unsigned int
         g_ctrl.retryCounter = 0;
 
         printf("[LOG]@dataSend\tAttempting to obtain receptor response\n");
-        reread:
         unsigned char *buf = getReceptorResponse(fd);
         if (buf == NULL)
         {
