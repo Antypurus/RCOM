@@ -10,6 +10,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <sys/time.h>
 
 int openFile(char *filename)
 {
@@ -34,11 +35,15 @@ unsigned char *extractDataFromPacket(unsigned char *data, unsigned int *sizeOfDa
 
 int main()
 {
+	struct timeval t1,t2;
+	double timeElapsed=0;
+
 	char filename[255];
 	int file;
 	char *buf = NULL;
 	int fd = llopen(0, RECEIVER);
 	int rd;
+	gettimeofday(&t1,NULL);
 	while (buf == NULL || strcmp(buf, "DC"))
 	{
 		rd = llread(fd, &buf);
@@ -85,6 +90,7 @@ int main()
 			}
 		}
 	}
+	gettimeofday(&t2,NULL);
 	if (!strcmp("DC", buf))
 	{
 		close(file);
@@ -94,5 +100,7 @@ int main()
 			printf("closed\n");
 		}
 	}
+	timeElapsed = (t2.tv_sec - t1.tv_sec)*1000.0;
+	printf("Transfer took:%fms\n",timeElapsed);
 	return 0;
 }
