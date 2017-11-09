@@ -1359,6 +1359,7 @@ unsigned char *readSentData(unsigned int fd, unsigned int *sizeOf)
                 {
                     printf("[ERROR]@rcRd\tStart Flag not read\n");
                     currSts = FLAG_STR;
+                    sendREJCommand(fd);
                     sz = 0;
                 }
                 break;
@@ -1375,6 +1376,7 @@ unsigned char *readSentData(unsigned int fd, unsigned int *sizeOf)
                 {
                     printf("[ERROR]@rcRd\tAddress byte not read\n");
                     currSts = FLAG_STR;
+                    sendREJCommand(fd);
                     sz = 0;
                 }
                 break;
@@ -1391,6 +1393,7 @@ unsigned char *readSentData(unsigned int fd, unsigned int *sizeOf)
                 {
                     printf("[LOG]@rcRd\tControll byte noy read\n");
                     currSts = FLAG_STR;
+                    sendREJCommand(fd);
                     sz = 0;
                 }
                 break;
@@ -1415,6 +1418,7 @@ unsigned char *readSentData(unsigned int fd, unsigned int *sizeOf)
                 {
                     printf("[ERROR]@rcRd\tBCC byte not validated\n");
                     currSts = FLAG_STR;
+                    sendREJCommand(fd);
                     sz = 0;
                 }
                 break;
@@ -1453,6 +1457,7 @@ unsigned char *readSentData(unsigned int fd, unsigned int *sizeOf)
                 {
                     printf("[ERROR]@rcRd\tFailed to read end flag\n");
                     currSts = FLAG_STR;
+                    sendREJCommand(fd);
                     sz = 0;
                 }
                 break;
