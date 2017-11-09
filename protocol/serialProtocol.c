@@ -14,7 +14,7 @@
 unsigned int hasReceived = FALSE;
 unsigned int numberOfDivs=0;
 
-#define FER 5;
+#define FER 5
 
 unsigned int allocateInformationFrames(unsigned char ***buff, const unsigned char data[], unsigned int sizeOf)
 {
