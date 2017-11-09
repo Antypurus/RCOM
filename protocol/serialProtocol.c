@@ -914,13 +914,14 @@ unsigned char sendData(unsigned int fd, const unsigned char data[], unsigned int
         g_ctrl.frameToSend = frames[i];
         g_ctrl.sendSize = toSend;
 
+        unsigned char keep = frames[i][5];
     resend:
         printf("[LOG]@dataSend\tAttempting to send data,listing each byte now\n");
 
-        unsigned char keep = frames[i][5];
         ctr++;
         if(FER!=0){
             if(ctr%FER==0){
+                keep = frames[i][5];
                 frames[i][5] = 423142;//random number to cause error
             }else{
                 frames[i][5] = keep;//restore the value
