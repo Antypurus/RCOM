@@ -14,6 +14,8 @@
 unsigned int hasReceived = FALSE;
 unsigned int numberOfDivs=0;
 
+#define fer 5;
+
 unsigned int allocateInformationFrames(unsigned char ***buff, const unsigned char data[], unsigned int sizeOf)
 {
     printf("[LOG]@memory\tStarting Allocation of information frames process for data of size:%d\n",sizeOf);
@@ -861,6 +863,7 @@ jump:
 //NEEDS COMMENTING
 unsigned char sendData(unsigned int fd, const unsigned char data[], unsigned int size)
 {
+    static unsigned int ctr = 0;
     printf("[LOG]@dataSend\tStarting data sending proccess\n");
     signal(SIGALRM, timeoutHandler);
     g_ctrl.retryCounter = 0;
@@ -913,6 +916,17 @@ unsigned char sendData(unsigned int fd, const unsigned char data[], unsigned int
 
     resend:
         printf("[LOG]@dataSend\tAttempting to send data,listing each byte now\n");
+
+        unsigned char keep = frames[i][5];
+        ctr++;
+        if(FER!=0){
+            if(ctr%FER==0){
+                frames[i][5] = 423142;//random number to cause error
+            }else{
+                frames[i][5] = keep;//restore the value
+            }
+        }
+
         unsigned int sent = write(fd, frames[i], g_ctrl.lastFrameSize);
 
         if (g_ctrl.retryCounter > MAX_TIMEOUT + 1)
